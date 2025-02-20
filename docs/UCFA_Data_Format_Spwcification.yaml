@@ -1,0 +1,58 @@
+# UCFA Data Format Specification
+# This YAML defines the file specification for UniversalCameraworkFrameArray.
+# All multi-byte values are encoded in little-endian.
+
+Header:
+  # 4 bytes: Signature "UCFA" (UniversalCameraworkFrameArray)
+  signature: "UCFA"
+  
+  # Version information (1 byte each)
+  version:
+    major: uint8_t       # 1 byte: Major Version
+    minor: uint8_t       # 1 byte: Minor Version
+  
+  # Reserved area: 18 bytes reserved to make the entire header 32 bytes
+  reserved: uint8_t[18]
+  
+  # 4 bytes: Total number of data records
+  recordCount: uint32_t
+  
+  # 4 bytes: Checksum for the entire file (CRC-32)
+  # CRC-32 settings:
+  #   - Polynomial: 0xEDB88320
+  #   - InitialValue: 0xFFFFFFFF
+  #   - FinalXORValue: 0xFFFFFFFF
+  checksum: uint32_t
+
+Record:
+  # Structure of each fixed-length data record
+  commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
+  timecode: Timecode         # Timecode information (bit allocations defined elsewhere)
+  packetNo: uint8_t          # Packet number
+  
+  # Camera position and orientation (units: meters or as appropriate)
+  eyePosition_right_m: float
+  eyePosition_up_m: float
+  eyePosition_forward_m: float
+  lookVector_right_m: float
+  lookVector_up_m: float
+  lookVector_forward_m: float
+  upVector_right_m: float
+  upVector_up_m: float
+  upVector_forward_m: float
+  
+  # Camera parameters
+  focalLength_mm: float
+  aspectRatio: float
+  focusDistance_m: float
+  aperture: float
+  sensorSize_width_mm: float
+  sensorSize_height_mm: float
+  nearClip_m: float
+  farClip_m: float
+  lensShift_horizontal_ratio: float
+  lensShift_vertical_ratio: float
+  lensDistortion_RadialCoefficients_k1: float
+  lensDistortion_RadialCoefficients_k2: float
+  lensDistortion_CenterPoint_right_mm: float
+  lensDistortion_CenterPoint_up_mm: float
