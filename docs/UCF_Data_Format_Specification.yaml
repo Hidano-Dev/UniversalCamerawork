@@ -1,8 +1,8 @@
-# UCP Data format
+# UCF Data Format Specification
 # This YAML file defines the data format for frame information in UniversalCameraworkProtocol(UCP).
 # All multi-byte values are encoded in little-endian.
 
-uint64_t: header       #0-2byte:ID(UCP=0x55 0x43 0x50) 3byte:MajorVersion 4byte:MinorVersion 5-7byte:ReservedArea
+uint64_t: header       #0-2byte:ID(UCF=0x55 0x43 0x46) 3byte:MajorVersion 4byte:MinorVersion 5-7byte:ReservedArea
 uint16_t: commands     #DOF_ENABLE = 0x04 LENS_DISTORTION_ENABLE = 0x08
 Timecode: timecode     #0-6bit:FrameNumber 7-12bit:SecondNumber 13-18bit:MinuteNumber 19-23bit:HourNumber
 uint8_t: packetNo
