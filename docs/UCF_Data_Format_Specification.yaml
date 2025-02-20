@@ -1,32 +1,49 @@
 # UCF Data Format Specification
-# This YAML file defines the data format for frame information in UniversalCameraworkProtocol(UCP).
+# This YAML file defines the data format for frame information in UniversalCameraworkProtocol (UCP).
 # All multi-byte values are encoded in little-endian.
 
-uint64_t: header       #0-2byte:ID(UCF=0x55 0x43 0x46) 3byte:MajorVersion 4byte:MinorVersion 5-7byte:ReservedArea
-uint16_t: commands     #DOF_ENABLE = 0x04 LENS_DISTORTION_ENABLE = 0x08
-Timecode: timecode     #0-6bit:FrameNumber 7-12bit:SecondNumber 13-18bit:MinuteNumber 19-23bit:HourNumber
-uint8_t: packetNo
-float: eyePosition_right_m
-float: eyePosition_up_m
-float: eyePosition_forward_m
-float: lookVector_right_m
-float: lookVector_up_m
-float: lookVector_forward_m
-float: upVector_right_m
-float: upVector_up_m
-float: upVector_forward_m
-float: focalLength_mm
-float: aspectRatio
-float: focusDistance_m
-float: aperture
-float: sensorSize_width_mm
-float: sensorSize_height_mm
-float: nearClip_m
-float: farClip_m
-float: lensShift_horizontal_ratio
-float: lensShift_vertical_ratio
-float: lensDistortion_RadialCoefficients_k1
-float: lensDistortion_RadialCoefficients_k2
-float: lensDistortion_CenterPoint_right_mm
-float: lensDistortion_CenterPoint_up_mm
-uint32_t: checksum     #CRC-32 Polynomial:0xEDB88320 InitialValue:0xFFFFFFFF FinalXORValue:0xFFFFFFFF
+Header:
+  # 8 bytes: Header structure
+  signature: "UCF"             # 3 bytes: ID ("UCF" represented as 0x55, 0x43, 0x46)
+  version:
+    major: uint8_t           # 1 byte: Major Version
+    minor: uint8_t           # 1 byte: Minor Version
+  reserved: uint8_t[3]        # 3 bytes: Reserved area to complete the header
+
+Record:
+  # Structure of each fixed-length data record
+  commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
+  timecode: Timecode         # Timecode information 
+                             # Bit allocation: 0-6bit: FrameNumber, 7-12bit: SecondNumber, 13-18bit: MinuteNumber, 19-23bit: HourNumber
+  packetNo: uint8_t          # Packet number
+  eyePosition_right_m: float
+  eyePosition_up_m: float
+  eyePosition_forward_m: float
+  lookVector_right_m: float
+  lookVector_up_m: float
+  lookVector_forward_m: float
+  upVector_right_m: float
+  upVector_up_m: float
+  upVector_forward_m: float
+  focalLength_mm: float
+  aspectRatio: float
+  focusDistance_m: float
+  aperture: float
+  sensorSize_width_mm: float
+  sensorSize_height_mm: float
+  nearClip_m: float
+  farClip_m: float
+  lensShift_horizontal_ratio: float
+  lensShift_vertical_ratio: float
+  lensDistortion_RadialCoefficients_k1: float
+  lensDistortion_RadialCoefficients_k2: float
+  lensDistortion_CenterPoint_right_mm: float
+  lensDistortion_CenterPoint_up_mm: float
+
+Footer:
+  # 4 bytes: Checksum for the entire file (CRC-32)
+  # CRC-32 settings:
+  #   - Polynomial: 0xEDB88320
+  #   - InitialValue: 0xFFFFFFFF
+  #   - FinalXORValue: 0xFFFFFFFF
+  checksum: uint32_t
