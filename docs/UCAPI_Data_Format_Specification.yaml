@@ -1,10 +1,10 @@
-# UCP Data Format Specification
-# This YAML defines the file specification for UniversalCameraworkProtocol.
+# UCAPI Data Format Specification
+# This YAML defines the file specification for UniversalCameraworkAPI.
 # All multi-byte values are encoded in little-endian.
 
 Header:
-  # 3 bytes: Signature "UCP" (UniversalCameraworkProtocol)
-  signature: "UCP"
+  # 3 bytes: Signature "UCAPI" (UniversalCameraworkAPI)
+  signature: "UCAPI"
   
   # Version information (1 byte each)
   version:
@@ -56,3 +56,7 @@ Record:
   lensDistortion_RadialCoefficients_k2: float
   lensDistortion_CenterPoint_right_mm: float
   lensDistortion_CenterPoint_up_mm: float
+
+  # Reserved area: 29 bytes reserved to make the entire header 128 bytes
+  reserved: uint8_t[29]
+  
