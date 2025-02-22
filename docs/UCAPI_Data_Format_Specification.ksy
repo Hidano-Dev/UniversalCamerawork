@@ -90,17 +90,12 @@ types:
   timecode:
     seq:
       - id: frame_number
-        type: u1
-        bit_size: 7
+        type: b7
       - id: second_number
-        type: u1
-        bit_size: 6
+        type: b6
       - id: minute_number
-        type: u1
-        bit_size: 6
+        type: b6
       - id: hour_number
-        type: u1
-        bit_size: 5
+        type: b5
       - id: reserved
-        type: u1
-        bit_size: 8
+        type: b8
