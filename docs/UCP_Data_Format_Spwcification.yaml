@@ -1,10 +1,10 @@
-# UCFA Data Format Specification
-# This YAML defines the file specification for UniversalCameraworkFrameArray.
+# UCP Data Format Specification
+# This YAML defines the file specification for UniversalCameraworkProtocol.
 # All multi-byte values are encoded in little-endian.
 
 Header:
-  # 4 bytes: Signature "UCFA" (UniversalCameraworkFrameArray)
-  signature: "UCFA"
+  # 3 bytes: Signature "UCP" (UniversalCameraworkProtocol)
+  signature: "UCP"
   
   # Version information (1 byte each)
   version:
