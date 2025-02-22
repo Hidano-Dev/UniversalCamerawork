@@ -1,6 +1,6 @@
 meta:
-  id: ucp
-  file-extension: ucp
+  id: ucapi
+  file-extension: ucapi
   endian: le
 seq:
   - id: header
