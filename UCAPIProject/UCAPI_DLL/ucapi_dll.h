@@ -54,6 +54,12 @@ extern "C" {
     /// <param name="obj">Pointer to the UCAPI_DllObject to free.</param>
     UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj);
 
+    /// <summary>
+    /// Creates a new default UCAPI object for serialization.
+    /// </summary>
+    /// <returns>Pointer to a new UCAPI object, or nullptr on failure.</returns>
+    UCAPI_API void* UCAPI_CreateDefault();
+
 #ifdef __cplusplus
 }
 #endif
