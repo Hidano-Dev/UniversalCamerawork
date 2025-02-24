@@ -64,7 +64,7 @@ void ucapi_serialization_t::header_t::_read() {
     m_version_major = m__io->read_u1();
     m_version_minor = m__io->read_u1();
     m_reserved = new std::vector<uint8_t>();
-    const int l_reserved = 18;
+    const int l_reserved = 17;
     for (int i = 0; i < l_reserved; i++) {
         m_reserved->push_back(m__io->read_u1());
     }

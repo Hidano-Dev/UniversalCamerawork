@@ -11,8 +11,8 @@ Header:
     major: uint8_t       # 1 byte: Major Version
     minor: uint8_t       # 1 byte: Minor Version
   
-  # Reserved area: 18 bytes reserved to make the entire header 32 bytes
-  reserved: uint8_t[18]
+  # Reserved area: 17 bytes reserved to make the entire header 32 bytes
+  reserved: uint8_t[17]
   
   # 4 bytes: Total number of data records
   recordCount: uint32_t

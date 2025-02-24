@@ -22,7 +22,7 @@ types:
       - id: reserved
         type: u1
         repeat: expr
-        repeat-expr: 18
+        repeat-expr: 17
       - id: record_count
         type: u4
       - id: checksum

@@ -58,7 +58,7 @@ void write_ucapi_header(const ucapi_serialization_t::header_t* header, std::ostr
     // Write version information (1 byte each)
     write_u1(os, header->version_major());
     write_u1(os, header->version_minor());
-    // Write reserved 18 bytes
+    // Write reserved 17 bytes
     const std::vector<uint8_t>* reserved = header->reserved();
     for (size_t i = 0; i < reserved->size(); i++) {
         write_u1(os, reserved->at(i));

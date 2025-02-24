@@ -101,7 +101,7 @@ extern "C" UCAPI_API void* UCAPI_CreateDefault() {
         // According to the specification:
         // - Signature: 5 bytes ("UCAPI")
         // - Version: 2 bytes (major, minor)
-        // - Reserved: 18 bytes (zero-filled)
+        // - Reserved: 17 bytes (zero-filled)
         // - Record count: 4 bytes (little-endian, here 0)
         // - Checksum: 4 bytes (little-endian, here 0)
         std::string defaultData;
@@ -110,8 +110,8 @@ extern "C" UCAPI_API void* UCAPI_CreateDefault() {
         // Append version: major=1, minor=0
         defaultData.push_back(1);
         defaultData.push_back(0);
-        // Append 18 reserved bytes (all zero)
-        defaultData.append(18, '\0');
+        // Append 17 reserved bytes (all zero)
+        defaultData.append(17, '\0');
         // Append record count (0, 4 bytes little-endian)
         defaultData.append(4, '\0');
         // Append checksum (0, 4 bytes little-endian)
