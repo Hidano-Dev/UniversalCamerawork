@@ -1,9 +1,9 @@
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-#include "ucapi.h"
+#include "ucapi_deserialization.h"
 #include "kaitai/exceptions.h"
 
-ucapi_t::ucapi_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent, ucapi_t* p__root) : kaitai::kstruct(p__io) {
+ucapi_serialization_t::ucapi_serialization_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent, ucapi_serialization_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
     m__root = this;
     m_header = 0;
@@ -17,7 +17,7 @@ ucapi_t::ucapi_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent, ucapi_t* p_
     }
 }
 
-void ucapi_t::_read() {
+void ucapi_serialization_t::_read() {
     m_header = new header_t(m__io, this, m__root);
     m_records = new std::vector<record_t*>();
     const int l_records = header()->record_count();
@@ -26,11 +26,11 @@ void ucapi_t::_read() {
     }
 }
 
-ucapi_t::~ucapi_t() {
+ucapi_serialization_t::~ucapi_serialization_t() {
     _clean_up();
 }
 
-void ucapi_t::_clean_up() {
+void ucapi_serialization_t::_clean_up() {
     if (m_header) {
         delete m_header; m_header = 0;
     }
@@ -42,7 +42,7 @@ void ucapi_t::_clean_up() {
     }
 }
 
-ucapi_t::header_t::header_t(kaitai::kstream* p__io, ucapi_t* p__parent, ucapi_t* p__root) : kaitai::kstruct(p__io) {
+ucapi_serialization_t::header_t::header_t(kaitai::kstream* p__io, ucapi_serialization_t* p__parent, ucapi_serialization_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
     m__root = p__root;
     m_reserved = 0;
@@ -55,7 +55,7 @@ ucapi_t::header_t::header_t(kaitai::kstream* p__io, ucapi_t* p__parent, ucapi_t*
     }
 }
 
-void ucapi_t::header_t::_read() {
+void ucapi_serialization_t::header_t::_read() {
     m_signature = m__io->read_bytes(5);
     if (!(signature() == std::string("\x55\x43\x41\x50\x49", 5))) {
         throw kaitai::validation_not_equal_error<std::string>(std::string("\x55\x43\x41\x50\x49", 5), signature(), _io(), std::string("/types/header/seq/0"));
@@ -71,17 +71,17 @@ void ucapi_t::header_t::_read() {
     m_checksum = m__io->read_u4le();
 }
 
-ucapi_t::header_t::~header_t() {
+ucapi_serialization_t::header_t::~header_t() {
     _clean_up();
 }
 
-void ucapi_t::header_t::_clean_up() {
+void ucapi_serialization_t::header_t::_clean_up() {
     if (m_reserved) {
         delete m_reserved; m_reserved = 0;
     }
 }
 
-ucapi_t::record_t::record_t(kaitai::kstream* p__io, ucapi_t* p__parent, ucapi_t* p__root) : kaitai::kstruct(p__io) {
+ucapi_serialization_t::record_t::record_t(kaitai::kstream* p__io, ucapi_serialization_t* p__parent, ucapi_serialization_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
     m__root = p__root;
     m_timecode = 0;
@@ -95,7 +95,7 @@ ucapi_t::record_t::record_t(kaitai::kstream* p__io, ucapi_t* p__parent, ucapi_t*
     }
 }
 
-void ucapi_t::record_t::_read() {
+void ucapi_serialization_t::record_t::_read() {
     m_commands = m__io->read_u2le();
     m_timecode = new timecode_t(m__io, this, m__root);
     m_packet_no = m__io->read_u1();
@@ -129,11 +129,11 @@ void ucapi_t::record_t::_read() {
     }
 }
 
-ucapi_t::record_t::~record_t() {
+ucapi_serialization_t::record_t::~record_t() {
     _clean_up();
 }
 
-void ucapi_t::record_t::_clean_up() {
+void ucapi_serialization_t::record_t::_clean_up() {
     if (m_timecode) {
         delete m_timecode; m_timecode = 0;
     }
@@ -142,7 +142,7 @@ void ucapi_t::record_t::_clean_up() {
     }
 }
 
-ucapi_t::timecode_t::timecode_t(kaitai::kstream* p__io, ucapi_t::record_t* p__parent, ucapi_t* p__root) : kaitai::kstruct(p__io) {
+ucapi_serialization_t::timecode_t::timecode_t(kaitai::kstream* p__io, ucapi_serialization_t::record_t* p__parent, ucapi_serialization_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
     m__root = p__root;
 
@@ -154,7 +154,7 @@ ucapi_t::timecode_t::timecode_t(kaitai::kstream* p__io, ucapi_t::record_t* p__pa
     }
 }
 
-void ucapi_t::timecode_t::_read() {
+void ucapi_serialization_t::timecode_t::_read() {
     m_frame_number = m__io->read_bits_int_be(7);
     m_second_number = m__io->read_bits_int_be(6);
     m_minute_number = m__io->read_bits_int_be(6);
@@ -162,9 +162,9 @@ void ucapi_t::timecode_t::_read() {
     m_reserved = m__io->read_bits_int_be(8);
 }
 
-ucapi_t::timecode_t::~timecode_t() {
+ucapi_serialization_t::timecode_t::~timecode_t() {
     _clean_up();
 }
 
-void ucapi_t::timecode_t::_clean_up() {
+void ucapi_serialization_t::timecode_t::_clean_up() {
 }

@@ -11,27 +11,27 @@
 #error "Incompatible Kaitai Struct C++/STL API: version 0.9 or later is required"
 #endif
 
-class ucapi_t : public kaitai::kstruct {
+class ucapi_serialization_t : public kaitai::kstruct {
 
 public:
     class header_t;
     class record_t;
     class timecode_t;
 
-    ucapi_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = 0, ucapi_t* p__root = 0);
+    ucapi_serialization_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = 0, ucapi_serialization_t* p__root = 0);
 
 private:
     void _read();
     void _clean_up();
 
 public:
-    ~ucapi_t();
+    ~ucapi_serialization_t();
 
     class header_t : public kaitai::kstruct {
 
     public:
 
-        header_t(kaitai::kstream* p__io, ucapi_t* p__parent = 0, ucapi_t* p__root = 0);
+        header_t(kaitai::kstream* p__io, ucapi_serialization_t* p__parent = 0, ucapi_serialization_t* p__root = 0);
 
     private:
         void _read();
@@ -47,8 +47,8 @@ public:
         std::vector<uint8_t>* m_reserved;
         uint32_t m_record_count;
         uint32_t m_checksum;
-        ucapi_t* m__root;
-        ucapi_t* m__parent;
+        ucapi_serialization_t* m__root;
+        ucapi_serialization_t* m__parent;
 
     public:
         std::string signature() const { return m_signature; }
@@ -57,15 +57,15 @@ public:
         std::vector<uint8_t>* reserved() const { return m_reserved; }
         uint32_t record_count() const { return m_record_count; }
         uint32_t checksum() const { return m_checksum; }
-        ucapi_t* _root() const { return m__root; }
-        ucapi_t* _parent() const { return m__parent; }
+        ucapi_serialization_t* _root() const { return m__root; }
+        ucapi_serialization_t* _parent() const { return m__parent; }
     };
 
     class record_t : public kaitai::kstruct {
 
     public:
 
-        record_t(kaitai::kstream* p__io, ucapi_t* p__parent = 0, ucapi_t* p__root = 0);
+        record_t(kaitai::kstream* p__io, ucapi_serialization_t* p__parent = 0, ucapi_serialization_t* p__root = 0);
 
     private:
         void _read();
@@ -102,8 +102,8 @@ public:
         float m_lens_distortion_center_point_right_mm;
         float m_lens_distortion_center_point_up_mm;
         std::vector<uint8_t>* m_reserved;
-        ucapi_t* m__root;
-        ucapi_t* m__parent;
+        ucapi_serialization_t* m__root;
+        ucapi_serialization_t* m__parent;
 
     public:
         uint16_t commands() const { return m_commands; }
@@ -133,15 +133,15 @@ public:
         float lens_distortion_center_point_right_mm() const { return m_lens_distortion_center_point_right_mm; }
         float lens_distortion_center_point_up_mm() const { return m_lens_distortion_center_point_up_mm; }
         std::vector<uint8_t>* reserved() const { return m_reserved; }
-        ucapi_t* _root() const { return m__root; }
-        ucapi_t* _parent() const { return m__parent; }
+        ucapi_serialization_t* _root() const { return m__root; }
+        ucapi_serialization_t* _parent() const { return m__parent; }
     };
 
     class timecode_t : public kaitai::kstruct {
 
     public:
 
-        timecode_t(kaitai::kstream* p__io, ucapi_t::record_t* p__parent = 0, ucapi_t* p__root = 0);
+        timecode_t(kaitai::kstream* p__io, ucapi_serialization_t::record_t* p__parent = 0, ucapi_serialization_t* p__root = 0);
 
     private:
         void _read();
@@ -156,8 +156,8 @@ public:
         uint64_t m_minute_number;
         uint64_t m_hour_number;
         uint64_t m_reserved;
-        ucapi_t* m__root;
-        ucapi_t::record_t* m__parent;
+        ucapi_serialization_t* m__root;
+        ucapi_serialization_t::record_t* m__parent;
 
     public:
         uint64_t frame_number() const { return m_frame_number; }
@@ -165,20 +165,20 @@ public:
         uint64_t minute_number() const { return m_minute_number; }
         uint64_t hour_number() const { return m_hour_number; }
         uint64_t reserved() const { return m_reserved; }
-        ucapi_t* _root() const { return m__root; }
-        ucapi_t::record_t* _parent() const { return m__parent; }
+        ucapi_serialization_t* _root() const { return m__root; }
+        ucapi_serialization_t::record_t* _parent() const { return m__parent; }
     };
 
 private:
     header_t* m_header;
     std::vector<record_t*>* m_records;
-    ucapi_t* m__root;
+    ucapi_serialization_t* m__root;
     kaitai::kstruct* m__parent;
 
 public:
     header_t* header() const { return m_header; }
     std::vector<record_t*>* records() const { return m_records; }
-    ucapi_t* _root() const { return m__root; }
+    ucapi_serialization_t* _root() const { return m__root; }
     kaitai::kstruct* _parent() const { return m__parent; }
 };
 

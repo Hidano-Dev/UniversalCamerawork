@@ -51,7 +51,7 @@ namespace {
 
 }  // namespace
 
-void write_ucapi_header(const ucapi_t::header_t* header, std::ostream& os) {
+void write_ucapi_header(const ucapi_serialization_t::header_t* header, std::ostream& os) {
     // Write the 5-byte signature (e.g. "UCAPI")
     write_bytes(os, header->signature().data(), 5);
     // Write version information (1 byte each)
@@ -68,7 +68,7 @@ void write_ucapi_header(const ucapi_t::header_t* header, std::ostream& os) {
     write_u4le(os, header->checksum());
 }
 
-void write_ucapi_timecode(const ucapi_t::timecode_t* timecode, std::ostream& os) {
+void write_ucapi_timecode(const ucapi_serialization_t::timecode_t* timecode, std::ostream& os) {
     // Pack the timecode fields into a 32-bit integer.
     // Field sizes: frame_number (7 bits), second_number (6 bits),
     // minute_number (6 bits), hour_number (5 bits), reserved (8 bits)
@@ -87,7 +87,7 @@ void write_ucapi_timecode(const ucapi_t::timecode_t* timecode, std::ostream& os)
     os.write(reinterpret_cast<const char*>(b), sizeof(b));
 }
 
-void write_ucapi_record(const ucapi_t::record_t* record, std::ostream& os) {
+void write_ucapi_record(const ucapi_serialization_t::record_t* record, std::ostream& os) {
     // Write commands (2 bytes, little-endian)
     write_u2le(os, record->commands());
     // Write nested timecode structure
@@ -125,11 +125,11 @@ void write_ucapi_record(const ucapi_t::record_t* record, std::ostream& os) {
     }
 }
 
-void write_ucapi(const ucapi_t* ucapi, std::ostream& os) {
+void write_ucapi(const ucapi_serialization_t* ucapi, std::ostream& os) {
     // Write header first
     write_ucapi_header(ucapi->header(), os);
     // Write each record (the number of records is given by header->record_count())
-    const std::vector<ucapi_t::record_t*>* records = ucapi->records();
+    const std::vector<ucapi_serialization_t::record_t*>* records = ucapi->records();
     for (size_t i = 0; i < records->size(); i++) {
         write_ucapi_record(records->at(i), os);
     }
