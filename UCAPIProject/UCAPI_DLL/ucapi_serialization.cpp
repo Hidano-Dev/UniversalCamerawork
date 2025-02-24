@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ucapi_serialization.h"
 #include <cstring>  // for memcpy
 
