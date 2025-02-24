@@ -49,7 +49,7 @@ extern "C" {
     UCAPI_API UCAPI_DllObject* UCAPI_Deserialize(const uint8_t* inBuffer, size_t inSize);
 
     /// <summary>
-    /// Frees the UCAPI object created by UCAPI_Deserialize.
+    /// Frees the UCAPI object created by UCAPI_Deserialize or UCAPI_CreateDefault.
     /// </summary>
     /// <param name="obj">Pointer to the UCAPI_DllObject to free.</param>
     UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj);
@@ -57,8 +57,8 @@ extern "C" {
     /// <summary>
     /// Creates a new default UCAPI object for serialization.
     /// </summary>
-    /// <returns>Pointer to a new UCAPI object, or nullptr on failure.</returns>
-    UCAPI_API void* UCAPI_CreateDefault();
+    /// <returns>Pointer to a new UCAPI_DllObject, or nullptr on failure.</returns>
+    UCAPI_API UCAPI_DllObject* UCAPI_CreateDefault();
 
 #ifdef __cplusplus
 }

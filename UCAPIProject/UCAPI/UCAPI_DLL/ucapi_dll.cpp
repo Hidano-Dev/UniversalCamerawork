@@ -24,7 +24,8 @@ struct UCAPI_DllObject {
 extern "C" UCAPI_API int UCAPI_Serialize(const void* ucapi, uint8_t** outBuffer, size_t* outSize) {
     try {
         // Cast the input pointer to the UCAPI object type.
-        const ucapi_serialization_t* ucapiObj = reinterpret_cast<const ucapi_serialization_t*>(ucapi);
+		const UCAPI_DllObject* handle = reinterpret_cast<const UCAPI_DllObject*>(ucapi);
+		const ucapi_serialization_t* ucapiObj = handle->obj;
         // Create an output stream in binary mode.
         std::ostringstream oss(std::ios::binary);
         // Serialize the UCAPI object into the stream.
@@ -92,10 +93,10 @@ extern "C" UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj) {
 }
 
 /// <summary>
-/// Creates a new default UCAPI object for serialization with at least one record.
+/// Creates a new default UCAPI object for serialization wrapped in a UCAPI_DllObject.
 /// </summary>
-/// <returns>Pointer to a new UCAPI object, or nullptr on failure.</returns>
-extern "C" UCAPI_API void* UCAPI_CreateDefault() {
+/// <returns>Pointer to a new UCAPI_DllObject, or nullptr on failure.</returns>
+extern "C" UCAPI_API UCAPI_DllObject* UCAPI_CreateDefault() {
     try {
         // Create a binary string that satisfies the UCAPI header specification with at least one record.
         // According to the specification:
@@ -127,7 +128,11 @@ extern "C" UCAPI_API void* UCAPI_CreateDefault() {
         kaitai::kstream* ks = new kaitai::kstream(defaultData);
         // Use the deserialization constructor to create a new UCAPI object.
         ucapi_serialization_t* obj = new ucapi_serialization_t(ks);
-        return reinterpret_cast<void*>(obj);
+        // Allocate and initialize the wrapper.
+        UCAPI_DllObject* wrapper = new UCAPI_DllObject;
+        wrapper->obj = obj;
+        wrapper->ks = ks;
+        return wrapper;
     }
     catch (const std::exception&) {
         return nullptr;
