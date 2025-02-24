@@ -92,18 +92,19 @@ extern "C" UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj) {
 }
 
 /// <summary>
-/// Creates a new default UCAPI object for serialization.
+/// Creates a new default UCAPI object for serialization with at least one record.
 /// </summary>
 /// <returns>Pointer to a new UCAPI object, or nullptr on failure.</returns>
 extern "C" UCAPI_API void* UCAPI_CreateDefault() {
     try {
-        // Create a binary string that satisfies the UCAPI header specification.
+        // Create a binary string that satisfies the UCAPI header specification with at least one record.
         // According to the specification:
         // - Signature: 5 bytes ("UCAPI")
         // - Version: 2 bytes (major, minor)
         // - Reserved: 17 bytes (zero-filled)
-        // - Record count: 4 bytes (little-endian, here 0)
+        // - Record count: 4 bytes (little-endian, here set to 1)
         // - Checksum: 4 bytes (little-endian, here 0)
+        // Then one record of 128 bytes (zero-filled) is appended.
         std::string defaultData;
         // Append signature ("UCAPI")
         defaultData.append("UCAPI", 5);
@@ -112,10 +113,15 @@ extern "C" UCAPI_API void* UCAPI_CreateDefault() {
         defaultData.push_back(0);
         // Append 17 reserved bytes (all zero)
         defaultData.append(17, '\0');
-        // Append record count (0, 4 bytes little-endian)
-        defaultData.append(4, '\0');
+        // Append record count (1, 4 bytes little-endian: 0x01, 0x00, 0x00, 0x00)
+        defaultData.push_back(1);
+        defaultData.push_back(0);
+        defaultData.push_back(0);
+        defaultData.push_back(0);
         // Append checksum (0, 4 bytes little-endian)
         defaultData.append(4, '\0');
+        // Append one default record (128 bytes, zero-filled)
+        defaultData.append(128, '\0');
 
         // Create a new kaitai::kstream from the binary string.
         kaitai::kstream* ks = new kaitai::kstream(defaultData);
