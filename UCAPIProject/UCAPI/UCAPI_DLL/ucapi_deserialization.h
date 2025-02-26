@@ -75,6 +75,7 @@ public:
         ~record_t();
 
     private:
+		uint32_t m_camera_no;
         uint16_t m_commands;
         timecode_t* m_timecode;
         uint8_t m_packet_no;
@@ -106,6 +107,7 @@ public:
         ucapi_serialization_t* m__parent;
 
     public:
+		uint32_t camera_no() const { return m_camera_no; }
         uint16_t commands() const { return m_commands; }
         timecode_t* timecode() const { return m_timecode; }
         uint8_t packet_no() const { return m_packet_no; }

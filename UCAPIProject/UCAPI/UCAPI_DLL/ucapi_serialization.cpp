@@ -89,6 +89,8 @@ void write_ucapi_timecode(const ucapi_serialization_t::timecode_t* timecode, std
 }
 
 void write_ucapi_record(const ucapi_serialization_t::record_t* record, std::ostream& os) {
+	// Write camera number (4 bytes, little-endian)
+	write_u4le(os, record->camera_no());
     // Write commands (2 bytes, little-endian)
     write_u2le(os, record->commands());
     // Write nested timecode structure
@@ -119,7 +121,7 @@ void write_ucapi_record(const ucapi_serialization_t::record_t* record, std::ostr
     write_f4le(os, record->lens_distortion_radial_coefficients_k2());
     write_f4le(os, record->lens_distortion_center_point_right_mm());
     write_f4le(os, record->lens_distortion_center_point_up_mm());
-    // Write reserved 29 bytes
+    // Write reserved 25 bytes
     const std::vector<uint8_t>* reserved = record->reserved();
     for (size_t i = 0; i < reserved->size(); i++) {
         write_u1(os, reserved->at(i));

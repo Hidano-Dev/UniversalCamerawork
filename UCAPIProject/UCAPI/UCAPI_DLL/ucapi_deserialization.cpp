@@ -97,6 +97,7 @@ ucapi_serialization_t::record_t::record_t(kaitai::kstream* p__io, ucapi_serializ
 }
 
 void ucapi_serialization_t::record_t::_read() {
+	m_camera_no = m__io->read_u4le();
     m_commands = m__io->read_u2le();
     m_timecode = new timecode_t(m__io, this, m__root);
     m_packet_no = m__io->read_u1();
@@ -124,7 +125,7 @@ void ucapi_serialization_t::record_t::_read() {
     m_lens_distortion_center_point_right_mm = m__io->read_f4le();
     m_lens_distortion_center_point_up_mm = m__io->read_f4le();
     m_reserved = new std::vector<uint8_t>();
-    const int l_reserved = 29;
+    const int l_reserved = 25;
     for (int i = 0; i < l_reserved; i++) {
         m_reserved->push_back(m__io->read_u1());
     }

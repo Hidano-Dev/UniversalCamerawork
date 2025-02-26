@@ -26,6 +26,7 @@ Header:
 
 Record:
   # Structure of each fixed-length data record
+  cameraNo: uint32_t         # Camera number
   commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
   timecode: Timecode         # Timecode information (bit allocations defined elsewhere)
   packetNo: uint8_t          # Packet number
@@ -57,6 +58,6 @@ Record:
   lensDistortion_CenterPoint_right_mm: float
   lensDistortion_CenterPoint_up_mm: float
 
-  # Reserved area: 29 bytes reserved to make the entire header 128 bytes
-  reserved: uint8_t[29]
+  # Reserved area: 25 bytes reserved to make the entire header 128 bytes
+  reserved: uint8_t[25]
   

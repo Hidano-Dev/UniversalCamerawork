@@ -30,6 +30,8 @@ types:
 
   record:
     seq:
+      - id: camera_no
+        type: u4
       - id: commands
         type: u2
       - id: timecode
@@ -85,7 +87,7 @@ types:
       - id: reserved
         type: u1
         repeat: expr
-        repeat-expr: 29
+        repeat-expr: 25
 
   timecode:
     seq:
