@@ -249,3 +249,5 @@ AkavacheSqliteLinkerOverride.cs
 NuGetBuild
 WiX.Toolset.DummyFile.txt
 GitHubVS.sln.DotSettings
+Unity/UCAPI_Develop/UCAPI_Develop/.idea
+Unity/UCAPI_Develop/UCAPI_Develop/UserSettings
