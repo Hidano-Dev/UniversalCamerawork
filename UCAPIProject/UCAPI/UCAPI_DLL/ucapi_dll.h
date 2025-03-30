@@ -31,7 +31,7 @@ extern "C" {
     /// <param name="outBuffer">Pointer to the output byte buffer pointer.</param>
     /// <param name="outSize">Pointer to the output buffer size.</param>
     /// <returns>0 on success, non-zero on failure.</returns>
-    UCAPI_API int UCAPI_Serialize(const void* ucapi, uint8_t** outBuffer, size_t* outSize);
+    UCAPI_API int UCAPI_Serialize(UCAPI_DllObject* ucapi, uint8_t** outBuffer, size_t* outSize);
 
     /// <summary>
     /// Frees a byte buffer allocated by UCAPI_Serialize.

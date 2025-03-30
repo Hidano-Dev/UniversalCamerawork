@@ -3,69 +3,67 @@
 
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-#include "kaitai/kaitaistruct.h"
+#include <kaitai/kaitaistruct.h>
+#include <kaitai/kaitaistream.h>
 #include <stdint.h>
 #include <vector>
 
-#if KAITAI_STRUCT_VERSION < 9000L
-#error "Incompatible Kaitai Struct C++/STL API: version 0.9 or later is required"
+#if KAITAI_STRUCT_VERSION < 11000L
+#error "Incompatible Kaitai Struct C++/STL API: version 0.11 or later is required"
 #endif
 
-class ucapi_serialization_t : public kaitai::kstruct {
+class ucapi_t : public kaitai::kstruct {
 
 public:
-    class header_t;
-    class record_t;
     class timecode_t;
+    class record_t;
 
-    ucapi_serialization_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = 0, ucapi_serialization_t* p__root = 0);
+    ucapi_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = 0, ucapi_t* p__root = 0);
 
 private:
     void _read();
     void _clean_up();
 
 public:
-    ~ucapi_serialization_t();
+    ~ucapi_t();
 
-    class header_t : public kaitai::kstruct {
+    class timecode_t : public kaitai::kstruct {
 
     public:
 
-        header_t(kaitai::kstream* p__io, ucapi_serialization_t* p__parent = 0, ucapi_serialization_t* p__root = 0);
+        timecode_t(kaitai::kstream* p__io, ucapi_t::record_t* p__parent = 0, ucapi_t* p__root = 0);
 
     private:
         void _read();
         void _clean_up();
 
     public:
-        ~header_t();
+        ~timecode_t();
 
     private:
-        std::string m_signature;
-        uint8_t m_version_major;
-        uint8_t m_version_minor;
-        std::vector<uint8_t>* m_reserved;
-        uint32_t m_record_count;
-        uint32_t m_checksum;
-        ucapi_serialization_t* m__root;
-        ucapi_serialization_t* m__parent;
+        uint64_t m_frame_number;
+        uint64_t m_second_number;
+        uint64_t m_minute_number;
+        uint64_t m_hour_number;
+        uint64_t m_reserved;
+        ucapi_t* m__root;
+        ucapi_t::record_t* m__parent;
 
     public:
-        std::string signature() const { return m_signature; }
-        uint8_t version_major() const { return m_version_major; }
-        uint8_t version_minor() const { return m_version_minor; }
-        std::vector<uint8_t>* reserved() const { return m_reserved; }
-        uint32_t record_count() const { return m_record_count; }
-        uint32_t checksum() const { return m_checksum; }
-        ucapi_serialization_t* _root() const { return m__root; }
-        ucapi_serialization_t* _parent() const { return m__parent; }
+        uint64_t frame_number() const { return m_frame_number; }
+        uint64_t second_number() const { return m_second_number; }
+        uint64_t minute_number() const { return m_minute_number; }
+        uint64_t hour_number() const { return m_hour_number; }
+        uint64_t reserved() const { return m_reserved; }
+        ucapi_t* _root() const { return m__root; }
+        ucapi_t::record_t* _parent() const { return m__parent; }
     };
 
     class record_t : public kaitai::kstruct {
 
     public:
 
-        record_t(kaitai::kstream* p__io, ucapi_serialization_t* p__parent = 0, ucapi_serialization_t* p__root = 0);
+        record_t(kaitai::kstream* p__io, ucapi_t* p__parent = 0, ucapi_t* p__root = 0);
 
     private:
         void _read();
@@ -75,7 +73,7 @@ public:
         ~record_t();
 
     private:
-		uint32_t m_camera_no;
+        uint32_t m_camera_no;
         uint16_t m_commands;
         timecode_t* m_timecode;
         uint8_t m_packet_no;
@@ -103,11 +101,11 @@ public:
         float m_lens_distortion_center_point_right_mm;
         float m_lens_distortion_center_point_up_mm;
         std::vector<uint8_t>* m_reserved;
-        ucapi_serialization_t* m__root;
-        ucapi_serialization_t* m__parent;
+        ucapi_t* m__root;
+        ucapi_t* m__parent;
 
     public:
-		uint32_t camera_no() const { return m_camera_no; }
+        uint32_t camera_no() const { return m_camera_no; }
         uint16_t commands() const { return m_commands; }
         timecode_t* timecode() const { return m_timecode; }
         uint8_t packet_no() const { return m_packet_no; }
@@ -135,53 +133,57 @@ public:
         float lens_distortion_center_point_right_mm() const { return m_lens_distortion_center_point_right_mm; }
         float lens_distortion_center_point_up_mm() const { return m_lens_distortion_center_point_up_mm; }
         std::vector<uint8_t>* reserved() const { return m_reserved; }
-        ucapi_serialization_t* _root() const { return m__root; }
-        ucapi_serialization_t* _parent() const { return m__parent; }
-    };
-
-    class timecode_t : public kaitai::kstruct {
-
-    public:
-
-        timecode_t(kaitai::kstream* p__io, ucapi_serialization_t::record_t* p__parent = 0, ucapi_serialization_t* p__root = 0);
-
-    private:
-        void _read();
-        void _clean_up();
-
-    public:
-        ~timecode_t();
-
-    private:
-        uint64_t m_frame_number;
-        uint64_t m_second_number;
-        uint64_t m_minute_number;
-        uint64_t m_hour_number;
-        uint64_t m_reserved;
-        ucapi_serialization_t* m__root;
-        ucapi_serialization_t::record_t* m__parent;
-
-    public:
-        uint64_t frame_number() const { return m_frame_number; }
-        uint64_t second_number() const { return m_second_number; }
-        uint64_t minute_number() const { return m_minute_number; }
-        uint64_t hour_number() const { return m_hour_number; }
-        uint64_t reserved() const { return m_reserved; }
-        ucapi_serialization_t* _root() const { return m__root; }
-        ucapi_serialization_t::record_t* _parent() const { return m__parent; }
+        ucapi_t* _root() const { return m__root; }
+        ucapi_t* _parent() const { return m__parent; }
     };
 
 private:
-    header_t* m_header;
-    std::vector<record_t*>* m_records;
-    ucapi_serialization_t* m__root;
+    uint16_t m_magic;
+    uint16_t m_version;
+    uint16_t m_num_payload;
+    uint16_t m_payload_length;
+    uint16_t m_crc16;
+    std::vector<record_t*>* m_payload;
+    ucapi_t* m__root;
     kaitai::kstruct* m__parent;
+    std::vector<std::string>* m__raw_payload;
+    std::vector<kaitai::kstream*>* m__io__raw_payload;
 
 public:
-    header_t* header() const { return m_header; }
-    std::vector<record_t*>* records() const { return m_records; }
-    ucapi_serialization_t* _root() const { return m__root; }
+
+    /**
+     * Magic number (e.g. 0x55AA)
+     */
+    uint16_t magic() const { return m_magic; }
+
+    /**
+     * Packet format version (e.g. 0x0002)
+     */
+    uint16_t version() const { return m_version; }
+
+    /**
+     * Number of records in this packet
+     */
+    uint16_t num_payload() const { return m_num_payload; }
+
+    /**
+     * Total length of payload in bytes (num_payload × 128)
+     */
+    uint16_t payload_length() const { return m_payload_length; }
+
+    /**
+     * CRC-16 checksum of payload[]
+     */
+    uint16_t crc16() const { return m_crc16; }
+
+    /**
+     * Array of UCAPI records
+     */
+    std::vector<record_t*>* payload() const { return m_payload; }
+    ucapi_t* _root() const { return m__root; }
     kaitai::kstruct* _parent() const { return m__parent; }
+    std::vector<std::string>* _raw_payload() const { return m__raw_payload; }
+    std::vector<kaitai::kstream*>* _io__raw_payload() const { return m__io__raw_payload; }
 };
 
 #endif  // UCAPI_H_

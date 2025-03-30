@@ -1,16 +1,17 @@
 #include "pch.h"
+#include "ucapi.h"
 #include "ucapi_dll.h"
-#include "ucapi_serialization.h"
-#include "ucapi_deserialization.h"
-#include "kaitai/kaitaistruct.h"
+#include "ucapi_serializer.h"
+#include <kaitai/kaitaistruct.h>
 #include <sstream>
 #include <vector>
 #include <cstring>
 #include <exception>
+#include <iostream>
 
 // Define the wrapper structure to hold both the deserialized UCAPI object and its stream.
 struct UCAPI_DllObject {
-    ucapi_serialization_t* obj;
+    ucapi_t* obj;
     kaitai::kstream* ks;
 };
 
@@ -21,11 +22,9 @@ struct UCAPI_DllObject {
 /// <param name="outBuffer">Pointer to the output byte buffer pointer.</param>
 /// <param name="outSize">Pointer to the output buffer size.</param>
 /// <returns>0 on success, non-zero on failure.</returns>
-extern "C" UCAPI_API int UCAPI_Serialize(const void* ucapi, uint8_t** outBuffer, size_t* outSize) {
+extern "C" UCAPI_API int UCAPI_Serialize(UCAPI_DllObject* ucapi, uint8_t** outBuffer, size_t* outSize) {
     try {
-        // Cast the input pointer to the UCAPI object type.
-		const UCAPI_DllObject* handle = reinterpret_cast<const UCAPI_DllObject*>(ucapi);
-		const ucapi_serialization_t* ucapiObj = handle->obj;
+		const ucapi_t* ucapiObj = ucapi->obj;
         // Create an output stream in binary mode.
         std::ostringstream oss(std::ios::binary);
         // Serialize the UCAPI object into the stream.
@@ -64,14 +63,16 @@ extern "C" UCAPI_API UCAPI_DllObject* UCAPI_Deserialize(const uint8_t* inBuffer,
         // Create a new kaitai::kstream from the binary data.
         kaitai::kstream* ks = new kaitai::kstream(data);
         // Deserialize the UCAPI object using the kstream.
-        ucapi_serialization_t* obj = new ucapi_serialization_t(ks);
+        ucapi_t* obj = new ucapi_t(ks);
         // Allocate and initialize the wrapper.
         UCAPI_DllObject* wrapper = new UCAPI_DllObject;
         wrapper->obj = obj;
         wrapper->ks = ks;
         return wrapper;
     }
-    catch (const std::exception&) {
+    catch (const std::exception& exp) {
+		// Print the exception message to the console.
+		std::cerr << exp.what() << std::endl;
         return nullptr;
     }
 }
@@ -98,36 +99,29 @@ extern "C" UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj) {
 /// <returns>Pointer to a new UCAPI_DllObject, or nullptr on failure.</returns>
 extern "C" UCAPI_API UCAPI_DllObject* UCAPI_CreateDefault() {
     try {
-        // Create a binary string that satisfies the UCAPI header specification with at least one record.
-        // According to the specification:
-        // - Signature: 5 bytes ("UCAPI")
-        // - Version: 2 bytes (major, minor)
-        // - Reserved: 17 bytes (zero-filled)
-        // - Record count: 4 bytes (little-endian, here set to 1)
-        // - Checksum: 4 bytes (little-endian, here 0)
-        // Then one record of 128 bytes (zero-filled) is appended.
-        std::string defaultData;
-        // Append signature ("UCAPI")
-        defaultData.append("UCAPI", 5);
-        // Append version: major=1, minor=0
-        defaultData.push_back(1);
-        defaultData.push_back(0);
-        // Append 17 reserved bytes (all zero)
-        defaultData.append(17, '\0');
-        // Append record count (1, 4 bytes little-endian: 0x01, 0x00, 0x00, 0x00)
-        defaultData.push_back(1);
-        defaultData.push_back(0);
-        defaultData.push_back(0);
-        defaultData.push_back(0);
-        // Append checksum (0, 4 bytes little-endian)
-        defaultData.append(4, '\0');
-        // Append one default record (128 bytes, zero-filled)
-        defaultData.append(128, '\0');
+		std::string defaultData;
+		// Append magic number (0x55AA, 2 bytes little-endian)
+		defaultData.push_back(0xAA);
+		defaultData.push_back(0x55);
+		// Append version number (0x0002, 2 bytes little-endian)
+		defaultData.push_back(0x02);
+		defaultData.push_back(0x00);
+		// Append number of records (1, 2 bytes little-endian)
+		defaultData.push_back(0x01);
+		defaultData.push_back(0x00);
+		// Append payload length (128, 2 bytes little-endian)
+		defaultData.push_back(0x80);
+		defaultData.push_back(0x00);
+		// Append CRC-16 checksum (0, 2 bytes little-endian)
+		defaultData.push_back(0x00);
+		defaultData.push_back(0x00);
+		// Append one default record (128 bytes, zero-filled)
+		defaultData.append(128, '\0');
 
         // Create a new kaitai::kstream from the binary string.
         kaitai::kstream* ks = new kaitai::kstream(defaultData);
         // Use the deserialization constructor to create a new UCAPI object.
-        ucapi_serialization_t* obj = new ucapi_serialization_t(ks);
+        ucapi_t* obj = new ucapi_t(ks);
         // Allocate and initialize the wrapper.
         UCAPI_DllObject* wrapper = new UCAPI_DllObject;
         wrapper->obj = obj;

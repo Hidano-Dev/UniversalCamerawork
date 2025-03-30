@@ -1,32 +1,43 @@
 meta:
   id: ucapi
-  file-extension: ucapi
   endian: le
+
 seq:
-  - id: header
-    type: header
-  - id: records
+  - id: magic
+    type: u2
+    doc: Magic number (e.g. 0x55AA)
+  - id: version
+    type: u2
+    doc: Packet format version (e.g. 0x0002)
+  - id: num_payload
+    type: u2
+    doc: Number of records in this packet
+  - id: payload_length
+    type: u2
+    doc: Total length of payload in bytes (num_payload × payload_length)
+  - id: crc16
+    type: u2
+    doc: CRC-16 checksum of payload[]
+  - id: payload
+    size: num_payload * payload_length
     type: record
     repeat: expr
-    repeat-expr: header.record_count
+    repeat-expr: num_payload
+    doc: Array of UCAPI records
 
 types:
-  header:
+  timecode:
     seq:
-      - id: signature
-        contents: "UCAPI"
-      - id: version_major
-        type: u1
-      - id: version_minor
-        type: u1
+      - id: frame_number
+        type: b7
+      - id: second_number
+        type: b6
+      - id: minute_number
+        type: b6
+      - id: hour_number
+        type: b5
       - id: reserved
-        type: u1
-        repeat: expr
-        repeat-expr: 17
-      - id: record_count
-        type: u4
-      - id: checksum
-        type: u4
+        type: b8
 
   record:
     seq:
@@ -88,16 +99,3 @@ types:
         type: u1
         repeat: expr
         repeat-expr: 25
-
-  timecode:
-    seq:
-      - id: frame_number
-        type: b7
-      - id: second_number
-        type: b6
-      - id: minute_number
-        type: b6
-      - id: hour_number
-        type: b5
-      - id: reserved
-        type: b8
