@@ -55,7 +55,7 @@ public:
 
         uint32_t m_camera_no;
         uint16_t m_commands;
-        timecode_t* m_timecode;
+        timecode_t m_timecode;
         uint8_t m_packet_no;
         float m_eye_position_right_m;
         float m_eye_position_up_m;
@@ -80,7 +80,6 @@ public:
         float m_lens_distortion_radial_coefficients_k2;
         float m_lens_distortion_center_point_right_mm;
         float m_lens_distortion_center_point_up_mm;
-        std::vector<uint8_t>* m_reserved;
     };
 
     uint16_t m_magic;
@@ -88,8 +87,7 @@ public:
     uint16_t m_num_payload;
     uint16_t m_payload_length;
     uint16_t m_crc16;
-    std::vector<record_t*>* m_payload;
-	std::vector<std::string>* m__raw_payload;
+    record_t* m_payload;
 };
 
 #endif  // UCAPI_H_

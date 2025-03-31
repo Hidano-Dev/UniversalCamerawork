@@ -39,8 +39,6 @@ namespace UCAPI4Unity.Core
             Debug.Log("UCAPI object created successfully.");
             var defaultUcapi = new UcApi(ucapiObject);
 
-            return;
-            
             // Serialize the UCAPI object.
             IntPtr nativeBuffer;
             UIntPtr nativeSize;

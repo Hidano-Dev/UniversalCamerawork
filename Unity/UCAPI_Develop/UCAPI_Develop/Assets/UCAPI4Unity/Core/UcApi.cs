@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -11,9 +10,9 @@ namespace UCAPI4Unity.Core
         public ushort Magic;
         public ushort Version;
         public ushort NumPayload;
-        public ushort NumPayloadLength;
+        public ushort PayloadLength;
         public ushort CRC16;
-        public List<UcApiRecord> Payload = new();
+        public IntPtr PayloadPtr;
         
         private const int HeaderSize = 10;
 
@@ -21,7 +20,6 @@ namespace UCAPI4Unity.Core
         {
             var objectPtr = GetObjectPtr(dataPtr);
             GetHeader(objectPtr);
-            GetPayload(objectPtr, NumPayloadLength);
         }
 
         private static IntPtr GetObjectPtr(IntPtr dataPtr)
@@ -34,9 +32,17 @@ namespace UCAPI4Unity.Core
         
         private void GetHeader(IntPtr dataPtr)
         {
-            // 全体のバイト数を把握するため、最初の10バイトを読み取る
-            var buffer = new byte[HeaderSize];
-            Marshal.Copy(dataPtr, buffer, 0, HeaderSize);
+            // 8バイトアライメントに足りないサイズを計算
+            int append = 8 - HeaderSize % 8;
+            if (append == 8)
+            {
+                append = 0;
+            }
+            
+            var dataSize = HeaderSize + append + 8;
+            
+            var buffer = new byte[dataSize];
+            Marshal.Copy(dataPtr, buffer, 0, dataSize);
             
             using (var ms = new MemoryStream(buffer))
             using (var br = new BinaryReader(ms))
@@ -48,9 +54,18 @@ namespace UCAPI4Unity.Core
                 // Payloadの数を読み取る
                 NumPayload = br.ReadUInt16();
                 // Payloadのサイズを読み取る
-                NumPayloadLength = br.ReadUInt16();
+                PayloadLength = br.ReadUInt16();
                 // CRC16を読み取る
                 CRC16 = br.ReadUInt16();
+                
+                for (var i = 0; i < append; i++)
+                {
+                    // 8バイトアライメントにするため、データポインタを調整
+                    br.ReadByte();
+                }
+
+                var ptr = br.ReadUInt64();
+                PayloadPtr = (IntPtr)ptr;
             }
             
             // Magicのチェック
@@ -58,21 +73,33 @@ namespace UCAPI4Unity.Core
             {
                 throw new Exception($"Magic check failed. Expected: 0x5543, Actual: {Magic}");
             }
+            
+            GetPayloads(PayloadPtr, NumPayload, PayloadLength);
         }
 
-        private void GetPayload(IntPtr dataPtr, int size)
+        private void GetPayloads(IntPtr dataPtr, int count, int size)
         {
-            var payload = GetPayloadBuffer(dataPtr, size);
+            for (var i = 0; i < count; i++)
+            {
+                GetPayload(dataPtr, size);
+                // 次のPayloadのポインタを取得
+                dataPtr += size;
+            }
+        }
+
+        private void GetPayload(IntPtr objectPtr, int size)
+        {
+            var payload = GetPayloadBuffer(objectPtr, size);
             Debug.Log("Payload: " + BitConverter.ToString(payload));
             var payloadPtr = Marshal.AllocHGlobal(size);
             Marshal.Copy(payload, 0, payloadPtr, size);
             try
             {
                 // Payloadのデータを読み取る
-                for (var i = 0; i < NumPayload; i++)
+                for (var j = 0; j < NumPayload; j++)
                 {
-                    var record = new UcApiRecord(payloadPtr + i * NumPayloadLength, NumPayloadLength);
-                    Payload.Add(record);
+                    var record = new UcApiRecord(payloadPtr + j * PayloadLength, PayloadLength);
+                    Debug.Log(record.ToString());
                 }
             }
             finally

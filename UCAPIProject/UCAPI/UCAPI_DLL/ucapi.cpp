@@ -11,11 +11,11 @@ ucapi_t::ucapi_t(const void* dataPtr){
 	m_num_payload = 1;
 	m_payload_length = 128;
 	m_crc16 = 0;
-	m_payload = new std::vector<record_t*>();
-	m__raw_payload = new std::vector<std::string>();
 
 	if (dataPtr == nullptr) {
-		m_payload->push_back(new record_t(m_payload_length));
+		auto payloadArray = new std::vector<record_t>();
+		payloadArray->push_back(record_t(m_payload_length));
+		m_payload = &payloadArray->at(0);
 		return;
 	}
 
@@ -50,15 +50,12 @@ void ucapi_t::_read(const void* dataPtr) {
 			throw std::runtime_error("Invalid payload size");
 		}
 
-		// ペイロードのバイト数を読み取る
-		m__raw_payload = new std::vector<std::string>();
-        m__raw_payload->push_back(std::string(reinterpret_cast<const char*>(&data[10]), payloadSize));
-
-		m_payload = new std::vector<record_t*>();
+		auto payloadArray = new std::vector<record_t>();
 		for (int i = 0; i < m_num_payload; i++) {
-			m_payload->push_back(new record_t((size_t)m_payload_length, &data[10 + i * m_payload_length]));
+			// ペイロードのバイト数を読み取る
+			payloadArray->push_back(record_t(m_payload_length, &data[10 + i * m_payload_length]));
 		}
-
+		m_payload = &payloadArray->at(0);
 	}
 	catch (std::exception& e) {
 		_clean_up();
@@ -73,14 +70,8 @@ ucapi_t::~ucapi_t() {
 }
 
 void ucapi_t::_clean_up() {
-    if (m__raw_payload) {
-        delete m__raw_payload; m__raw_payload = 0;
-    }
     if (m_payload) {
-        for (std::vector<record_t*>::iterator it = m_payload->begin(); it != m_payload->end(); ++it) {
-            delete *it;
-        }
-        delete m_payload; m_payload = 0;
+		delete m_payload;
     }
 }
 
@@ -149,11 +140,7 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 	m_lens_distortion_radial_coefficients_k2 = 0;
 	m_lens_distortion_center_point_right_mm = 0;
 	m_lens_distortion_center_point_up_mm = 0;
-	m_reserved = new std::vector<uint8_t>();
-
-	for (int i = 0; i < 25; i++) {
-		m_reserved->push_back(0);
-	}
+	uint8_t* reserved = new uint8_t[25];
 
 	if (dataPtr == nullptr) {
 		return;
@@ -171,10 +158,10 @@ void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 
 	// ペイロードのバイト数分のデータを読み取る
-	m_camera_no = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
-	m_commands = (data[5] << 8) | data[4];
+	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
+	m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
 	m_timecode = new timecode_t(&data[6]);
-	m_packet_no = data[10];
+	m_packet_no = *reinterpret_cast<const uint8_t*>(&data[10]);
 	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[11]);
 	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[15]);
 	m_eye_position_forward_m = *reinterpret_cast<const float*>(&data[19]);
@@ -198,10 +185,6 @@ void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
 	m_lens_distortion_radial_coefficients_k2 = *reinterpret_cast<const float*>(&data[91]);
 	m_lens_distortion_center_point_right_mm = *reinterpret_cast<const float*>(&data[95]);
 	m_lens_distortion_center_point_up_mm = *reinterpret_cast<const float*>(&data[99]);
-	m_reserved = new std::vector<uint8_t>();
-	for (int i = 0; i < 25; i++) {
-		m_reserved->push_back(data[103 + i]);
-	}
 }
 
 ucapi_t::record_t::~record_t() {
@@ -209,10 +192,5 @@ ucapi_t::record_t::~record_t() {
 }
 
 void ucapi_t::record_t::_clean_up() {
-    if (m_timecode) {
-        delete m_timecode; m_timecode = 0;
-    }
-    if (m_reserved) {
-        delete m_reserved; m_reserved = 0;
-    }
+	
 }
