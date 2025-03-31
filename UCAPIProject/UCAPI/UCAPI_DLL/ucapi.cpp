@@ -5,9 +5,17 @@
 #include <iostream>
 
 ucapi_t::ucapi_t(const void* dataPtr){
-    m_payload = 0;
+	// magic��0x5543�ŏ�����
+	m_magic = 0x5543;
+	m_version = 0;
+	m_num_payload = 1;
+	m_payload_length = 128;
+	m_crc16 = 0;
+	m_payload = new std::vector<record_t*>();
+	m__raw_payload = new std::vector<std::string>();
 
 	if (dataPtr == nullptr) {
+		m_payload->push_back(new record_t(m_payload_length));
 		return;
 	}
 
@@ -114,8 +122,38 @@ void ucapi_t::timecode_t::_clean_up() {
 }
 
 ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
-    m_timecode = 0;
-    m_reserved = 0;
+	m_camera_no = 0;
+	m_commands = 0;
+	m_timecode = new timecode_t();
+	m_packet_no = 0;
+	m_eye_position_right_m = 0;
+	m_eye_position_up_m = 0;
+	m_eye_position_forward_m = 0;
+	m_look_vector_right_m = 0;
+	m_look_vector_up_m = 0;
+	m_look_vector_forward_m = 0;
+	m_up_vector_right_m = 0;
+	m_up_vector_up_m = 0;
+	m_up_vector_forward_m = 0;
+	m_focal_length_mm = 0;
+	m_aspect_ratio = 0;
+	m_focus_distance_m = 0;
+	m_aperture = 0;
+	m_sensor_size_width_mm = 0;
+	m_sensor_size_height_mm = 0;
+	m_near_clip_m = 0;
+	m_far_clip_m = 0;
+	m_lens_shift_horizontal_ratio = 0;
+	m_lens_shift_vertical_ratio = 0;
+	m_lens_distortion_radial_coefficients_k1 = 0;
+	m_lens_distortion_radial_coefficients_k2 = 0;
+	m_lens_distortion_center_point_right_mm = 0;
+	m_lens_distortion_center_point_up_mm = 0;
+	m_reserved = new std::vector<uint8_t>();
+
+	for (int i = 0; i < 25; i++) {
+		m_reserved->push_back(0);
+	}
 
 	if (dataPtr == nullptr) {
 		return;
