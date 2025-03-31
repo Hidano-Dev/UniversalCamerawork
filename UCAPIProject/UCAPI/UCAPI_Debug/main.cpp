@@ -1,12 +1,10 @@
 #ifdef _DEBUG
 #include <iostream>
 #include <ucapi.h>
-#include <kaitai/kaitaistream.h>
 #include <ucapi_dll.h>
 
 struct UCAPI_DllObject { // Forward declaration
     ucapi_t* obj;
-    kaitai::kstream* ks;
 };
 
 /// <summary>
