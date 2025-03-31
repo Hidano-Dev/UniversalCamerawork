@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UCAPI4Unity.Core
 {
-    public class UcApiWrapper : MonoBehaviour
+    public static class UcApiForUnity
     {
         // Import the UCAPI_CreateDefault function from the DLL.
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
@@ -26,57 +26,55 @@ namespace UCAPI4Unity.Core
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern void UCAPI_FreeObject(IntPtr obj);
 
-        // Example usage: Create a default UCAPI object, serialize and then deserialize it.
-        void Start()
+        public static UcApi CreateDefault()
         {
             // Create a default UCAPI object using the C++ factory function.
-            IntPtr ucapiObject = UCAPI_CreateDefault();
+            var ucapiObject = UCAPI_CreateDefault();
             if (ucapiObject == IntPtr.Zero)
             {
-                Debug.LogError("UCAPI_CreateDefault failed.");
-                return;
+                Debug.Assert(false, "UCAPI_CreateDefault failed.");
             }
             Debug.Log("UCAPI object created successfully.");
             var defaultUcapi = new UcApi(ucapiObject);
-
-            // Serialize the UCAPI object.
-            IntPtr nativeBuffer;
-            UIntPtr nativeSize;
-            int result = UCAPI_Serialize(ucapiObject, out nativeBuffer, out nativeSize);
+            return defaultUcapi;
+        }
+        
+        public static int Serialize(UcApi ucApi, out IntPtr outBuffer, out UIntPtr outSize)
+        {
+            var ucApiPtr = GetUcApiPointer(ucApi);
+            // Serialize the UCAPI object to a native buffer.
+            var result = UCAPI_Serialize(ucApiPtr, out outBuffer, out outSize);
             if (result != 0)
             {
                 Debug.LogError("UCAPI_Serialize failed.");
-                UCAPI_FreeObject(ucapiObject);
-                return;
+                UCAPI_FreeObject(ucApiPtr);
+                return result;
             }
+            Debug.Log("Serialization succeeded. Buffer size: " + outSize.ToUInt32());
+            return 0;
+        }
 
-            int size = (int)nativeSize;
-            byte[] managedBuffer = new byte[size];
-            Marshal.Copy(nativeBuffer, managedBuffer, 0, size);
-            Debug.Log("Serialization succeeded. Buffer size: " + size);
-
-            // Free the native buffer allocated by UCAPI_Serialize.
-            UCAPI_FreeBuffer(nativeBuffer);
-
+        public static UcApi Deserialize(byte[] managedBuffer)
+        {
             // Now, attempt to deserialize the byte array back to a UCAPI object.
-            IntPtr dllObjectPtr = UCAPI_Deserialize(managedBuffer, (UIntPtr)managedBuffer.Length);
+            var dllObjectPtr = UCAPI_Deserialize(managedBuffer, (UIntPtr)managedBuffer.Length);
             if (dllObjectPtr == IntPtr.Zero)
             {
                 Debug.LogError("UCAPI_Deserialize failed.");
-                UCAPI_FreeObject(ucapiObject);
-                return;
+                return null;
             }
-            else
-            {
-                Debug.Log("Deserialization succeeded.");
-            }
+            Debug.Log("Deserialization succeeded.");
 
-            // ここでdllObjectPtrを用いて必要な処理を実施する…
             var ucapi = new UcApi(dllObjectPtr);
-
-            // 使用後、生成したオブジェクトは必ず解放する。
-            UCAPI_FreeObject(dllObjectPtr);
-            UCAPI_FreeObject(ucapiObject);
+            return ucapi;
+        }
+        
+        private static IntPtr GetUcApiPointer(UcApi ucApi)
+        {
+            // Get the pointer to the UCAPI object.
+            var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(UcApi)));
+            Marshal.StructureToPtr(ucApi, ptr, false);
+            return ptr;
         }
     }
 }
