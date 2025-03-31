@@ -42,11 +42,11 @@ int main() {
 
    // オブジェクトに変換して各フィールドを表示
    ucapi_t* obj = deserializedHandle->obj;
-   std::cout << "Magic: " << obj->magic() << std::endl;
-   std::cout << "Version: " << obj->version() << std::endl;
-   std::cout << "Num Payload: " << obj->num_payload() << std::endl;
-   std::cout << "Payload Length: " << obj->payload_length() << std::endl;
-   std::cout << "CRC16: " << obj->crc16() << std::endl;
+   std::cout << "Magic: " << obj->m_magic << std::endl;
+   std::cout << "Version: " << obj->m_version << std::endl;
+   std::cout << "Num Payload: " << obj->m_num_payload << std::endl;
+   std::cout << "Payload Length: " << obj->m_payload_length << std::endl;
+   std::cout << "CRC16: " << obj->m_crc16 << std::endl;
 
 
    // Recordのフィールドを表示
