@@ -22,7 +22,7 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		timecode_data[1] = ((timecode->m_second_number & 0x3F) << 2) | ((timecode->m_minute_number & 0x30) >> 4);
 		timecode_data[2] = ((timecode->m_minute_number & 0x0F) << 4) | (timecode->m_hour_number & 0x1F);
 		timecode_data[3] = timecode->m_reserved;
-		os.write(reinterpret_cast<char*>(timecode_data), 3);
+		os.write(reinterpret_cast<char*>(timecode_data), 4);
 		os.write(reinterpret_cast<const char*>(&rec->m_packet_no), sizeof(rec->m_packet_no));
 		os.write(reinterpret_cast<const char*>(&rec->m_eye_position_right_m), sizeof(rec->m_eye_position_right_m));
 		os.write(reinterpret_cast<const char*>(&rec->m_eye_position_up_m), sizeof(rec->m_eye_position_up_m));
