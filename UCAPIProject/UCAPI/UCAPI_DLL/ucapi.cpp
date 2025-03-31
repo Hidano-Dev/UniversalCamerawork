@@ -5,7 +5,7 @@
 #include <iostream>
 
 ucapi_t::ucapi_t(const void* dataPtr){
-	// magicï¿½ï¿½0x5543ï¿½Åï¿½ï¿½ï¿½ï¿½ï¿½
+	// magic‚Í0x5543‚Å‰Šú‰»
 	m_magic = 0x5543;
 	m_version = 0;
 	m_num_payload = 1;
@@ -31,11 +31,11 @@ void ucapi_t::_read(const void* dataPtr) {
     try {
 		// ‘S‘Ì‚ÌƒoƒCƒg”‚ğ”cˆ¬‚·‚é‚½‚ßAÅ‰‚Ì10ƒoƒCƒg‚ğ“Ç‚İæ‚é
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
-		m_magic = (data[0] << 8) | data[1];
-		m_version = (data[2] << 8) | data[3];
-		m_num_payload = (data[4] << 8) | data[5];
-		m_payload_length = (data[6] << 8) | data[7];
-		m_crc16 = (data[8] << 8) | data[9];
+		m_magic = (data[1] << 8) | data[0];
+		m_version = (data[3] << 8) | data[2];
+		m_num_payload = (data[5] << 8) | data[4];
+		m_payload_length = (data[7] << 8) | data[6];
+		m_crc16 = (data[9] << 8) | data[8];
 
 		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ğŒvZ‚·‚é
 		size_t payloadSize = m_num_payload * m_payload_length;
@@ -171,8 +171,8 @@ void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 
 	// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”•ª‚Ìƒf[ƒ^‚ğ“Ç‚İæ‚é
-	m_camera_no = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-	m_commands = (data[4] << 8) | data[5];
+	m_camera_no = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+	m_commands = (data[5] << 8) | data[4];
 	m_timecode = new timecode_t(&data[6]);
 	m_packet_no = data[10];
 	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[11]);
