@@ -3,26 +3,22 @@
 # All multi-byte values are encoded in little-endian.
 
 Header:
-  # 3 bytes: Signature "UCAPI" (UniversalCameraworkAPI)
-  signature: "UCAPI"
-  
-  # Version information (1 byte each)
-  version:
-    major: uint8_t       # 1 byte: Major Version
-    minor: uint8_t       # 1 byte: Minor Version
-  
-  # Reserved area: 17 bytes reserved to make the entire header 32 bytes
-  reserved: uint8_t[17]
-  
-  # 4 bytes: Total number of data records
-  recordCount: uint32_t
-  
-  # 4 bytes: Checksum for the entire file (CRC-32)
-  # CRC-32 settings:
-  #   - Polynomial: 0xEDB88320
-  #   - InitialValue: 0xFFFFFFFF
-  #   - FinalXORValue: 0xFFFFFFFF
-  checksum: uint32_t
+  magic: uint16_t            # Magic number (e.g. 0x55AA)
+  version: uint16_t          # Packet format version (e.g. 0x0002)
+  numPayload: uint16_t       # Number of records in this packet
+  payloadLength: uint16_t    # Total length of payload in bytes (e.g. 128)
+  crc16: uint16_t            # CRC-16 checksum of payload[]
+
+Payload:
+  type: Record               # UCAPI record
+  repeat: numPayload         # Number of records = numPayload
+
+Timecode:
+  frameNumber: bits[7]       # 7-bit frame number
+  secondNumber: bits[6]      # 6-bit second number
+  minuteNumber: bits[6]      # 6-bit minute number
+  hourNumber: bits[5]        # 5-bit hour number
+  reserved: uint8_t          # 8-bit reserved
 
 Record:
   # Structure of each fixed-length data record
@@ -30,7 +26,7 @@ Record:
   commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
   timecode: Timecode         # Timecode information (bit allocations defined elsewhere)
   packetNo: uint8_t          # Packet number
-  
+
   # Camera position and orientation (units: meters or as appropriate)
   eyePosition_right_m: float
   eyePosition_up_m: float
@@ -41,7 +37,7 @@ Record:
   upVector_right_m: float
   upVector_up_m: float
   upVector_forward_m: float
-  
+
   # Camera parameters
   focalLength_mm: float
   aspectRatio: float
