@@ -33,11 +33,11 @@ public:
     public:
         ~timecode_t();
 
-        uint64_t m_frame_number;
-        uint64_t m_second_number;
-        uint64_t m_minute_number;
-        uint64_t m_hour_number;
-        uint64_t m_reserved;
+        uint8_t m_frame_number;
+        uint8_t m_second_number;
+        uint8_t m_minute_number;
+        uint8_t m_hour_number;
+        uint8_t m_reserved;
     };
 
     class record_t{
