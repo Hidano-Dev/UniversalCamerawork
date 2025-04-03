@@ -22,23 +22,6 @@ namespace UCAPI4Unity.Core
             GetHeader(objectPtr);
         }
 
-        public static UcApi Copy(UcApi src, ref UcApi dst)
-        {
-            dst.Magic = src.Magic;
-            dst.Version = src.Version;
-            dst.NumPayload = src.NumPayload;
-            dst.PayloadLength = src.PayloadLength;
-            dst.CRC16 = src.CRC16;
-            
-            var records = new UcApiRecord[src.NumPayload];
-            for (var i = 0; i < src.NumPayload; i++)
-            {
-                records[i] = src.Payloads[i];
-            }
-            dst.Payloads = records;
-            return dst;
-        }
-        
         private static IntPtr GetObjectPtr(IntPtr dataPtr)
         {
             // 先頭4バイトをUcApiDllObjectに変換

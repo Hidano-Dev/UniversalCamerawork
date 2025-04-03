@@ -10,7 +10,7 @@ namespace UCAPI4Unity.Tests
         [Test(ExpectedResult = null)]
         public IEnumerator UcApiCoreTest_CreateDefault()
         {
-            var ucApi = Core.UcApiForUnity.CreateDefault();
+            var ucApi = UcApiForUnity.CreateDefault();
             Assert.IsNotNull(ucApi);
             Assert.AreEqual(0, ucApi.Magic);
             Assert.AreEqual(0, ucApi.Version);
@@ -23,7 +23,7 @@ namespace UCAPI4Unity.Tests
         [Test(ExpectedResult = null)]
         public IEnumerator UcApiCoreTest_Serialize()
         {
-            var ucApi = Core.UcApiForUnity.CreateDefault();
+            var ucApi = UcApiForUnity.CreateDefault();
             Assert.IsNotNull(ucApi);
             Assert.AreEqual(0, ucApi.Magic);
             Assert.AreEqual(0, ucApi.Version);
@@ -31,7 +31,7 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(0, ucApi.PayloadLength);
             Assert.AreEqual(0, ucApi.CRC16);
 
-            var result = Core.UcApiForUnity.Serialize(ucApi, out var outBuffer, out var outSize);
+            var result = UcApiForUnity.Serialize(ucApi, out _, out var outSize);
             Assert.AreEqual(0, result);
             Assert.IsTrue(outSize.ToUInt32() > 0);
             yield return null;

@@ -1,11 +1,13 @@
 namespace UCAPI4Unity.Core
 {
     /// <summary>
-    /// 7bit...Frame Number
+    /// 8bit...Frame Number
     /// 6bit...Second
     /// 6bit...Minute
     /// 5bit...Hour
-    /// 8bit...Reserved
+    /// 4bit...Frame Rate
+    /// 1bit...Drop Frame
+    /// 2bit...Reserved
     /// Total 32bit
     /// </summary>
     public class UcApiTimeCode
@@ -14,8 +16,14 @@ namespace UCAPI4Unity.Core
         public int Second { get; }
         public int Minute { get; }
         public int Hour { get; }
+        
+        public FrameRate FrameRate { get; }
+        
+        public bool DropFrame { get; }
+        
         private int _reserved;
 
+        
         /// <summary>
         /// 32bitのデータをTimeCodeに変換する
         /// </summary>
@@ -26,37 +34,52 @@ namespace UCAPI4Unity.Core
             Second = GetSecond(data);
             Minute = GetMinute(data);
             Hour = GetHour(data);
+            FrameRate = GetFrameRate(data);
+            DropFrame = GetDropFrame(data);
             _reserved = GetReserved(data);
         }
         
         private static int GetFrameNumber(int data)
         {
-            return data & 0x7F;
+            return data & 0xFF;
         }
         
         private static int GetSecond(int data)
         {
-            return (data >> 7) & 0x3F;
+            return (data >> 8) & 0x3F;
         }
         
         private static int GetMinute(int data)
         {
-            return (data >> 13) & 0x3F;
+            return (data >> 14) & 0x3F;
         }
         
         private static int GetHour(int data)
         {
-            return (data >> 19) & 0x1F;
+            return (data >> 20) & 0x1F;
+        }
+        
+        private static FrameRate GetFrameRate(int data)
+        {
+            return (FrameRate)((data >> 25) & 0xF);
+        }
+        
+        private static bool GetDropFrame(int data)
+        {
+            return ((data >> 29) & 0x1) == 1;
         }
         
         private static int GetReserved(int data)
         {
-            return data >> 25;
+            return (data >> 30) & 0x3;
         }
         
         public override string ToString()
         {
-            return $"{Hour:D2}:{Minute:D2}:{Second:D2}:{FrameNumber:D2}";
+            return $"{Hour:D2}:{Minute:D2}:{Second:D2}:{FrameNumber:D2} " +
+                   $"({(int)FrameRate}) " +
+                   $"{(DropFrame ? "Drop" : "Non-Drop")} " +
+                   $"Reserved: {_reserved}";
         }
     }
 }
