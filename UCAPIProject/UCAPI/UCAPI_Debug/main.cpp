@@ -25,7 +25,7 @@ int main() {
    std::cout << "Default UCAPI object created successfully." << std::endl;
 
    // ˆê“xƒ_ƒ“ƒv‚µ‚Ä‚Ý‚é
-   RawDump(defaultHandle);
+   Dump(defaultHandle);
 
    // Serialize the default UCAPI object.
    uint8_t* serializedBuffer = nullptr;
@@ -71,11 +71,13 @@ void Dump(UCAPI_DllObject* handle) {
     ucapi_t::record_t* m_payload = obj->m_payload;
     std::cout << "CameraNo " << m_payload->m_camera_no << std::endl;
     std::cout << "Commands " << m_payload->m_commands << std::endl;
-    std::cout << "Timecode Frame Number " << m_payload->m_timecode.m_frame_number << std::endl;
-    std::cout << "Timecode Second Number " << m_payload->m_timecode.m_second_number << std::endl;
-    std::cout << "Timecode Minute Number " << m_payload->m_timecode.m_minute_number << std::endl;
-    std::cout << "Timecode Hour Number " << m_payload->m_timecode.m_hour_number << std::endl;
-    std::cout << "Timecode Reserved " << m_payload->m_timecode.m_reserved << std::endl;
+    std::cout << "Timecode Frame Number " << std::to_string(m_payload->m_timecode.m_frame_number) << std::endl;
+	std::cout << "Timecode Second Number " << std::to_string(m_payload->m_timecode.m_second_number) << std::endl;
+	std::cout << "Timecode Minute Number " << std::to_string(m_payload->m_timecode.m_minute_number) << std::endl;
+	std::cout << "Timecode Hour Number " << std::to_string(m_payload->m_timecode.m_hour_number) << std::endl;
+	std::cout << "Timecode Frame Rate " << std::to_string(m_payload->m_timecode.m_frame_rate) << std::endl;
+	std::cout << "Timecode Drop Frame " << std::to_string(m_payload->m_timecode.m_drop_frame) << std::endl;
+	std::cout << "Timecode Reserved " << std::to_string(m_payload->m_timecode.m_reserved) << std::endl;
     std::cout << "PacketNo " << std::to_string(m_payload->m_packet_no) << std::endl;
     std::cout << "Eye Position Right M " << m_payload->m_eye_position_right_m << std::endl;
     std::cout << "Eye Position Up M " << m_payload->m_eye_position_up_m << std::endl;

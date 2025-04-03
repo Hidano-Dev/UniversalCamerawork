@@ -80,6 +80,8 @@ ucapi_t::timecode_t::timecode_t(const void* dataPtr) {
 	m_second_number = 0;
 	m_minute_number = 0;
 	m_hour_number = 0;
+	m_frame_rate = FRAME_RATE_60;
+	m_drop_frame = 0;
 	m_reserved = 0;
 
 	if (dataPtr == nullptr) {
@@ -97,12 +99,20 @@ ucapi_t::timecode_t::timecode_t(const void* dataPtr) {
 void ucapi_t::timecode_t::_read(const void* dataPtr) {
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 
-	// 4バイトのデータを読み取る
-	m_frame_number = (data[0] & 0x7F);
-	m_second_number = ((data[0] & 0x80) >> 7) | ((data[1] & 0x3F) << 1);
-	m_minute_number = ((data[1] & 0xC0) >> 6) | ((data[2] & 0x0F) << 2);
-	m_hour_number = (data[2] & 0xF0) >> 4;
-	m_reserved = data[3];
+	// frame_numberは1バイト
+	m_frame_number = data[0] & 0xFF;
+	// second_numberはdata[1]の下位6ビット
+	m_second_number = (data[1] & 0x3F);
+	// minute_numberはdata[1]の上位2ビットとdata[2]の下位4ビット
+	m_minute_number = ((data[1] >> 6) & 0x03) | ((data[2] & 0x0F) << 2);
+	// hour_numberはdata[2]の上位4ビットとdata[3]の下位1ビット
+	m_hour_number = ((data[2] >> 4) & 0x0F) | ((data[3] & 0x01) << 4);
+	// frame_rateはdata[3]の下位5～2ビット
+	m_frame_rate = (data[3] >> 2) & 0x0F;
+	// drop_frameはdata[3]の上位3ビット目
+	m_drop_frame = (data[3] >> 1) & 0x01;
+	// reservedはdata[3]の上位2ビット
+	m_reserved = (data[3] >> 7) & 0x01;
 }
 
 ucapi_t::timecode_t::~timecode_t() {
