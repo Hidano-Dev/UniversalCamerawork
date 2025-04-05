@@ -64,9 +64,9 @@ namespace UCAPI4Unity.Core
             }
 
             // Magicのチェック
-            if (Magic != 0x5543)
+            if (Magic != 0x55AA)
             {
-                throw new Exception($"Magic check failed. Expected: 0x5543, Actual: {Magic}");
+                throw new Exception($"Magic check failed. Expected: 0x55AA, Actual: {Magic}");
             }
 
             var ptr = br.ReadUInt64();

@@ -12,10 +12,10 @@ namespace UCAPI4Unity.Tests
         {
             var ucApi = UcApiForUnity.CreateDefault();
             Assert.IsNotNull(ucApi);
-            Assert.AreEqual(0, ucApi.Magic);
+            Assert.AreEqual(0x55AA, ucApi.Magic);
             Assert.AreEqual(0, ucApi.Version);
-            Assert.AreEqual(0, ucApi.NumPayload);
-            Assert.AreEqual(0, ucApi.PayloadLength);
+            Assert.AreEqual(1, ucApi.NumPayload);
+            Assert.AreEqual(128, ucApi.PayloadLength);
             Assert.AreEqual(0, ucApi.CRC16);
             yield return null;
         }
@@ -25,10 +25,10 @@ namespace UCAPI4Unity.Tests
         {
             var ucApi = UcApiForUnity.CreateDefault();
             Assert.IsNotNull(ucApi);
-            Assert.AreEqual(0, ucApi.Magic);
+            Assert.AreEqual(0x55AA, ucApi.Magic);
             Assert.AreEqual(0, ucApi.Version);
-            Assert.AreEqual(0, ucApi.NumPayload);
-            Assert.AreEqual(0, ucApi.PayloadLength);
+            Assert.AreEqual(1, ucApi.NumPayload);
+            Assert.AreEqual(128, ucApi.PayloadLength);
             Assert.AreEqual(0, ucApi.CRC16);
 
             var result = UcApiForUnity.Serialize(ucApi, out _, out var outSize);
@@ -42,10 +42,10 @@ namespace UCAPI4Unity.Tests
         {
             var ucApi = UcApiForUnity.CreateDefault();
             Assert.IsNotNull(ucApi);
-            Assert.AreEqual(0, ucApi.Magic);
+            Assert.AreEqual(0x55AA, ucApi.Magic);
             Assert.AreEqual(0, ucApi.Version);
-            Assert.AreEqual(0, ucApi.NumPayload);
-            Assert.AreEqual(0, ucApi.PayloadLength);
+            Assert.AreEqual(1, ucApi.NumPayload);
+            Assert.AreEqual(128, ucApi.PayloadLength);
             Assert.AreEqual(0, ucApi.CRC16);
 
             var result = UcApiForUnity.Serialize(ucApi, out var outBuffer, out var outSize);

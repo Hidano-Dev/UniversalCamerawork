@@ -5,8 +5,8 @@
 #include <iostream>
 
 ucapi_t::ucapi_t(const void* dataPtr){
-	// magic‚Í0x5543‚Å‰Šú‰»
-	m_magic = 0x5543;
+    // magic‚Í0x55AA‚Å‰Šú‰»
+    m_magic = 0x55AA;
 	m_version = 0;
 	m_num_payload = 1;
 	m_payload_length = 128;
