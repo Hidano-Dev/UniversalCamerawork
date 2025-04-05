@@ -54,20 +54,19 @@ namespace UCAPI4Unity.Tests
             Assert.IsNotNull(clone);
 
             var data = new UcApiObject(original);
-            var cloneData = new UcApiObject(clone);
 
-            Assert.AreEqual(data.Magic, cloneData.Magic);
-            Assert.AreEqual(data.Version, cloneData.Version);
-            Assert.AreEqual(data.NumPayload, cloneData.NumPayload);
-            Assert.AreEqual(data.PayloadLength, cloneData.PayloadLength);
-            Assert.AreEqual(data.CRC16, cloneData.CRC16);
+            Assert.AreEqual(data.Magic, clone.Magic);
+            Assert.AreEqual(data.Version, clone.Version);
+            Assert.AreEqual(data.NumPayload, clone.NumPayload);
+            Assert.AreEqual(data.PayloadLength, clone.PayloadLength);
+            Assert.AreEqual(data.CRC16, clone.CRC16);
 
             Assert.IsNotNull(data.Payloads);
-            Assert.IsNotNull(cloneData.Payloads);
-            Assert.AreEqual(data.Payloads.Length, cloneData.Payloads.Length);
+            Assert.IsNotNull(clone.Payloads);
+            Assert.AreEqual(data.Payloads.Length, clone.Payloads.Length);
 
             var a = data.Payloads[0];
-            var b = cloneData.Payloads[0];
+            var b = clone.Payloads[0];
 
             Assert.AreEqual(a.CameraNo, b.CameraNo);
             Assert.AreEqual(a.Commands, b.Commands);
@@ -82,7 +81,6 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(a.TimeCode.DropFrame, b.TimeCode.DropFrame);
 
             UcApiForUnity.Free(original);
-            UcApiForUnity.Free(clone);
             yield return null;
         }
         
@@ -117,7 +115,6 @@ namespace UCAPI4Unity.Tests
             Assert.IsNotNull(deserialized);
 
             UcApiForUnity.Free(ucApi);
-            UcApiForUnity.Free(deserialized);
             yield return null;
         }
     }

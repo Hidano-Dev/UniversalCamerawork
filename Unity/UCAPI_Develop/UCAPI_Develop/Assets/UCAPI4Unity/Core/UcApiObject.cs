@@ -1,16 +1,18 @@
 using System;
 using System.IO;
+using MessagePack;
 
 namespace UCAPI4Unity.Core
 {
+    [MessagePackObject]
     public struct UcApiObject
     {
-        public ushort Magic;
-        public ushort Version;
-        public ushort NumPayload;
-        public ushort PayloadLength;
-        public ushort CRC16;
-        public UcApiRecord[] Payloads;
+        [Key(0)] public ushort Magic;
+        [Key(1)] public ushort Version;
+        [Key(2)] public ushort NumPayload;
+        [Key(3)] public ushort PayloadLength;
+        [Key(4)] public ushort CRC16;
+        [Key(5)] public UcApiRecord[] Payloads;
 
         private const int HeaderSize = 10;
 
@@ -31,7 +33,7 @@ namespace UCAPI4Unity.Core
 
             if (binary == null || binary.Length < HeaderSize)
                 throw new InvalidDataException("Failed to read binary data from UCAPI DLL object.");
-
+            
             using var ms = new MemoryStream(binary);
             using var br = new BinaryReader(ms);
 

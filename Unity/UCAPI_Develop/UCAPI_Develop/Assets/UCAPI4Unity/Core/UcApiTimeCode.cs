@@ -1,4 +1,5 @@
 using System;
+using MessagePack;
 
 namespace UCAPI4Unity.Core
 {
@@ -12,14 +13,15 @@ namespace UCAPI4Unity.Core
     /// 2bit...Reserved
     /// Total 32bit
     /// </summary>
+    [MessagePackObject]
     public struct UcApiTimeCode
     {
-        public int FrameNumber { get; }
-        public int Second { get; }
-        public int Minute { get; }
-        public int Hour { get; }
-        public FrameRate FrameRate { get; }
-        public bool DropFrame { get; }
+        [Key(0)] public int FrameNumber { get; set; }
+        [Key(1)] public int Second { get; set; }
+        [Key(2)] public int Minute { get; set; }
+        [Key(3)] public int Hour { get; set; }
+        [Key(4)] public FrameRate FrameRate { get; set; }
+        [Key(5)] public bool DropFrame { get; set; }
 
         private readonly int _reserved;
 
@@ -29,7 +31,7 @@ namespace UCAPI4Unity.Core
                 throw new ArgumentException("Timecode data must be 4 bytes.");
 
             // Little-endianでintに変換
-            int raw = BitConverter.ToInt32(data, 0);
+            var raw = BitConverter.ToInt32(data, 0);
 
             FrameNumber = raw & 0xFF;
             Second = (raw >> 8) & 0x3F;

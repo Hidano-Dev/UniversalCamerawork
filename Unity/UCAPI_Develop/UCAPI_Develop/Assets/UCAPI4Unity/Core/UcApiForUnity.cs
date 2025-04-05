@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using MessagePack;
 using UnityEngine;
 
 namespace UCAPI4Unity.Core
@@ -30,11 +31,11 @@ namespace UCAPI4Unity.Core
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern void UCAPI_FreeObject(IntPtr obj);
 
-        public static UcApiDllObject DeserializeFromMessagePack(byte[] messagePackData)
+        public static UcApiObject DeserializeFromMessagePack(byte[] messagePackData)
         {
-            var nativePtr = UCAPI_DeserializeMessagePack(messagePackData, (UIntPtr)messagePackData.Length);
-            Debug.Assert(nativePtr != IntPtr.Zero, "Deserialization failed.");
-            return new UcApiDllObject(nativePtr);
+            
+            var ucApiObject = MessagePackSerializer.Deserialize<UcApiObject>(messagePackData);
+            return ucApiObject;
         }
 
         public static byte[] SerializeToMessagePack(UcApiDllObject ucApiObject)

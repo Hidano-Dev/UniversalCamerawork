@@ -1,3 +1,4 @@
+using MessagePack;
 using UCAPI4Unity.Core;
 using UnityEngine;
 using uOSC;
@@ -9,32 +10,64 @@ namespace UCAPI4Unity.Sample
         [SerializeField] private uOscClient client;
         [SerializeField] private new Camera camera;
 
-        private void Start()
+        private void Update()
         {
-            var mock = CreateDefaultMock();
-            var msgpack = UcApiForUnity.SerializeToMessagePack(mock);
-            UcApiForUnity.Free(mock);
-            client.Send("/ucapi/data", msgpack);
+            var ucapi = CreateFromCamera(camera);
+            client.Send("/ucapi/data", ucapi);
         }
         
-        private static UcApiDllObject CreateDefaultMock()
+        private static byte[] CreateFromCamera(Camera cam)
         {
-            var binary = new byte[10 + 128];
-            binary[0] = 0xAA;
-            binary[1] = 0x55;
-            binary[4] = 0x01;
-            binary[6] = 0x80;
+            var obj = new UcApiObject
+            {
+                Magic = 0xAA55,
+                Version = 0,
+                NumPayload = 1,
+                PayloadLength = 128,
+                CRC16 = 0, // CRC16 placeholder
+                Payloads = new UcApiRecord[1]
+            };
+            obj.Payloads[0] = new UcApiRecord
+            {
+                CameraNo = 1,
+                Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
+                PacketNo = 1,
+                TimeCode = new UcApiTimeCode
+                {
+                    FrameNumber = 12,
+                    Second = 34,
+                    Minute = 56,
+                    Hour = 78,
+                    FrameRate = FrameRate.FrameRate60,
+                    DropFrame = false
+                },
+                EyePositionRightM = cam.transform.position.x,
+                EyePositionUpM = cam.transform.position.y,
+                EyePositionForwardM = cam.transform.position.z,
+                LookVectorRightM = cam.transform.forward.x,
+                LookVectorUpM = cam.transform.forward.y,
+                LookVectorForwardM = cam.transform.forward.z,
+                UpVectorRightM = cam.transform.up.x,
+                UpVectorUpM = cam.transform.up.y,
+                UpVectorForwardM = cam.transform.up.z,
+                FocalLengthMm = cam.focalLength,
+                AspectRatio = cam.aspect,
+                FocusDistanceM = cam.focusDistance,
+                Aperture = cam.aperture,
+                SensorSizeWidthMm = cam.sensorSize.x,
+                SensorSizeHeightMm = cam.sensorSize.y,
+                NearClipM = cam.nearClipPlane,
+                FarClipM = cam.farClipPlane,
+                LensShiftHorizontalRatio = cam.lensShift.x,
+                LensShiftVerticalRatio = cam.lensShift.y,
+                // Lens distortion と center point は 0 にしておく
+                LensDistortionRadialCoefficientsK1 = 0f,
+                LensDistortionRadialCoefficientsK2 = 0f,
+                LensDistortionCenterPointRightMm = 0f,
+                LensDistortionCenterPointUpMm = 0f
+            };
 
-            // 任意のカメラNo
-            binary[10 + 0] = 0x01;
-
-            // timeCode適当
-            binary[10 + 6] = 1;
-            binary[10 + 7] = 2;
-            binary[10 + 8] = 3;
-            binary[10 + 9] = 4;
-
-            return UcApiForUnity.DecodeFromBinary(binary);
+            return MessagePackSerializer.Serialize(obj);
         }
     }
 }
