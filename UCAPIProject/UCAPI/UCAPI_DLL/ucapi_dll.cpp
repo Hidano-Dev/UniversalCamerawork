@@ -3,6 +3,7 @@
 #include <iostream>
 #include <msgpack.hpp>
 #include "ucapi_msgpack_converter.h"
+#include "ucapi_serializer_utility.h"
 
 struct UCAPI_DllObject {
     ucapi_t* obj;
@@ -42,6 +43,40 @@ UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuff
     catch (const std::exception& e) {
         std::cerr << "[UCAPI_SerializeMessagePack] " << e.what() << std::endl;
         return -1;
+    }
+}
+
+UCAPI_API uint8_t* UCAPI_EncodeToBinary(UCAPI_DllObject* obj, size_t* outSize) {
+    try {
+		std::ostringstream oss(std::ios::binary);
+		write_ucapi(obj->obj, oss);
+
+		std::string bin = oss.str();
+		*outSize = bin.size();
+
+		uint8_t* out = new uint8_t[*outSize];
+		std::memcpy(out, bin.data(), *outSize);
+
+		return out;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[UCAPI_EncodeToBinary] " << e.what() << std::endl;
+        *outSize = 0;
+        return nullptr;
+    }
+}
+
+UCAPI_API UCAPI_DllObject* UCAPI_DecodeFromBinary(const uint8_t* data, size_t size) {
+    try {
+        if (!data || size == 0) return nullptr;
+
+        UCAPI_DllObject* wrapper = new UCAPI_DllObject;
+        wrapper->obj = new ucapi_t(static_cast<const void*>(data));  // _read ‚ª‘–‚é
+        return wrapper;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[UCAPI_DecodeFromBinary] " << e.what() << std::endl;
+        return nullptr;
     }
 }
 

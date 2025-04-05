@@ -176,6 +176,7 @@
     <ClInclude Include="ucapi_dll.h" />
     <ClInclude Include="ucapi_msgpack_converter.h" />
     <ClInclude Include="ucapi_msgpack_types.h" />
+    <ClInclude Include="ucapi_serializer_utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -188,6 +189,7 @@
     <ClCompile Include="ucapi.cpp" />
     <ClCompile Include="ucapi_dll.cpp" />
     <ClCompile Include="ucapi_msgpack_converter.cpp" />
+    <ClCompile Include="ucapi_serializer_utlity.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

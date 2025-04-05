@@ -25,6 +25,12 @@ extern "C" {
 
     UCAPI_API UCAPI_DllObject* UCAPI_DeserializeMessagePack(const uint8_t* buffer, size_t size);
 
+    UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuffer, size_t* outSize);
+    
+    UCAPI_API uint8_t* UCAPI_EncodeToBinary(UCAPI_DllObject* obj, size_t* outSize);
+    
+    UCAPI_API UCAPI_DllObject* UCAPI_DecodeFromBinary(const uint8_t* data, size_t size);
+
     /// <summary>
     /// Frees a byte buffer allocated by UCAPI_Serialize.
     /// </summary>
@@ -36,7 +42,6 @@ extern "C" {
     /// </summary>
     /// <param name="obj">Pointer to the UCAPI_DllObject to free.</param>
     UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj);
-    UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuffer, size_t* outSize);
 
 #ifdef __cplusplus
 }
