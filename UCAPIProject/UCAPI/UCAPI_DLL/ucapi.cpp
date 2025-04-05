@@ -13,10 +13,6 @@ ucapi_t::ucapi_t(const void* dataPtr){
 	m_crc16 = 0;
 
 	if (dataPtr == nullptr) {
-		m_payload.reserve(m_num_payload);
-		for (int i = 0; i < m_num_payload; i++) {
-			m_payload.emplace_back(m_payload_length);
-		}
 		return;
 	}
 

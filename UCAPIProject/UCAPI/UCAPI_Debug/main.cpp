@@ -1,119 +1,137 @@
 #ifdef _DEBUG
+#include "pch.h"
 #include <iostream>
 #include <iomanip>
+#include <msgpack.hpp>
 #include <ucapi.h>
 #include <ucapi_dll.h>
+#include "ucapi_msgpack_types.h"
 
-struct UCAPI_DllObject { // Forward declaration
+struct UCAPI_DllObject {
     ucapi_t* obj;
 };
 
 void Dump(UCAPI_DllObject* handle);
-void RawDump(UCAPI_DllObject* handle);
 
-/// <summary>
-/// Demonstrates creating default UCAPI data, serialization, and deserialization
-/// using unified memory management.
-/// </summary>
+// 最小構成の MessagePack オブジェクトを構築してテスト
 int main() {
-   // Create a default UCAPI object for serialization.
-   UCAPI_DllObject* defaultHandle = UCAPI_CreateDefault();
-   if (!defaultHandle) {
-       std::cerr << "Failed to create default UCAPI object." << std::endl;
-       return -1;
-   }
-   std::cout << "Default UCAPI object created successfully." << std::endl;
+    // MessagePack構造体の初期化
+    ucapi_msgpack_timecode_t tc = { 1, 2, 3, 4, 5, 0, 0 };
+    ucapi_msgpack_record_t record;
+    record.camera_no = 1;
+    record.commands = 0x0A;
+    record.timecode = tc;
+    record.packet_no = 5;
+    record.eye_position_right_m = 1.0f;
+	record.eye_position_up_m = 2.0f;
+	record.eye_position_forward_m = 3.0f;
+	record.look_vector_right_m = 4.0f;
+	record.look_vector_up_m = 5.0f;
+	record.look_vector_forward_m = 6.0f;
+	record.up_vector_right_m = 7.0f;
+	record.up_vector_up_m = 8.0f;
+	record.up_vector_forward_m = 9.0f;
+	record.focal_length_mm = 50.0f;
+	record.aspect_ratio = 1.78f;
+	record.focus_distance_m = 1.0f;
+	record.aperture = 2.8f;
+	record.sensor_size_width_mm = 36.0f;
+	record.sensor_size_height_mm = 24.0f;
+	record.near_clip_m = 0.1f;
+	record.far_clip_m = 100.0f;
+	record.lens_shift_horizontal_ratio = 0.0f;
+	record.lens_shift_vertical_ratio = 0.0f;
+	record.lens_distortion_radial_coefficients_k1 = 0.0f;
+	record.lens_distortion_radial_coefficients_k2 = 0.0f;
+	record.lens_distortion_center_point_right_mm = 0.0f;
+	record.lens_distortion_center_point_up_mm = 0.0f;
+	// 25バイト分の予約領域を確保
+    record.reserved = std::vector<uint8_t>(25, 0);
 
-   // 一度ダンプしてみる
-   Dump(defaultHandle);
+    ucapi_msgpack_t data;
+    data.magic = 0x55AA;
+    data.version = 1;
+    data.num_payload = 1;
+    data.payload_length = 128;
+    data.crc16 = 0;
+    data.payload.push_back(record);
 
-   // Serialize the default UCAPI object.
-   uint8_t* serializedBuffer = nullptr;
-   size_t serializedSize = 0;
-   if (UCAPI_Serialize(defaultHandle, &serializedBuffer, &serializedSize) != 0) {
-       std::cerr << "Serialization failed." << std::endl;
-       UCAPI_FreeObject(defaultHandle);
-       return -1;
-   }
-   std::cout << "Serialization succeeded. Serialized size: " << serializedSize << " bytes." << std::endl;
+    // MessagePackバイナリにエンコード
+    msgpack::sbuffer sbuf;
+    msgpack::pack(sbuf, data);
 
-   // Deserialize the serialized data.
-   UCAPI_DllObject* deserializedHandle = UCAPI_Deserialize(serializedBuffer, serializedSize);
-   if (!deserializedHandle) {
-       std::cerr << "Deserialization failed." << std::endl;
-       UCAPI_FreeBuffer(serializedBuffer);
-       UCAPI_FreeObject(defaultHandle);
-       return -1;
-   }
-   std::cout << "Deserialization succeeded." << std::endl;
+    // Deserialize via DLL
+    UCAPI_DllObject* handle = UCAPI_DeserializeMessagePack(reinterpret_cast<const uint8_t*>(sbuf.data()), sbuf.size());
+    if (!handle) {
+        std::cerr << "Deserialization failed." << std::endl;
+        return -1;
+    }
 
-   // オブジェクトに変換して各フィールドを表示
-   Dump(deserializedHandle);
+    std::cout << "Deserialization succeeded!" << std::endl;
+    Dump(handle);
 
-   // Free the allocated resources.
-   UCAPI_FreeBuffer(serializedBuffer);
-   UCAPI_FreeObject(deserializedHandle);
-   UCAPI_FreeObject(defaultHandle);
+    // Serialize back via DLL
+    uint8_t* outBuf = nullptr;
+    size_t outSize = 0;
+    if (UCAPI_SerializeMessagePack(handle, &outBuf, &outSize) != 0) {
+        std::cerr << "Serialization failed." << std::endl;
+        UCAPI_FreeObject(handle);
+        return -1;
+    }
 
-   return 0;
+    std::cout << "Serialization succeeded! Size: " << outSize << " bytes" << std::endl;
+
+    // 後始末
+    UCAPI_FreeBuffer(outBuf);
+    UCAPI_FreeObject(handle);
+    return 0;
 }
 
 void Dump(UCAPI_DllObject* handle) {
-    ucapi_t* obj = handle->obj;
+    const ucapi_t* obj = handle->obj;
     std::cout << "Magic: " << obj->m_magic << std::endl;
     std::cout << "Version: " << obj->m_version << std::endl;
     std::cout << "Num Payload: " << obj->m_num_payload << std::endl;
     std::cout << "Payload Length: " << obj->m_payload_length << std::endl;
     std::cout << "CRC16: " << obj->m_crc16 << std::endl;
 
-
-    // Recordのフィールドを表示
-    ucapi_t::record_t* m_payload = obj->m_payload;
-    std::cout << "CameraNo " << m_payload->m_camera_no << std::endl;
-    std::cout << "Commands " << m_payload->m_commands << std::endl;
-    std::cout << "Timecode Frame Number " << std::to_string(m_payload->m_timecode.m_frame_number) << std::endl;
-	std::cout << "Timecode Second Number " << std::to_string(m_payload->m_timecode.m_second_number) << std::endl;
-	std::cout << "Timecode Minute Number " << std::to_string(m_payload->m_timecode.m_minute_number) << std::endl;
-	std::cout << "Timecode Hour Number " << std::to_string(m_payload->m_timecode.m_hour_number) << std::endl;
-	std::cout << "Timecode Frame Rate " << std::to_string(m_payload->m_timecode.m_frame_rate) << std::endl;
-	std::cout << "Timecode Drop Frame " << std::to_string(m_payload->m_timecode.m_drop_frame) << std::endl;
-	std::cout << "Timecode Reserved " << std::to_string(m_payload->m_timecode.m_reserved) << std::endl;
-    std::cout << "PacketNo " << std::to_string(m_payload->m_packet_no) << std::endl;
-    std::cout << "Eye Position Right M " << m_payload->m_eye_position_right_m << std::endl;
-    std::cout << "Eye Position Up M " << m_payload->m_eye_position_up_m << std::endl;
-    std::cout << "Eye Position Forward M " << m_payload->m_eye_position_forward_m << std::endl;
-    std::cout << "Look Vector Right M " << m_payload->m_look_vector_right_m << std::endl;
-    std::cout << "Look Vector Up M " << m_payload->m_look_vector_up_m << std::endl;
-    std::cout << "Look Vector Forward M " << m_payload->m_look_vector_forward_m << std::endl;
-    std::cout << "Up Vector Right M " << m_payload->m_up_vector_right_m << std::endl;
-    std::cout << "Up Vector Up M " << m_payload->m_up_vector_up_m << std::endl;
-    std::cout << "Up Vector Forward M " << m_payload->m_up_vector_forward_m << std::endl;
-    std::cout << "Focal Length Mm " << m_payload->m_focal_length_mm << std::endl;
-    std::cout << "Aspect Ratio " << m_payload->m_aspect_ratio << std::endl;
-    std::cout << "Focus Distance M " << m_payload->m_focus_distance_m << std::endl;
-    std::cout << "Aperture " << m_payload->m_aperture << std::endl;
-    std::cout << "Sensor Size Width Mm " << m_payload->m_sensor_size_width_mm << std::endl;
-    std::cout << "Sensor Size Height Mm " << m_payload->m_sensor_size_height_mm << std::endl;
-    std::cout << "Near Clip M " << m_payload->m_near_clip_m << std::endl;
-    std::cout << "Far Clip M " << m_payload->m_far_clip_m << std::endl;
-    std::cout << "Lens Shift Horizontal Ratio " << m_payload->m_lens_shift_horizontal_ratio << std::endl;
-    std::cout << "Lens Shift Vertical Ratio " << m_payload->m_lens_shift_vertical_ratio << std::endl;
-    std::cout << "Lens Distortion Radial Coefficients K1 " << m_payload->m_lens_distortion_radial_coefficients_k1 << std::endl;
-    std::cout << "Lens Distortion Radial Coefficients K2 " << m_payload->m_lens_distortion_radial_coefficients_k2 << std::endl;
-    std::cout << "Lens Distortion Center Point Right Mm " << m_payload->m_lens_distortion_center_point_right_mm << std::endl;
-    std::cout << "Lens Distortion Center Point Up Mm " << m_payload->m_lens_distortion_center_point_up_mm << std::endl;
-}
-
-void RawDump(UCAPI_DllObject* handle) {  
-   ucapi_t* obj = handle->obj;  
-   // 全てをバイト列として表示
-   std::cout << "Raw Data: ";
-   for (size_t i = 0; i < sizeof(ucapi_t); i++) {
-	   // 1バイトずつ16進数で表示
-	   // 2桁表示で、ハイフンで区切る
-	   std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)((uint8_t*)obj)[i] << "-";
-   }
-   std::cout << std::endl;
+	for (size_t i = 0; i < obj->m_num_payload; ++i) {
+        const auto& m_payload = obj->m_payload[i];
+        std::cout << "--- Payload " << i << " ---" << std::endl;
+        std::cout << "CameraNo " << m_payload.m_camera_no << std::endl;
+        std::cout << "Commands " << m_payload.m_commands << std::endl;
+        std::cout << "Timecode Frame Number " << std::to_string(m_payload.m_timecode.m_frame_number) << std::endl;
+		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_frame_number) << std::endl;
+		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_second_number) << std::endl;
+		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_minute_number) << std::endl;
+		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_hour_number) << std::endl;
+		std::cout << "Timecode Frame Rate " << std::to_string(m_payload.m_timecode.m_frame_rate) << std::endl;
+		std::cout << "Timecode Drop Frame " << std::to_string(m_payload.m_timecode.m_drop_frame) << std::endl;
+		std::cout << "Packet No " << m_payload.m_packet_no << std::endl;
+		std::cout << "Eye Position Right " << m_payload.m_eye_position_right_m << std::endl;
+		std::cout << "Eye Position Up " << m_payload.m_eye_position_up_m << std::endl;
+		std::cout << "Eye Position Forward " << m_payload.m_eye_position_forward_m << std::endl;
+		std::cout << "Look Vector Right " << m_payload.m_look_vector_right_m << std::endl;
+		std::cout << "Look Vector Up " << m_payload.m_look_vector_up_m << std::endl;
+		std::cout << "Look Vector Forward " << m_payload.m_look_vector_forward_m << std::endl;
+		std::cout << "Up Vector Right " << m_payload.m_up_vector_right_m << std::endl;
+		std::cout << "Up Vector Up " << m_payload.m_up_vector_up_m << std::endl;
+		std::cout << "Up Vector Forward " << m_payload.m_up_vector_forward_m << std::endl;
+		std::cout << "Focal Length " << m_payload.m_focal_length_mm << std::endl;
+		std::cout << "Aspect Ratio " << m_payload.m_aspect_ratio << std::endl;
+		std::cout << "Focus Distance " << m_payload.m_focus_distance_m << std::endl;
+		std::cout << "Aperture " << m_payload.m_aperture << std::endl;
+		std::cout << "Sensor Size Width " << m_payload.m_sensor_size_width_mm << std::endl;
+		std::cout << "Sensor Size Height " << m_payload.m_sensor_size_height_mm << std::endl;
+		std::cout << "Near Clip " << m_payload.m_near_clip_m << std::endl;
+		std::cout << "Far Clip " << m_payload.m_far_clip_m << std::endl;
+		std::cout << "Lens Shift Horizontal Ratio " << m_payload.m_lens_shift_horizontal_ratio << std::endl;
+		std::cout << "Lens Shift Vertical Ratio " << m_payload.m_lens_shift_vertical_ratio << std::endl;
+		std::cout << "Lens Distortion Radial Coefficients K1 " << m_payload.m_lens_distortion_radial_coefficients_k1 << std::endl;
+		std::cout << "Lens Distortion Radial Coefficients K2 " << m_payload.m_lens_distortion_radial_coefficients_k2 << std::endl;
+		std::cout << "Lens Distortion Center Point Right " << m_payload.m_lens_distortion_center_point_right_mm << std::endl;
+		std::cout << "Lens Distortion Center Point Up " << m_payload.m_lens_distortion_center_point_up_mm << std::endl;
+    }
 }
 
 #endif // _DEBUG

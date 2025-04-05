@@ -10,6 +10,7 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
     ucapi->m_num_payload = msgpack_obj.num_payload;
     ucapi->m_payload_length = msgpack_obj.payload_length;
     ucapi->m_crc16 = msgpack_obj.crc16;
+	ucapi->m_payload.reserve(msgpack_obj.num_payload);
 
     for (const auto& rec : msgpack_obj.payload) {
 		ucapi->m_payload.emplace_back(ucapi->m_payload_length);
