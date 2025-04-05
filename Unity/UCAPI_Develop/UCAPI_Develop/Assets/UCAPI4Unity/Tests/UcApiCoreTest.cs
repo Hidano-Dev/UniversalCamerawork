@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 using UCAPI4Unity.Core;
 
@@ -7,92 +6,118 @@ namespace UCAPI4Unity.Tests
 {
     public class UcApiCoreTest
     {
-        [Test(ExpectedResult = null)]
-        public IEnumerator UcApiCoreTest_CreateDefault()
+        private static UcApiDllObject CreateDefaultMock()
         {
-            var ucApi = UcApiForUnity.CreateDefault();
-            Assert.IsNotNull(ucApi);
-            Assert.AreEqual(0x55AA, ucApi.Magic);
-            Assert.AreEqual(0, ucApi.Version);
-            Assert.AreEqual(1, ucApi.NumPayload);
-            Assert.AreEqual(128, ucApi.PayloadLength);
-            Assert.AreEqual(0, ucApi.CRC16);
+            var binary = new byte[10 + 128];
+            binary[0] = 0xAA;
+            binary[1] = 0x55;
+            binary[2] = 0x00;
+            binary[3] = 0x00;
+            binary[4] = 0x01;
+            binary[5] = 0x00;
+            binary[6] = 0x80;
+            binary[7] = 0x00;
+            binary[8] = 0x00;
+            binary[9] = 0x00;
+
+            // カメラNo (uint32_t) -> 1
+            binary[10 + 0] = 0x01;
+
+            // commands (uint16_t) -> 0x0A0B
+            binary[10 + 4] = 0x0B;
+            binary[10 + 5] = 0x0A;
+
+            // timecode
+            binary[10 + 6] = 12;           // frame
+            binary[10 + 7] = 34;           // second + (minute lower bits)
+            binary[10 + 8] = 56;           // minute + hour lower bits
+            binary[10 + 9] = 78;           // hour upper + framerate + drop + reserved
+
+            // packetNo (uint8_t)
+            binary[10 + 10] = 0x2A;
+
+            // その他 float 値はすべてゼロのままにする
+
+            return UcApiForUnity.DecodeFromBinary(binary);
+        }
+
+        [Test(ExpectedResult = null)]
+        public IEnumerator UcApiCoreTest_SerializeDeserialize_CompareFields()
+        {
+            var original = CreateDefaultMock();
+
+            var msgpack = UcApiForUnity.SerializeToMessagePack(original);
+            Assert.IsNotNull(msgpack);
+            Assert.IsTrue(msgpack.Length > 0);
+
+            var clone = UcApiForUnity.DeserializeFromMessagePack(msgpack);
+            Assert.IsNotNull(clone);
+
+            var data = new UcApiObject(original);
+            var cloneData = new UcApiObject(clone);
+
+            Assert.AreEqual(data.Magic, cloneData.Magic);
+            Assert.AreEqual(data.Version, cloneData.Version);
+            Assert.AreEqual(data.NumPayload, cloneData.NumPayload);
+            Assert.AreEqual(data.PayloadLength, cloneData.PayloadLength);
+            Assert.AreEqual(data.CRC16, cloneData.CRC16);
+
+            Assert.IsNotNull(data.Payloads);
+            Assert.IsNotNull(cloneData.Payloads);
+            Assert.AreEqual(data.Payloads.Length, cloneData.Payloads.Length);
+
+            var a = data.Payloads[0];
+            var b = cloneData.Payloads[0];
+
+            Assert.AreEqual(a.CameraNo, b.CameraNo);
+            Assert.AreEqual(a.Commands, b.Commands);
+            Assert.AreEqual(a.PacketNo, b.PacketNo);
+
+            // Timecode 比較（ToString または各フィールド）
+            Assert.AreEqual(a.TimeCode.FrameNumber, b.TimeCode.FrameNumber);
+            Assert.AreEqual(a.TimeCode.Second, b.TimeCode.Second);
+            Assert.AreEqual(a.TimeCode.Minute, b.TimeCode.Minute);
+            Assert.AreEqual(a.TimeCode.Hour, b.TimeCode.Hour);
+            Assert.AreEqual(a.TimeCode.FrameRate, b.TimeCode.FrameRate);
+            Assert.AreEqual(a.TimeCode.DropFrame, b.TimeCode.DropFrame);
+
+            UcApiForUnity.Free(original);
+            UcApiForUnity.Free(clone);
             yield return null;
         }
         
         [Test(ExpectedResult = null)]
-        public IEnumerator UcApiCoreTest_Serialize()
+        public IEnumerator UcApiCoreTest_EncodeDecodeBinary()
         {
-            var ucApi = UcApiForUnity.CreateDefault();
+            var ucApi = CreateDefaultMock();
             Assert.IsNotNull(ucApi);
-            Assert.AreEqual(0x55AA, ucApi.Magic);
-            Assert.AreEqual(0, ucApi.Version);
-            Assert.AreEqual(1, ucApi.NumPayload);
-            Assert.AreEqual(128, ucApi.PayloadLength);
-            Assert.AreEqual(0, ucApi.CRC16);
 
-            var result = UcApiForUnity.Serialize(ucApi, out _, out var outSize);
-            Assert.AreEqual(0, result);
-            Assert.IsTrue(outSize.ToUInt32() > 0);
+            var binary = UcApiForUnity.EncodeToBinary(ucApi);
+            Assert.IsNotNull(binary);
+            Assert.IsTrue(binary.Length >= 138);
+
+            var decoded = UcApiForUnity.DecodeFromBinary(binary);
+            Assert.IsNotNull(decoded);
+            UcApiForUnity.Free(ucApi);
+            UcApiForUnity.Free(decoded);
             yield return null;
         }
-        
+
         [Test(ExpectedResult = null)]
-        public IEnumerator UcApiCoreTest_Deserialize()
+        public IEnumerator UcApiCoreTest_SerializeDeserializeMessagePack()
         {
-            var ucApi = UcApiForUnity.CreateDefault();
+            var ucApi = CreateDefaultMock();
             Assert.IsNotNull(ucApi);
-            Assert.AreEqual(0x55AA, ucApi.Magic);
-            Assert.AreEqual(0, ucApi.Version);
-            Assert.AreEqual(1, ucApi.NumPayload);
-            Assert.AreEqual(128, ucApi.PayloadLength);
-            Assert.AreEqual(0, ucApi.CRC16);
 
-            var result = UcApiForUnity.Serialize(ucApi, out var outBuffer, out var outSize);
-            Assert.AreEqual(0, result);
-            Assert.IsTrue(outSize.ToUInt32() > 0);
+            var msgpack = UcApiForUnity.SerializeToMessagePack(ucApi);
+            Assert.IsNotNull(msgpack);
+            Assert.IsTrue(msgpack.Length > 0);
 
-            var managedBuffer = new byte[outSize.ToUInt32()];
-            Marshal.Copy(outBuffer, managedBuffer, 0, (int)outSize.ToUInt32());
-            
-            var deserializedUcApi = UcApiForUnity.Deserialize(managedBuffer);
-            Assert.IsNotNull(deserializedUcApi);
-            Assert.AreEqual(ucApi.Magic, deserializedUcApi.Magic);
-            Assert.AreEqual(ucApi.Version, deserializedUcApi.Version);
-            Assert.AreEqual(ucApi.NumPayload, deserializedUcApi.NumPayload);
-            Assert.AreEqual(ucApi.PayloadLength, deserializedUcApi.PayloadLength);
-            Assert.AreEqual(ucApi.CRC16, deserializedUcApi.CRC16);
-            Assert.AreEqual(ucApi.Payloads.Length, deserializedUcApi.Payloads.Length);
-            for (var i = 0; i < ucApi.Payloads.Length; i++)
-            {
-                Assert.AreEqual(ucApi.Payloads[i].CameraNo, deserializedUcApi.Payloads[i].CameraNo);
-                Assert.AreEqual(ucApi.Payloads[i].Commands, deserializedUcApi.Payloads[i].Commands);
-                Assert.AreEqual(ucApi.Payloads[i].TimeCode.ToString(), deserializedUcApi.Payloads[i].TimeCode.ToString());
-                Assert.AreEqual(ucApi.Payloads[i].PacketNo, deserializedUcApi.Payloads[i].PacketNo);
-                Assert.AreEqual(ucApi.Payloads[i].EyePositionRightM, deserializedUcApi.Payloads[i].EyePositionRightM);
-                Assert.AreEqual(ucApi.Payloads[i].EyePositionUpM, deserializedUcApi.Payloads[i].EyePositionUpM);
-                Assert.AreEqual(ucApi.Payloads[i].EyePositionForwardM, deserializedUcApi.Payloads[i].EyePositionForwardM);
-                Assert.AreEqual(ucApi.Payloads[i].LookVectorRightM, deserializedUcApi.Payloads[i].LookVectorRightM);
-                Assert.AreEqual(ucApi.Payloads[i].LookVectorUpM, deserializedUcApi.Payloads[i].LookVectorUpM);
-                Assert.AreEqual(ucApi.Payloads[i].LookVectorForwardM, deserializedUcApi.Payloads[i].LookVectorForwardM);
-                Assert.AreEqual(ucApi.Payloads[i].UpVectorRightM, deserializedUcApi.Payloads[i].UpVectorRightM);
-                Assert.AreEqual(ucApi.Payloads[i].UpVectorUpM, deserializedUcApi.Payloads[i].UpVectorUpM);
-                Assert.AreEqual(ucApi.Payloads[i].UpVectorForwardM, deserializedUcApi.Payloads[i].UpVectorForwardM);
-                Assert.AreEqual(ucApi.Payloads[i].FocalLengthMm, deserializedUcApi.Payloads[i].FocalLengthMm);
-                Assert.AreEqual(ucApi.Payloads[i].AspectRatio, deserializedUcApi.Payloads[i].AspectRatio);
-                Assert.AreEqual(ucApi.Payloads[i].FocusDistanceM, deserializedUcApi.Payloads[i].FocusDistanceM);
-                Assert.AreEqual(ucApi.Payloads[i].Aperture, deserializedUcApi.Payloads[i].Aperture);
-                Assert.AreEqual(ucApi.Payloads[i].SensorSizeWidthMm, deserializedUcApi.Payloads[i].SensorSizeWidthMm);
-                Assert.AreEqual(ucApi.Payloads[i].SensorSizeHeightMm, deserializedUcApi.Payloads[i].SensorSizeHeightMm);
-                Assert.AreEqual(ucApi.Payloads[i].NearClipM, deserializedUcApi.Payloads[i].NearClipM);
-                Assert.AreEqual(ucApi.Payloads[i].FarClipM, deserializedUcApi.Payloads[i].FarClipM);
-                Assert.AreEqual(ucApi.Payloads[i].LensShiftHorizontalRatio, deserializedUcApi.Payloads[i].LensShiftHorizontalRatio);
-                Assert.AreEqual(ucApi.Payloads[i].LensShiftVerticalRatio, deserializedUcApi.Payloads[i].LensShiftVerticalRatio);
-                Assert.AreEqual(ucApi.Payloads[i].LensDistortionRadialCoefficientsK1, deserializedUcApi.Payloads[i].LensDistortionRadialCoefficientsK1);
-                Assert.AreEqual(ucApi.Payloads[i].LensDistortionRadialCoefficientsK2, deserializedUcApi.Payloads[i].LensDistortionRadialCoefficientsK2);
-                Assert.AreEqual(ucApi.Payloads[i].LensDistortionCenterPointRightMm, deserializedUcApi.Payloads[i].LensDistortionCenterPointRightMm);
-                Assert.AreEqual(ucApi.Payloads[i].LensDistortionCenterPointUpMm, deserializedUcApi.Payloads[i].LensDistortionCenterPointUpMm);
-            }
+            var deserialized = UcApiForUnity.DeserializeFromMessagePack(msgpack);
+            Assert.IsNotNull(deserialized);
+
+            UcApiForUnity.Free(ucApi);
+            UcApiForUnity.Free(deserialized);
             yield return null;
         }
     }

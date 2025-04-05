@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace UCAPI4Unity.Core
 {
@@ -34,26 +32,29 @@ namespace UCAPI4Unity.Core
         public readonly float LensDistortionCenterPointRightMm;
         public readonly float LensDistortionCenterPointUpMm;
 
-        public UcApiRecord(IntPtr ptr, int size)
+        public UcApiRecord(byte[] buffer)
         {
-            var buffer = new byte[size];
-            Marshal.Copy(ptr, buffer, 0, size);
-            
             using var ms = new MemoryStream(buffer);
             using var br = new BinaryReader(ms);
+
             CameraNo = br.ReadUInt32();
             Commands = br.ReadUInt16();
-            TimeCode = new UcApiTimeCode(br.ReadInt32());
+            var timeCodeBytes = br.ReadBytes(4);
+            TimeCode = new UcApiTimeCode(timeCodeBytes);
             PacketNo = br.ReadByte();
+
             EyePositionRightM = br.ReadSingle();
             EyePositionUpM = br.ReadSingle();
             EyePositionForwardM = br.ReadSingle();
+
             LookVectorRightM = br.ReadSingle();
             LookVectorUpM = br.ReadSingle();
             LookVectorForwardM = br.ReadSingle();
+
             UpVectorRightM = br.ReadSingle();
             UpVectorUpM = br.ReadSingle();
             UpVectorForwardM = br.ReadSingle();
+
             FocalLengthMm = br.ReadSingle();
             AspectRatio = br.ReadSingle();
             FocusDistanceM = br.ReadSingle();
@@ -68,6 +69,8 @@ namespace UCAPI4Unity.Core
             LensDistortionRadialCoefficientsK2 = br.ReadSingle();
             LensDistortionCenterPointRightMm = br.ReadSingle();
             LensDistortionCenterPointUpMm = br.ReadSingle();
+
+            br.ReadBytes(25); // reserved
         }
     }
 }

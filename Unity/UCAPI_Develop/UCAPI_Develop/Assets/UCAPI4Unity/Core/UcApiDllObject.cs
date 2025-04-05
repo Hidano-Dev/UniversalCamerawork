@@ -2,8 +2,18 @@ using System;
 
 namespace UCAPI4Unity.Core
 {
-    public struct UcApiDllObject
+    public class UcApiDllObject
     {
-        public IntPtr Obj;
+        public IntPtr NativePtr;
+        
+        internal UcApiDllObject(IntPtr ptr)
+        {
+            NativePtr = ptr;
+        }
+
+        internal void Invalidate()
+        {
+            NativePtr = IntPtr.Zero;
+        }
     }
 }

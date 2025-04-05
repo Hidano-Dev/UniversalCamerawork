@@ -1,3 +1,5 @@
+using System;
+
 namespace UCAPI4Unity.Core
 {
     /// <summary>
@@ -12,68 +14,32 @@ namespace UCAPI4Unity.Core
     /// </summary>
     public struct UcApiTimeCode
     {
-        public  int FrameNumber { get; }
+        public int FrameNumber { get; }
         public int Second { get; }
         public int Minute { get; }
         public int Hour { get; }
-        
         public FrameRate FrameRate { get; }
-        
         public bool DropFrame { get; }
-        
-        private int _reserved;
 
-        
-        /// <summary>
-        /// 32bitのデータをTimeCodeに変換する
-        /// </summary>
-        /// <param name="data"></param>
-        public UcApiTimeCode(int data)
+        private readonly int _reserved;
+
+        public UcApiTimeCode(byte[] data)
         {
-            FrameNumber = GetFrameNumber(data);
-            Second = GetSecond(data);
-            Minute = GetMinute(data);
-            Hour = GetHour(data);
-            FrameRate = GetFrameRate(data);
-            DropFrame = GetDropFrame(data);
-            _reserved = GetReserved(data);
+            if (data == null || data.Length != 4)
+                throw new ArgumentException("Timecode data must be 4 bytes.");
+
+            // Little-endianでintに変換
+            int raw = BitConverter.ToInt32(data, 0);
+
+            FrameNumber = raw & 0xFF;
+            Second = (raw >> 8) & 0x3F;
+            Minute = (raw >> 14) & 0x3F;
+            Hour = (raw >> 20) & 0x1F;
+            FrameRate = (FrameRate)((raw >> 25) & 0xF);
+            DropFrame = ((raw >> 29) & 0x1) == 1;
+            _reserved = (raw >> 30) & 0x3;
         }
-        
-        private static int GetFrameNumber(int data)
-        {
-            return data & 0xFF;
-        }
-        
-        private static int GetSecond(int data)
-        {
-            return (data >> 8) & 0x3F;
-        }
-        
-        private static int GetMinute(int data)
-        {
-            return (data >> 14) & 0x3F;
-        }
-        
-        private static int GetHour(int data)
-        {
-            return (data >> 20) & 0x1F;
-        }
-        
-        private static FrameRate GetFrameRate(int data)
-        {
-            return (FrameRate)((data >> 25) & 0xF);
-        }
-        
-        private static bool GetDropFrame(int data)
-        {
-            return ((data >> 29) & 0x1) == 1;
-        }
-        
-        private static int GetReserved(int data)
-        {
-            return (data >> 30) & 0x3;
-        }
-        
+
         public override string ToString()
         {
             return $"{Hour:D2}:{Minute:D2}:{Second:D2}:{FrameNumber:D2} " +
