@@ -13,9 +13,10 @@ ucapi_t::ucapi_t(const void* dataPtr){
 	m_crc16 = 0;
 
 	if (dataPtr == nullptr) {
-		auto payloadArray = new std::vector<record_t>();
-		payloadArray->push_back(record_t(m_payload_length));
-		m_payload = &payloadArray->at(0);
+		m_payload.reserve(m_num_payload);
+		for (int i = 0; i < m_num_payload; i++) {
+			m_payload.emplace_back(m_payload_length);
+		}
 		return;
 	}
 
@@ -50,12 +51,12 @@ void ucapi_t::_read(const void* dataPtr) {
 			throw std::runtime_error("Invalid payload size");
 		}
 
+		m_payload.clear();
+		m_payload.reserve(m_num_payload);
 		auto payloadArray = new std::vector<record_t>();
 		for (int i = 0; i < m_num_payload; i++) {
-			// ペイロードのバイト数を読み取る
-			payloadArray->push_back(record_t(m_payload_length, &data[10 + i * m_payload_length]));
+			m_payload.emplace_back(m_payload_length, &data[10 + i * m_payload_length]);
 		}
-		m_payload = &payloadArray->at(0);
 	}
 	catch (std::exception& e) {
 		_clean_up();
@@ -70,9 +71,7 @@ ucapi_t::~ucapi_t() {
 }
 
 void ucapi_t::_clean_up() {
-    if (m_payload) {
-		delete m_payload;
-    }
+	m_payload.clear();
 }
 
 ucapi_t::timecode_t::timecode_t(const void* dataPtr) {

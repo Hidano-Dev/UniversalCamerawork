@@ -105,7 +105,7 @@ public:
     uint16_t m_num_payload;
     uint16_t m_payload_length;
     uint16_t m_crc16;
-    record_t* m_payload;
+    std::vector<record_t> m_payload;
 };
 
 #endif  // UCAPI_H_

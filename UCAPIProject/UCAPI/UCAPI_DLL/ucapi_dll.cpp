@@ -1,41 +1,46 @@
 #include "pch.h"
-#include "ucapi.h"
 #include "ucapi_dll.h"
-#include "ucapi_serializer_utility.h"
-#include <sstream>
-#include <vector>
-#include <cstring>
-#include <exception>
 #include <iostream>
+#include <msgpack.hpp>
+#include "ucapi_msgpack_converter.h"
 
-// Define the wrapper structure to hold both the deserialized UCAPI object and its stream.
 struct UCAPI_DllObject {
     ucapi_t* obj;
 };
 
-/// <summary>
-/// Serializes the given UCAPI structure into a newly allocated byte buffer.
-/// </summary>
-/// <param name="ucapi">Pointer to the UCAPI structure to serialize.</param>
-/// <param name="outBuffer">Pointer to the output byte buffer pointer.</param>
-/// <param name="outSize">Pointer to the output buffer size.</param>
-/// <returns>0 on success, non-zero on failure.</returns>
-extern "C" UCAPI_API int UCAPI_Serialize(UCAPI_DllObject* ucapi, uint8_t** outBuffer, size_t* outSize) {
+UCAPI_API UCAPI_DllObject* UCAPI_DeserializeMessagePack(const uint8_t* buffer, size_t size) {
     try {
-		const ucapi_t* ucapiObj = ucapi->obj;
-        // Create an output stream in binary mode.
-        std::ostringstream oss(std::ios::binary);
-        // Serialize the UCAPI object into the stream.
-        write_ucapi(ucapiObj, oss);
-        // Obtain the binary data.
-        std::string data = oss.str();
-        *outSize = data.size();
-        // Allocate a buffer for the output data.
+        msgpack::object_handle oh = msgpack::unpack(reinterpret_cast<const char*>(buffer), size);
+        msgpack::object obj = oh.get();
+
+        ucapi_msgpack_t msgpack_obj;
+        obj.convert(msgpack_obj);
+
+        ucapi_t* native = convert_to_ucapi(msgpack_obj);
+
+        UCAPI_DllObject* wrapper = new UCAPI_DllObject;
+        wrapper->obj = native;
+        return wrapper;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[UCAPI_DeserializeMessagePack] " << e.what() << std::endl;
+        return nullptr;
+    }
+}
+
+UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuffer, size_t* outSize) {
+    try {
+        ucapi_msgpack_t packed = convert_to_msgpack(obj->obj);
+        msgpack::sbuffer sbuf;
+        msgpack::pack(sbuf, packed);
+
+        *outSize = sbuf.size();
         *outBuffer = new uint8_t[*outSize];
-        std::memcpy(*outBuffer, data.data(), *outSize);
+        std::memcpy(*outBuffer, sbuf.data(), *outSize);
         return 0;
     }
-    catch (const std::exception&) {
+    catch (const std::exception& e) {
+        std::cerr << "[UCAPI_SerializeMessagePack] " << e.what() << std::endl;
         return -1;
     }
 }
@@ -44,59 +49,19 @@ extern "C" UCAPI_API int UCAPI_Serialize(UCAPI_DllObject* ucapi, uint8_t** outBu
 /// Frees a byte buffer allocated by UCAPI_Serialize.
 /// </summary>
 /// <param name="buffer">Pointer to the buffer to free.</param>
-extern "C" UCAPI_API void UCAPI_FreeBuffer(uint8_t* buffer) {
+UCAPI_API void UCAPI_FreeBuffer(uint8_t* buffer) {
     delete[] buffer;
-}
-
-/// <summary>
-/// Deserializes the given byte buffer into a UCAPI object.
-/// </summary>
-/// <param name="inBuffer">Pointer to the input byte buffer.</param>
-/// <param name="inSize">Size of the input buffer.</param>
-/// <returns>Pointer to a UCAPI_DllObject on success, or nullptr on failure.</returns>
-extern "C" UCAPI_API UCAPI_DllObject* UCAPI_Deserialize(const uint8_t* inBuffer, size_t inSize) {
-    try {
-        // Create a std::string from the input buffer.
-        std::string data(reinterpret_cast<const char*>(inBuffer), inSize);
-		ucapi_t* obj = new ucapi_t(data.data());
-        // Allocate and initialize the wrapper.
-        UCAPI_DllObject* wrapper = new UCAPI_DllObject;
-        wrapper->obj = obj;
-        return wrapper;
-    }
-    catch (const std::exception& exp) {
-		// Print the exception message to the console.
-		std::cerr << exp.what() << std::endl;
-        return nullptr;
-    }
 }
 
 /// <summary>
 /// Frees the UCAPI object created by UCAPI_Deserialize.
 /// </summary>
 /// <param name="obj">Pointer to the UCAPI_DllObject to free.</param>
-extern "C" UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj) {
+UCAPI_API void UCAPI_FreeObject(UCAPI_DllObject* obj) {
     if (obj) {
         if (obj->obj) {
             delete obj->obj;
         }
         delete obj;
-    }
-}
-
-/// <summary>
-/// Creates a new default UCAPI object for serialization wrapped in a UCAPI_DllObject.
-/// </summary>
-/// <returns>Pointer to a new UCAPI_DllObject, or nullptr on failure.</returns>
-extern "C" UCAPI_API UCAPI_DllObject* UCAPI_CreateDefault() {
-    try {
-        ucapi_t* obj = new ucapi_t();
-        // Allocate and initialize the wrapper.
-        UCAPI_DllObject* wrapper = new UCAPI_DllObject;
-        wrapper->obj = obj;
-        return wrapper;
-    }
-    catch (const std::exception&) {
-        return nullptr;
     }
 }
