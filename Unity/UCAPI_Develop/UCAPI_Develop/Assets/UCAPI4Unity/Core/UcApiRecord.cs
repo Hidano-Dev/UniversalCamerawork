@@ -4,35 +4,35 @@ using System.Runtime.InteropServices;
 
 namespace UCAPI4Unity.Core
 {
-    public class UcApiRecord
+    public struct UcApiRecord
     {
-        public uint CameraNo;
-        public ushort Commands;
+        public readonly uint CameraNo;
+        public readonly ushort Commands;
         public UcApiTimeCode TimeCode;
-        public byte PacketNo;
-        public float EyePositionRightM;
-        public float EyePositionUpM;
-        public float EyePositionForwardM;
-        public float LookVectorRightM;
-        public float LookVectorUpM;
-        public float LookVectorForwardM;
-        public float UpVectorRightM;
-        public float UpVectorUpM;
-        public float UpVectorForwardM;
-        public float FocalLengthMm;
-        public float AspectRatio;
-        public float FocusDistanceM;
-        public float Aperture;
-        public float SensorSizeWidthMm;
-        public float SensorSizeHeightMm;
-        public float NearClipM;
-        public float FarClipM;
-        public float LensShiftHorizontalRatio;
-        public float LensShiftVerticalRatio;
-        public float LensDistortionRadialCoefficientsK1;
-        public float LensDistortionRadialCoefficientsK2;
-        public float LensDistortionCenterPointRightMm;
-        public float LensDistortionCenterPointUpMm;
+        public readonly byte PacketNo;
+        public readonly float EyePositionRightM;
+        public readonly float EyePositionUpM;
+        public readonly float EyePositionForwardM;
+        public readonly float LookVectorRightM;
+        public readonly float LookVectorUpM;
+        public readonly float LookVectorForwardM;
+        public readonly float UpVectorRightM;
+        public readonly float UpVectorUpM;
+        public readonly float UpVectorForwardM;
+        public readonly float FocalLengthMm;
+        public readonly float AspectRatio;
+        public readonly float FocusDistanceM;
+        public readonly float Aperture;
+        public readonly float SensorSizeWidthMm;
+        public readonly float SensorSizeHeightMm;
+        public readonly float NearClipM;
+        public readonly float FarClipM;
+        public readonly float LensShiftHorizontalRatio;
+        public readonly float LensShiftVerticalRatio;
+        public readonly float LensDistortionRadialCoefficientsK1;
+        public readonly float LensDistortionRadialCoefficientsK2;
+        public readonly float LensDistortionCenterPointRightMm;
+        public readonly float LensDistortionCenterPointUpMm;
 
         public UcApiRecord(IntPtr ptr, int size)
         {

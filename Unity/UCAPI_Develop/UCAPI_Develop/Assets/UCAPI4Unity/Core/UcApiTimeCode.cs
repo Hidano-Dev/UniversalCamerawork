@@ -10,9 +10,9 @@ namespace UCAPI4Unity.Core
     /// 2bit...Reserved
     /// Total 32bit
     /// </summary>
-    public class UcApiTimeCode
+    public struct UcApiTimeCode
     {
-        public int FrameNumber { get; }
+        public  int FrameNumber { get; }
         public int Second { get; }
         public int Minute { get; }
         public int Hour { get; }
