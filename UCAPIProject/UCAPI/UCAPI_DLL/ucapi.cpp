@@ -9,7 +9,6 @@ ucapi_t::ucapi_t(const void* dataPtr){
     m_magic = 0x55AA;
 	m_version = 0;
 	m_num_payload = 1;
-	m_payload_length = 128;
 	m_crc16 = 0;
 
 	if (dataPtr == nullptr) {
@@ -26,16 +25,17 @@ ucapi_t::ucapi_t(const void* dataPtr){
 
 void ucapi_t::_read(const void* dataPtr) {
     try {
-		// 全体のバイト数を把握するため、最初の10バイトを読み取る
+		// 全体のバイト数を把握するため、最初の8バイトを読み取る
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 		m_magic = (data[1] << 8) | data[0];
 		m_version = (data[3] << 8) | data[2];
 		m_num_payload = (data[5] << 8) | data[4];
-		m_payload_length = (data[7] << 8) | data[6];
-		m_crc16 = (data[9] << 8) | data[8];
+		m_crc16 = (data[7] << 8) | data[6];
+
+		auto payloadLength = sizeof(record_t);
 
 		// ペイロードのバイト数を計算する
-		size_t payloadSize = m_num_payload * m_payload_length;
+		size_t payloadSize = m_num_payload * payloadLength;
 
 		// ペイロードのバイト数が0の場合は読み取らない
 		if (payloadSize == 0) {
@@ -51,7 +51,7 @@ void ucapi_t::_read(const void* dataPtr) {
 		m_payload.reserve(m_num_payload);
 		auto payloadArray = new std::vector<record_t>();
 		for (int i = 0; i < m_num_payload; i++) {
-			m_payload.emplace_back(m_payload_length, &data[10 + i * m_payload_length]);
+			m_payload.emplace_back(payloadLength, &data[10 + i * payloadLength]);
 		}
 	}
 	catch (std::exception& e) {
@@ -115,7 +115,6 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 
-	// ペイロードのバイト数分のデータを読み取る
 	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
 	m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
 	m_timecode = new timecode_t(&data[6]);

@@ -46,7 +46,6 @@ int main() {
     data.magic = 0x55AA;
     data.version = 1;
     data.num_payload = 1;
-    data.payload_length = 128;
     data.crc16 = 0;
     data.payload.push_back(record);
 
@@ -83,7 +82,6 @@ void Dump(ucapi_t* obj) {
     std::cout << "Magic: " << obj->m_magic << std::endl;
     std::cout << "Version: " << obj->m_version << std::endl;
     std::cout << "Num Payload: " << obj->m_num_payload << std::endl;
-    std::cout << "Payload Length: " << obj->m_payload_length << std::endl;
     std::cout << "CRC16: " << obj->m_crc16 << std::endl;
 
 	for (size_t i = 0; i < obj->m_num_payload; ++i) {

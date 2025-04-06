@@ -65,7 +65,6 @@ public:
     uint16_t m_magic;
     uint16_t m_version;
     uint16_t m_num_payload;
-    uint16_t m_payload_length;
     uint16_t m_crc16;
     std::vector<record_t> m_payload;
 };

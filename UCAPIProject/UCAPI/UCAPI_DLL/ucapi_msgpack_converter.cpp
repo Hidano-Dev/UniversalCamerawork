@@ -8,12 +8,13 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
     ucapi->m_magic = msgpack_obj.magic;
     ucapi->m_version = msgpack_obj.version;
     ucapi->m_num_payload = msgpack_obj.num_payload;
-    ucapi->m_payload_length = msgpack_obj.payload_length;
     ucapi->m_crc16 = msgpack_obj.crc16;
 	ucapi->m_payload.reserve(msgpack_obj.num_payload);
 
+	auto payload_length = sizeof(ucapi_t::record_t);
+
     for (const auto& rec : msgpack_obj.payload) {
-		ucapi->m_payload.emplace_back(ucapi->m_payload_length);
+		ucapi->m_payload.emplace_back(payload_length);
         auto& crec = ucapi->m_payload.back();
 
         crec.m_camera_no = rec.camera_no;
@@ -60,7 +61,6 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
     out.magic = ucapi_obj->m_magic;
     out.version = ucapi_obj->m_version;
     out.num_payload = ucapi_obj->m_num_payload;
-    out.payload_length = ucapi_obj->m_payload_length;
     out.crc16 = ucapi_obj->m_crc16;
 
     for (int i = 0; i < ucapi_obj->m_num_payload; ++i) {

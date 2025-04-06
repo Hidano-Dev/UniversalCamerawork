@@ -25,7 +25,6 @@ namespace UCAPI4Unity.Runtime
                 Magic = 0xAA55,
                 Version = 0,
                 NumPayload = 1,
-                PayloadLength = 128,
                 CRC16 = 0, // CRC16 placeholder 
                 Payloads = payloadPtr
             };

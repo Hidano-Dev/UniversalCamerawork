@@ -7,7 +7,6 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 	os.write(reinterpret_cast<const char*>(&obj->m_magic), sizeof(obj->m_magic));
 	os.write(reinterpret_cast<const char*>(&obj->m_version), sizeof(obj->m_version));
 	os.write(reinterpret_cast<const char*>(&obj->m_num_payload), sizeof(obj->m_num_payload));
-	os.write(reinterpret_cast<const char*>(&obj->m_payload_length), sizeof(obj->m_payload_length));
 	os.write(reinterpret_cast<const char*>(&obj->m_crc16), sizeof(obj->m_crc16));
 
 	for (int i = 0; i < obj->m_num_payload; i++) {

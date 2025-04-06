@@ -18,7 +18,6 @@ namespace UCAPI4Unity.Tests
                 Magic = 0x1234,
                 Version = 1,
                 NumPayload = 2,
-                PayloadLength = 1024,
                 CRC16 = 0xABCD,
                 Payloads = IntPtr.Zero
             };
@@ -33,7 +32,6 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(original.Magic, deserialized.Magic);
             Assert.AreEqual(original.Version, deserialized.Version);
             Assert.AreEqual(original.NumPayload, deserialized.NumPayload);
-            Assert.AreEqual(original.PayloadLength, deserialized.PayloadLength);
             Assert.AreEqual(original.CRC16, deserialized.CRC16);
 
             yield return null;
@@ -62,7 +60,6 @@ namespace UCAPI4Unity.Tests
                 Magic = 0,
                 Version = 0,
                 NumPayload = 0,
-                PayloadLength = 0,
                 CRC16 = 0,
                 Payloads = IntPtr.Zero
             };
@@ -78,7 +75,6 @@ namespace UCAPI4Unity.Tests
                 Magic = ushort.MaxValue,
                 Version = ushort.MaxValue,
                 NumPayload = ushort.MaxValue,
-                PayloadLength = ushort.MaxValue,
                 CRC16 = ushort.MaxValue,
                 Payloads = IntPtr.Zero
             };
@@ -88,7 +84,6 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(maxObj.Magic, maxDeserialized.Magic);
             Assert.AreEqual(maxObj.Version, maxDeserialized.Version);
             Assert.AreEqual(maxObj.NumPayload, maxDeserialized.NumPayload);
-            Assert.AreEqual(maxObj.PayloadLength, maxDeserialized.PayloadLength);
             Assert.AreEqual(maxObj.CRC16, maxDeserialized.CRC16);
 
             yield return null;

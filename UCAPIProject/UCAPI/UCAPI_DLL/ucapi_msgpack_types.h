@@ -55,10 +55,9 @@ struct ucapi_msgpack_t {
     uint16_t magic;
     uint16_t version;
     uint16_t num_payload;
-    uint16_t payload_length;
     uint16_t crc16;
 
     std::vector<ucapi_msgpack_record_t> payload;
 
-    MSGPACK_DEFINE(magic, version, num_payload, payload_length, crc16, payload);
+    MSGPACK_DEFINE(magic, version, num_payload, crc16, payload);
 };
