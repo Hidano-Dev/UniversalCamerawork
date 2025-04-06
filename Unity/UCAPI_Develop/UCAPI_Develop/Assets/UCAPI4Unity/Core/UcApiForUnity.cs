@@ -8,32 +8,19 @@ namespace UCAPI4Unity.Core
     {
         // Deserialize from MessagePack
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr UCAPI_Deserialize(byte[] buffer, ulong size);
+        private static extern IntPtr UCAPI_Deserialize(byte[] buffer, UIntPtr payloadCount);
 
         // Serialize to MessagePack
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern int UCAPI_Serialize(IntPtr obj, out IntPtr outBuffer, out UIntPtr outSize);
 
-        // Encode to binary
-        [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr UCAPI_EncodeToBinary(IntPtr obj, out UIntPtr outSize);
-
-        // Decode from binary
-        [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr UCAPI_DecodeFromBinary(byte[] buffer, UIntPtr size);
-
         // Free buffer
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern void UCAPI_FreeBuffer(IntPtr buffer);
 
-        // Free object
-        [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void UCAPI_FreeObject(IntPtr obj);
-
-
         public static void ApplyToCamera(byte[] raw, Camera camera)
         {
-            var ucApiRecords = DeserializeInternal(raw);
+            var ucApiRecords = DeserializeInternal(raw, 1);
             var rec = ucApiRecords[0];
             
             // カメラ位置・回転を反映
@@ -137,9 +124,9 @@ namespace UCAPI4Unity.Core
             return serializedData;
         }
         
-        private static UcApiRecord[] DeserializeInternal(byte[] buffer)
+        private static UcApiRecord[] DeserializeInternal(byte[] buffer, int payloadCount)
         {
-            var ucApiObjPtr = UCAPI_Deserialize(buffer, 138);
+            var ucApiObjPtr = UCAPI_Deserialize(buffer, (UIntPtr)payloadCount);
             if (ucApiObjPtr == IntPtr.Zero)
             {
                 throw new Exception("Deserialization failed.");
