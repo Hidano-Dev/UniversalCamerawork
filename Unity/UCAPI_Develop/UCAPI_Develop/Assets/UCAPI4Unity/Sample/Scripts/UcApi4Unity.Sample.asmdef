@@ -1,0 +1,17 @@
+{
+    "name": "UcApi4Unity.Sample",
+    "rootNamespace": "",
+    "references": [
+        "GUID:dc60844e34fd6b24d94afb3a5cc82e30",
+        "GUID:e8063cf3a345f9c46b7c7c4f14d54285"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

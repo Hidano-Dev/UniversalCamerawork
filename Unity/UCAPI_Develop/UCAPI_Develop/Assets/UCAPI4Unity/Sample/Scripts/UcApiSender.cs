@@ -1,9 +1,8 @@
-using UCAPI4Unity.Core;
 using UCAPI4Unity.Runtime;
 using UnityEngine;
 using uOSC;
 
-namespace UCAPI4Unity.Sample
+namespace UCAPI4Unity.Sample.Scripts
 {
     public class UcApiSender : MonoBehaviour
     {
