@@ -1,10 +1,11 @@
 {
-    "name": "UcApi4Unity.Sample",
+    "name": "UcApi4Unity.CinemachineCamera",
     "rootNamespace": "",
     "references": [
-        "GUID:dc60844e34fd6b24d94afb3a5cc82e30",
-        "GUID:e8063cf3a345f9c46b7c7c4f14d54285",
-        "GUID:4307f53044263cf4b835bd812fc161a4"
+        "GUID:2e3e0626734e26f42a277eae0f0bc283",
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

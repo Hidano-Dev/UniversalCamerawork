@@ -18,5 +18,11 @@ namespace UCAPI4Unity.Runtime
             var payload = UcApiRecordParser.FromCamera(cam);
             return UcApiCore.SerializeFromRecord(payload);
         }
+        
+        public static byte[] SerializeFromVirtualCamera(ICinemachineCamera cam)
+        {
+            var payload = UcApiRecordParser.FromVirtualCamera(cam);
+            return UcApiCore.SerializeFromRecord(payload);
+        }
     }
 }
