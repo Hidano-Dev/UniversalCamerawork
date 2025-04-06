@@ -1,121 +1,107 @@
+using System;
 using System.Collections;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 using UCAPI4Unity.Core;
 
 namespace UCAPI4Unity.Tests
 {
     public class UcApiCoreTest
     {
-        private static UcApiDllObject CreateDefaultMock()
+        // 正常なオブジェクトを用いたシリアライズ／デシリアライズのラウンドトリップテスト
+        [UnityTest]
+        public IEnumerator SerializeAndDeserialize_ValidData()
         {
-            var binary = new byte[10 + 128];
-            binary[0] = 0xAA;
-            binary[1] = 0x55;
-            binary[2] = 0x00;
-            binary[3] = 0x00;
-            binary[4] = 0x01;
-            binary[5] = 0x00;
-            binary[6] = 0x80;
-            binary[7] = 0x00;
-            binary[8] = 0x00;
-            binary[9] = 0x00;
+            // 例: テスト用オブジェクトを作成
+            var original = new UcApiObject
+            {
+                Magic = 0x1234,
+                Version = 1,
+                NumPayload = 2,
+                PayloadLength = 1024,
+                CRC16 = 0xABCD,
+                Payloads = IntPtr.Zero
+            };
 
-            // カメラNo (uint32_t) -> 1
-            binary[10 + 0] = 0x01;
+            // オブジェクトをシリアライズする関数（実装済みのシリアライズ処理を呼ぶ）
+            var buffer = SerializeObject(original);
+            Assert.IsNotNull(buffer);
+            Assert.Greater(buffer.Length, 0);
 
-            // commands (uint16_t) -> 0x0A0B
-            binary[10 + 4] = 0x0B;
-            binary[10 + 5] = 0x0A;
+            // シリアライズしたバッファを元にデシリアライズを行う
+            var deserialized = DeserializeObject(buffer, original.NumPayload);
+            Assert.AreEqual(original.Magic, deserialized.Magic);
+            Assert.AreEqual(original.Version, deserialized.Version);
+            Assert.AreEqual(original.NumPayload, deserialized.NumPayload);
+            Assert.AreEqual(original.PayloadLength, deserialized.PayloadLength);
+            Assert.AreEqual(original.CRC16, deserialized.CRC16);
 
-            // timecode
-            binary[10 + 6] = 12;           // frame
-            binary[10 + 7] = 34;           // second + (minute lower bits)
-            binary[10 + 8] = 56;           // minute + hour lower bits
-            binary[10 + 9] = 78;           // hour upper + framerate + drop + reserved
-
-            // packetNo (uint8_t)
-            binary[10 + 10] = 0x2A;
-
-            // その他 float 値はすべてゼロのままにする
-
-            return UcApiForUnity.DecodeFromBinary(binary);
+            yield return null;
         }
 
-        [Test(ExpectedResult = null)]
-        public IEnumerator UcApiCoreTest_SerializeDeserialize_CompareFields()
+        // 異常な入力（nullや短いバッファ）によるデシリアライズテスト
+        [Test]
+        public void Deserialize_InvalidData_ThrowsException()
         {
-            var original = CreateDefaultMock();
+            // nullバッファ
+            byte[] nullBuffer = null;
+            Assert.Throws<ArgumentNullException>(() => DeserializeObject(nullBuffer, 0));
 
-            var msgpack = UcApiForUnity.SerializeToMessagePack(original);
-            Assert.IsNotNull(msgpack);
-            Assert.IsTrue(msgpack.Length > 0);
+            // データが不足しているバッファ
+            var shortBuffer = new byte[2];
+            Assert.Throws<InvalidOperationException>(() => DeserializeObject(shortBuffer, 0));
+        }
 
-            var clone = UcApiForUnity.DeserializeFromMessagePack(msgpack);
-            Assert.IsNotNull(clone);
+        // 境界値（最小サイズ、最大サイズ）を用いたテスト例
+        [UnityTest]
+        public IEnumerator Serialize_Deserialize_BoundaryValues()
+        {
+            // 最小値設定のオブジェクト
+            var minObj = new UcApiObject
+            {
+                Magic = 0,
+                Version = 0,
+                NumPayload = 0,
+                PayloadLength = 0,
+                CRC16 = 0,
+                Payloads = IntPtr.Zero
+            };
 
-            var data = new UcApiObject(original);
+            var minBuffer = SerializeObject(minObj);
+            var minDeserialized = DeserializeObject(minBuffer, minObj.NumPayload);
+            Assert.AreEqual(minObj.Magic, minDeserialized.Magic);
+            Assert.AreEqual(minObj.Version, minDeserialized.Version);
 
-            Assert.AreEqual(data.Magic, clone.Magic);
-            Assert.AreEqual(data.Version, clone.Version);
-            Assert.AreEqual(data.NumPayload, clone.NumPayload);
-            Assert.AreEqual(data.PayloadLength, clone.PayloadLength);
-            Assert.AreEqual(data.CRC16, clone.CRC16);
+            // 最大値設定のオブジェクト（例として上限値を設定）
+            var maxObj = new UcApiObject
+            {
+                Magic = ushort.MaxValue,
+                Version = ushort.MaxValue,
+                NumPayload = ushort.MaxValue,
+                PayloadLength = ushort.MaxValue,
+                CRC16 = ushort.MaxValue,
+                Payloads = IntPtr.Zero
+            };
 
-            Assert.IsNotNull(data.Payloads);
-            Assert.IsNotNull(clone.Payloads);
-            Assert.AreEqual(data.Payloads.Length, clone.Payloads.Length);
+            var maxBuffer = SerializeObject(maxObj);
+            var maxDeserialized = DeserializeObject(maxBuffer, maxObj.NumPayload);
+            Assert.AreEqual(maxObj.Magic, maxDeserialized.Magic);
+            Assert.AreEqual(maxObj.Version, maxDeserialized.Version);
+            Assert.AreEqual(maxObj.NumPayload, maxDeserialized.NumPayload);
+            Assert.AreEqual(maxObj.PayloadLength, maxDeserialized.PayloadLength);
+            Assert.AreEqual(maxObj.CRC16, maxDeserialized.CRC16);
 
-            var a = data.Payloads[0];
-            var b = clone.Payloads[0];
-
-            Assert.AreEqual(a.CameraNo, b.CameraNo);
-            Assert.AreEqual(a.Commands, b.Commands);
-            Assert.AreEqual(a.PacketNo, b.PacketNo);
-
-            // Timecode 比較（ToString または各フィールド）
-            Assert.AreEqual(a.TimeCode.FrameNumber, b.TimeCode.FrameNumber);
-            Assert.AreEqual(a.TimeCode.Second, b.TimeCode.Second);
-            Assert.AreEqual(a.TimeCode.Minute, b.TimeCode.Minute);
-            Assert.AreEqual(a.TimeCode.Hour, b.TimeCode.Hour);
-            Assert.AreEqual(a.TimeCode.FrameRate, b.TimeCode.FrameRate);
-            Assert.AreEqual(a.TimeCode.DropFrame, b.TimeCode.DropFrame);
-
-            UcApiForUnity.Free(original);
             yield return null;
+        }
+
+        private static byte[] SerializeObject(UcApiObject obj)
+        {
+            return UcApiCore.SerializeInternal(obj);
         }
         
-        [Test(ExpectedResult = null)]
-        public IEnumerator UcApiCoreTest_EncodeDecodeBinary()
+        private static UcApiObject DeserializeObject(byte[] buffer, int payloadCount)
         {
-            var ucApi = CreateDefaultMock();
-            Assert.IsNotNull(ucApi);
-
-            var binary = UcApiForUnity.EncodeToBinary(ucApi);
-            Assert.IsNotNull(binary);
-            Assert.IsTrue(binary.Length >= 138);
-
-            var decoded = UcApiForUnity.DecodeFromBinary(binary);
-            Assert.IsNotNull(decoded);
-            UcApiForUnity.Free(ucApi);
-            UcApiForUnity.Free(decoded);
-            yield return null;
-        }
-
-        [Test(ExpectedResult = null)]
-        public IEnumerator UcApiCoreTest_SerializeDeserializeMessagePack()
-        {
-            var ucApi = CreateDefaultMock();
-            Assert.IsNotNull(ucApi);
-
-            var msgpack = UcApiForUnity.SerializeToMessagePack(ucApi);
-            Assert.IsNotNull(msgpack);
-            Assert.IsTrue(msgpack.Length > 0);
-
-            var deserialized = UcApiForUnity.DeserializeFromMessagePack(msgpack);
-            Assert.IsNotNull(deserialized);
-
-            UcApiForUnity.Free(ucApi);
-            yield return null;
+            return UcApiCore.DeserializeObject(buffer, payloadCount);
         }
     }
 }

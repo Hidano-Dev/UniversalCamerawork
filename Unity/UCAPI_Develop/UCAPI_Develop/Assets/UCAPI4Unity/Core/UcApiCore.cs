@@ -19,12 +19,7 @@ namespace UCAPI4Unity.Core
 
         internal static UcApiRecord[] DeserializeInternal(byte[] buffer, int payloadCount)
         {
-            var ucApiObjPtr = UCAPI_Deserialize(buffer, (UIntPtr)payloadCount);
-            if (ucApiObjPtr == IntPtr.Zero)
-            {
-                throw new Exception("Deserialization failed.");
-            }
-            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(ucApiObjPtr);
+            var ucApiObject = DeserializeObject(buffer, payloadCount);
             if (ucApiObject.NumPayload == 0)
             {
                 throw new Exception("No payloads found.");
@@ -38,8 +33,24 @@ namespace UCAPI4Unity.Core
                 payloadPtr += Marshal.SizeOf(payload);
             }
             
-            UCAPI_FreeBuffer(ucApiObjPtr);
             return payloads;
+        }
+        
+        internal static UcApiObject DeserializeObject(byte[] buffer, int payloadCount)
+        {
+            var ucApiObjPtr = UCAPI_Deserialize(buffer, (UIntPtr)payloadCount);
+            if (ucApiObjPtr == IntPtr.Zero)
+            {
+                throw new Exception("Deserialization failed.");
+            }
+            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(ucApiObjPtr);
+            if (ucApiObject.NumPayload == 0)
+            {
+                throw new Exception("No payloads found.");
+            }
+            
+            UCAPI_FreeBuffer(ucApiObjPtr);
+            return ucApiObject;
         }
         
         internal static byte[] SerializeInternal(UcApiObject ucApiObject)
