@@ -2,16 +2,11 @@
 #include "pch.h"
 #include <iostream>
 #include <iomanip>
-#include <msgpack.hpp>
 #include <ucapi.h>
 #include <ucapi_dll.h>
 #include "ucapi_msgpack_types.h"
 
-struct UCAPI_DllObject {
-    ucapi_t* obj;
-};
-
-void Dump(UCAPI_DllObject* handle);
+void Dump(ucapi_t* handle);
 
 // 最小構成の MessagePack オブジェクトを構築してテスト
 int main() {
@@ -61,7 +56,7 @@ int main() {
     msgpack::pack(sbuf, data);
 
     // Deserialize via DLL
-    UCAPI_DllObject* handle = UCAPI_DeserializeMessagePack(reinterpret_cast<const uint8_t*>(sbuf.data()), sbuf.size());
+    auto handle = UCAPI_Deserialize(reinterpret_cast<const uint8_t*>(sbuf.data()), sbuf.size());
     if (!handle) {
         std::cerr << "Deserialization failed." << std::endl;
         return -1;
@@ -75,7 +70,6 @@ int main() {
     size_t outSize = 0;
     if (UCAPI_Serialize(handle, &outBuf, &outSize) != 0) {
         std::cerr << "Serialization failed." << std::endl;
-        UCAPI_FreeObject(handle);
         return -1;
     }
 
@@ -83,12 +77,10 @@ int main() {
 
     // 後始末
     UCAPI_FreeBuffer(outBuf);
-    UCAPI_FreeObject(handle);
     return 0;
 }
 
-void Dump(UCAPI_DllObject* handle) {
-    const ucapi_t* obj = handle->obj;
+void Dump(ucapi_t* obj) {
     std::cout << "Magic: " << obj->m_magic << std::endl;
     std::cout << "Version: " << obj->m_version << std::endl;
     std::cout << "Num Payload: " << obj->m_num_payload << std::endl;
