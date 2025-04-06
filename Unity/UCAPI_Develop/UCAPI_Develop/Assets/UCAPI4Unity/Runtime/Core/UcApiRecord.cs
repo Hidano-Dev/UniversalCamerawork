@@ -1,12 +1,10 @@
-using UnityEngine;
-
-namespace UCAPI4Unity.Core
+namespace UCAPI4Unity.Runtime.Core
 {
     public struct UcApiRecord
     {
         public uint CameraNo;
         public ushort Commands;
-        public UcApiTimeCode TimeCode;
+        public uint TimeCode;
         public byte PacketNo;
         public float EyePositionRightM;
         public float EyePositionUpM;

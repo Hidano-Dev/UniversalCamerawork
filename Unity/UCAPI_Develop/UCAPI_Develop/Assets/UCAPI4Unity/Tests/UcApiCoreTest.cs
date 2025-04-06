@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
-using UCAPI4Unity.Core;
 using UCAPI4Unity.Runtime.Core;
 
 namespace UCAPI4Unity.Tests

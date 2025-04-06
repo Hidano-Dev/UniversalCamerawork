@@ -11,11 +11,10 @@ void Dump(ucapi_t* handle);
 // 最小構成の MessagePack オブジェクトを構築してテスト
 int main() {
     // MessagePack構造体の初期化
-    ucapi_msgpack_timecode_t tc = { 1, 2, 3, 4, 5, 0, 0 };
     ucapi_msgpack_record_t record;
     record.camera_no = 1;
     record.commands = 0x0A;
-    record.timecode = tc;
+	record.timecode = 0x12345678; // 32ビットのtimecode
     record.packet_no = 5;
     record.eye_position_right_m = 1.0f;
 	record.eye_position_up_m = 2.0f;

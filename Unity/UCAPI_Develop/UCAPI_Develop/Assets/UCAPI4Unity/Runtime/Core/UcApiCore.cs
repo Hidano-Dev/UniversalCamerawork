@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using UCAPI4Unity.Core;
 
 namespace UCAPI4Unity.Runtime.Core
 {

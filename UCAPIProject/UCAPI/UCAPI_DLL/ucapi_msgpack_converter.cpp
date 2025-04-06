@@ -20,14 +20,7 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
         crec.m_commands = rec.commands;
 
         const auto& mtc = rec.timecode;
-        crec.m_timecode = ucapi_t::timecode_t();
-        crec.m_timecode.m_frame_number = mtc.frame_number;
-        crec.m_timecode.m_second_number = mtc.second_number;
-        crec.m_timecode.m_minute_number = mtc.minute_number;
-        crec.m_timecode.m_hour_number = mtc.hour_number;
-        crec.m_timecode.m_frame_rate = mtc.frame_rate;
-        crec.m_timecode.m_drop_frame = mtc.drop_frame;
-        crec.m_timecode.m_reserved = mtc.reserved;
+        crec.m_timecode = timecode_t(mtc);
 
         crec.m_packet_no = rec.packet_no;
 
@@ -77,15 +70,7 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
         r.camera_no = rec.m_camera_no;
         r.commands = rec.m_commands;
 
-        r.timecode = {
-            rec.m_timecode.m_frame_number,
-            rec.m_timecode.m_second_number,
-            rec.m_timecode.m_minute_number,
-            rec.m_timecode.m_hour_number,
-            rec.m_timecode.m_frame_rate,
-            rec.m_timecode.m_drop_frame,
-            rec.m_timecode.m_reserved
-        };
+		r.timecode = timecode_t::pack(rec.m_timecode);
 
         r.packet_no = rec.m_packet_no;
 

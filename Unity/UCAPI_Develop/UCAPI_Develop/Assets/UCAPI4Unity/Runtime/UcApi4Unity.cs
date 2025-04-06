@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using UCAPI4Unity.Core;
 using UCAPI4Unity.Runtime.Core;
 using UCAPI4Unity.Runtime.UnityCamera;
 using UnityEngine;

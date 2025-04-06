@@ -1,4 +1,4 @@
-namespace UCAPI4Unity.Core
+namespace UCAPI4Unity.Runtime.Core
 {
     public enum FrameRate
     {

@@ -1,4 +1,4 @@
-using UCAPI4Unity.Core;
+using UCAPI4Unity.Runtime.Core;
 using UnityEngine;
 
 namespace UCAPI4Unity.Runtime.UnityCamera
@@ -7,20 +7,21 @@ namespace UCAPI4Unity.Runtime.UnityCamera
     {
         public static UcApiRecord FromCamera(Camera cam)
         {
+            var timeCode = new UcApiTimeCode
+            {
+                FrameNumber = 12,
+                Second = 34,
+                Minute = 56,
+                Hour = 78,
+                FrameRate = FrameRate.FrameRate60,
+                DropFrame = false
+            };
             var record = new UcApiRecord
             {
                 CameraNo = 1,
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
                 PacketNo = 1,
-                TimeCode = new UcApiTimeCode
-                {
-                    FrameNumber = 12,
-                    Second = 34,
-                    Minute = 56,
-                    Hour = 78,
-                    FrameRate = (byte)FrameRate.FrameRate60,
-                    DropFrame = 0
-                },
+                TimeCode = UcApiTimeCode.ToRaw(timeCode),
                 EyePositionRightM = cam.transform.position.x,
                 EyePositionUpM = cam.transform.position.y,
                 EyePositionForwardM = cam.transform.position.z,

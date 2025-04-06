@@ -3,22 +3,10 @@
 #include <vector>
 #include <cstdint>
 
-struct ucapi_msgpack_timecode_t {
-    uint8_t frame_number;
-    uint8_t second_number;
-    uint8_t minute_number;
-    uint8_t hour_number;
-    uint8_t frame_rate;
-    uint8_t drop_frame;
-    uint8_t reserved;
-
-    MSGPACK_DEFINE(frame_number, second_number, minute_number, hour_number, frame_rate, drop_frame, reserved);
-};
-
 struct ucapi_msgpack_record_t {
     uint32_t camera_no;
     uint16_t commands;
-    ucapi_msgpack_timecode_t timecode;
+    uint32_t timecode;
     uint8_t packet_no;
 
     float eye_position_right_m;
