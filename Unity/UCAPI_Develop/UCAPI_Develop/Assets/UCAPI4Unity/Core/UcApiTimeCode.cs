@@ -1,5 +1,3 @@
-using MessagePack;
-
 namespace UCAPI4Unity.Core
 {
     /// <summary>
@@ -12,15 +10,14 @@ namespace UCAPI4Unity.Core
     /// 2bit...Reserved
     /// Total 32bit
     /// </summary>
-    [MessagePackObject]
     public struct UcApiTimeCode
     {
-        [Key(0)] public byte FrameNumber;
-        [Key(1)] public byte Second;
-        [Key(2)] public byte Minute;
-        [Key(3)] public byte Hour;
-        [Key(4)] public byte FrameRate;
-        [Key(5)] public byte DropFrame;
+        public byte FrameNumber;
+        public byte Second;
+        public byte Minute;
+        public byte Hour;
+        public byte FrameRate;
+        public byte DropFrame;
 
         private byte _reserved;
 
