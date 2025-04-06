@@ -3,6 +3,7 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using UCAPI4Unity.Core;
+using UCAPI4Unity.Runtime.Core;
 
 namespace UCAPI4Unity.Tests
 {
@@ -96,12 +97,12 @@ namespace UCAPI4Unity.Tests
 
         private static byte[] SerializeObject(UcApiObject obj)
         {
-            return UcApiCore.SerializeInternal(obj);
+            return UcApiCore.SerializeFromObject(obj);
         }
         
         private static UcApiObject DeserializeObject(byte[] buffer, int payloadCount)
         {
-            return UcApiCore.DeserializeObject(buffer, payloadCount);
+            return UcApiCore.DeserializeToObject(buffer, payloadCount);
         }
     }
 }

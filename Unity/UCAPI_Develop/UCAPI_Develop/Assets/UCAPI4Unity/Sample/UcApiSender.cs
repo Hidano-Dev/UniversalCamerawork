@@ -1,4 +1,5 @@
 using UCAPI4Unity.Core;
+using UCAPI4Unity.Runtime;
 using UnityEngine;
 using uOSC;
 
@@ -11,7 +12,7 @@ namespace UCAPI4Unity.Sample
 
         private void Update()
         {
-            var ucapi = UcApiForUnity.SerializeFromCamera(camera);
+            var ucapi = UcApi4Unity.SerializeFromCamera(camera);
             client.Send("/ucapi/data", ucapi);
         }
     }

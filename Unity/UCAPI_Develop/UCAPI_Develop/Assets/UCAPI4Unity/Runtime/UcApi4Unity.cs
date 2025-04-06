@@ -1,20 +1,23 @@
 using System.Runtime.InteropServices;
+using UCAPI4Unity.Core;
+using UCAPI4Unity.Runtime.Core;
+using UCAPI4Unity.UnityCamera;
 using UnityEngine;
 
-namespace UCAPI4Unity.Core
+namespace UCAPI4Unity.Runtime
 {
-    public static class UcApiForUnity
+    public static class UcApi4Unity
     {
         public static void ApplyToCamera(byte[] raw, Camera camera)
         {
-            var ucApiRecords = UcApiCore.DeserializeInternal(raw, 1);
+            var ucApiRecords = UcApiCore.DeserializeToRecord(raw, 1);
             var rec = ucApiRecords[0];
-            rec.ApplyToCamera(camera);
+            UcApiRecordParser.ToCamera(rec, camera);
         }
         
         public static byte[] SerializeFromCamera(Camera cam)
         {
-            var payload = new UcApiRecord(cam);
+            var payload = UcApiRecordParser.FromCamera(cam);
             var payloadPtr = Marshal.AllocHGlobal(Marshal.SizeOf(payload));
             Marshal.StructureToPtr(payload, payloadPtr, false);
             
@@ -28,7 +31,7 @@ namespace UCAPI4Unity.Core
                 Payloads = payloadPtr
             };
             
-            var serializedData = UcApiCore.SerializeInternal(obj);
+            var serializedData = UcApiCore.SerializeFromObject(obj);
 
             Marshal.FreeHGlobal(payloadPtr);
 

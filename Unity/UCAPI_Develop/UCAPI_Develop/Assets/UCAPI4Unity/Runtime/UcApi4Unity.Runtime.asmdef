@@ -1,0 +1,17 @@
+{
+    "name": "UcApi4Unity.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2e3e0626734e26f42a277eae0f0bc283",
+        "GUID:398fac1736544b33ab8b7d5c148315b3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

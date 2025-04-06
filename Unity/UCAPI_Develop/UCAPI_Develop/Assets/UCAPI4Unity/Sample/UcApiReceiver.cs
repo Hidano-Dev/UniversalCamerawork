@@ -1,4 +1,5 @@
 using UCAPI4Unity.Core;
+using UCAPI4Unity.Runtime;
 using UnityEngine;
 using uOSC;
 
@@ -13,7 +14,7 @@ namespace UCAPI4Unity.Sample
             if (message.address != "/ucapi/data") return;
 
             var raw = (byte[])message.values[0];
-            UcApiForUnity.ApplyToCamera(raw, camera);
+            UcApi4Unity.ApplyToCamera(raw, camera);
         }
     }
 }
