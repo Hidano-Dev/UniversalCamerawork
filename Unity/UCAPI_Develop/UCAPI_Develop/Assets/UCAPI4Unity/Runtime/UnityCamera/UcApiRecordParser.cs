@@ -1,7 +1,7 @@
 using UCAPI4Unity.Core;
 using UnityEngine;
 
-namespace UCAPI4Unity.UnityCamera
+namespace UCAPI4Unity.Runtime.UnityCamera
 {
     public static class UcApiRecordParser
     {
