@@ -34,12 +34,12 @@ namespace UCAPI4Unity.Core
         public static void ApplyToCamera(byte[] raw, Camera camera)
         {
             // DLL内でsize_t型として受け取る
-            var dllObj = UCAPI_Deserialize(raw, 138);
-            if (dllObj == IntPtr.Zero)
+            var ucApiObjPtr = UCAPI_Deserialize(raw, 138);
+            if (ucApiObjPtr == IntPtr.Zero)
             {
                 throw new Exception("Deserialization failed.");
             }
-            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(dllObj);
+            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(ucApiObjPtr);
             if (ucApiObject.NumPayload == 0)
             {
                 throw new Exception("No payloads found.");
@@ -93,6 +93,8 @@ namespace UCAPI4Unity.Core
                 camera.focusDistance = rec.FocusDistanceM;
                 camera.aperture = rec.Aperture;
             }
+            
+            UCAPI_FreeBuffer(ucApiObjPtr);
         }
         
         public static byte[] SerializeFromCamera(Camera cam)
