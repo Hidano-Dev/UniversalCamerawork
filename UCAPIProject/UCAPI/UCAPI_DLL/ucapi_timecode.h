@@ -4,13 +4,9 @@
 class timecode_t {
 
 public:
-
-	timecode_t(const void* dataPtr = nullptr);
-	timecode_t(uint32_t packed);
-	static uint32_t pack(timecode_t timecode);
+	timecode_t();
 
 private:
-	void _read(const void* dataPtr);
 	void _clean_up();
 
 	enum {
@@ -31,6 +27,8 @@ private:
 
 public:
 	~timecode_t();
+	static uint32_t pack(timecode_t timecode);
+	static timecode_t unpack(uint32_t packed);
 
 	uint8_t m_frame_number;
 	uint8_t m_second_number;

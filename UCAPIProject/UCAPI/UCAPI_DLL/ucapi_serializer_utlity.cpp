@@ -14,16 +14,7 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_camera_no), sizeof(rec.m_camera_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_commands), sizeof(rec.m_commands));
 
-		auto timecode = rec.m_timecode;
-		uint8_t timecode_data[4] = { 0 };
-		timecode_data[0] = timecode.m_frame_number;
-		timecode_data[1] = (timecode.m_second_number & 0x3F);
-		timecode_data[1] |= ((timecode.m_minute_number & 0x03) << 6);
-		timecode_data[2] = ((timecode.m_minute_number & 0x0F) >> 2) | ((timecode.m_hour_number & 0x0F) << 4);
-		timecode_data[3] = ((timecode.m_hour_number & 0x10) >> 4) | (timecode.m_frame_rate & 0x0F) << 1;
-		timecode_data[3] |= (timecode.m_drop_frame & 0x01) << 5;
-		timecode_data[3] |= (timecode.m_reserved & 0x3) << 6;
-		os.write(reinterpret_cast<char*>(timecode_data), 4);
+		os.write(reinterpret_cast<const char*>(&rec.m_timecode), sizeof(rec.m_timecode));
 		os.write(reinterpret_cast<const char*>(&rec.m_packet_no), sizeof(rec.m_packet_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_right_m), sizeof(rec.m_eye_position_right_m));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_up_m), sizeof(rec.m_eye_position_up_m));

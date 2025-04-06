@@ -16,6 +16,7 @@ public:
 private:
     void _read(const void* dataPtr);
     void _clean_up();
+    uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = 0x1021, uint16_t initValue = 0xFFFF);
 
 public:
     ~ucapi_t();
@@ -35,7 +36,7 @@ public:
 
         uint32_t m_camera_no;
         uint16_t m_commands;
-        timecode_t m_timecode;
+        uint32_t m_timecode;
         uint8_t m_packet_no;
         float m_eye_position_right_m;
         float m_eye_position_up_m;

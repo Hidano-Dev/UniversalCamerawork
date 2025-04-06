@@ -1,5 +1,3 @@
-using System;
-
 namespace UCAPI4Unity.Runtime.Core
 {
     /// <summary>
@@ -14,23 +12,16 @@ namespace UCAPI4Unity.Runtime.Core
     /// </summary>
     public struct UcApiTimeCode
     {
-        public int FrameNumber;
-        public int Second;
-        public int Minute;
-        public int Hour;
+        public uint FrameNumber;
+        public uint Second;
+        public uint Minute;
+        public uint Hour;
         public FrameRate FrameRate;
         public bool DropFrame;
+        private uint _reserved;
 
-        private readonly int _reserved;
-
-        public static UcApiTimeCode FromRaw(byte[] data)
+        public static UcApiTimeCode FromRaw(uint raw)
         {
-            if (data is not { Length: 4 })
-                throw new ArgumentException("TimeCode data must be 4 bytes.");
-        
-            // Little-endianでintに変換
-            var raw = BitConverter.ToInt32(data, 0);
-        
             var timeCode = new UcApiTimeCode
             {
                 FrameNumber = raw & 0xFF,
@@ -38,7 +29,8 @@ namespace UCAPI4Unity.Runtime.Core
                 Minute = (raw >> 14) & 0x3F,
                 Hour = (raw >> 20) & 0x1F,
                 FrameRate = (FrameRate)((raw >> 25) & 0xF),
-                DropFrame = ((raw >> 29) & 0x1) == 1
+                DropFrame = ((raw >> 29) & 0x1) == 1,
+                _reserved = (raw >> 30) & 0x3
             };
             
             return timeCode;
@@ -54,13 +46,13 @@ namespace UCAPI4Unity.Runtime.Core
         
         public static uint ToRaw(UcApiTimeCode timeCode)
         {
-            var raw = (uint)timeCode.FrameNumber;
-            raw |= (uint)(timeCode.Second << 8);
-            raw |= (uint)(timeCode.Minute << 14);
-            raw |= (uint)(timeCode.Hour << 20);
+            var raw = timeCode.FrameNumber;
+            raw |= timeCode.Second << 8;
+            raw |= timeCode.Minute << 14;
+            raw |= timeCode.Hour << 20;
             raw |= (uint)((int)timeCode.FrameRate << 25);
             raw |= (uint)(timeCode.DropFrame ? 1 : 0) << 29;
-            raw |= (uint)(timeCode._reserved << 30);
+            raw |= timeCode._reserved << 30;
             return raw;
         }
     }

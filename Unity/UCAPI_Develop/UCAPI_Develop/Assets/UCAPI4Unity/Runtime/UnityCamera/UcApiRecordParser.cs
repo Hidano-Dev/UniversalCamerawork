@@ -12,7 +12,7 @@ namespace UCAPI4Unity.Runtime.UnityCamera
                 FrameNumber = 12,
                 Second = 34,
                 Minute = 56,
-                Hour = 78,
+                Hour = 14,
                 FrameRate = FrameRate.FrameRate60,
                 DropFrame = false
             };

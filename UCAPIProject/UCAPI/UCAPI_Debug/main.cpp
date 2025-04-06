@@ -2,9 +2,11 @@
 #include "pch.h"
 #include <iostream>
 #include <iomanip>
-#include <ucapi.h>
-#include <ucapi_dll.h>
+#include <string>
+#include "ucapi.h"
+#include "ucapi_dll.h"
 #include "ucapi_msgpack_types.h"
+#include "ucapi_timecode.h"
 
 void Dump(ucapi_t* handle);
 
@@ -89,13 +91,7 @@ void Dump(ucapi_t* obj) {
         std::cout << "--- Payload " << i << " ---" << std::endl;
         std::cout << "CameraNo " << m_payload.m_camera_no << std::endl;
         std::cout << "Commands " << m_payload.m_commands << std::endl;
-        std::cout << "Timecode Frame Number " << std::to_string(m_payload.m_timecode.m_frame_number) << std::endl;
-		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_frame_number) << std::endl;
-		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_second_number) << std::endl;
-		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_minute_number) << std::endl;
-		std::cout << "Timecode Timecode " << std::to_string(m_payload.m_timecode.m_hour_number) << std::endl;
-		std::cout << "Timecode Frame Rate " << std::to_string(m_payload.m_timecode.m_frame_rate) << std::endl;
-		std::cout << "Timecode Drop Frame " << std::to_string(m_payload.m_timecode.m_drop_frame) << std::endl;
+		std::cout << "Timecode Binary " << std::hex << std::setw(8) << std::setfill('0') << m_payload.m_timecode << std::dec << std::endl;
 		std::cout << "Packet No " << m_payload.m_packet_no << std::endl;
 		std::cout << "Eye Position Right " << m_payload.m_eye_position_right_m << std::endl;
 		std::cout << "Eye Position Up " << m_payload.m_eye_position_up_m << std::endl;

@@ -1,22 +1,26 @@
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
 #include "pch.h"
-#include "ucapi.h"
 #include <iostream>
+#include "ucapi.h"
 
 ucapi_t::ucapi_t(const void* dataPtr){
     // magicÇÕ0x55AAÇ≈èâä˙âª
     m_magic = 0x55AA;
 	m_version = 0;
 	m_num_payload = 1;
-	m_crc16 = 0;
+	m_payload.clear();
+	m_payload.reserve(m_num_payload);
 
 	if (dataPtr == nullptr) {
+		m_crc16 = 0;
 		return;
 	}
 
     try {
         _read(dataPtr);
+		m_crc16 = computeCRC16(reinterpret_cast<record_t*>(m_payload.data()), sizeof(record_t) * m_num_payload);
+
     } catch(...) {
         _clean_up();
         throw;
@@ -70,10 +74,27 @@ void ucapi_t::_clean_up() {
 	m_payload.clear();
 }
 
+uint16_t ucapi_t::computeCRC16(record_t* record, size_t length, uint16_t poly, uint16_t initValue) {
+	const uint8_t* data = reinterpret_cast<const uint8_t*>(record);
+	uint16_t crc = initValue;
+	for (size_t i = 0; i < length; ++i) {
+		crc ^= static_cast<uint16_t>(data[i]) << 8;
+		for (int j = 0; j < 8; ++j) {
+			if (crc & 0x8000) {
+				crc = (crc << 1) ^ poly;
+			}
+			else {
+				crc <<= 1;
+			}
+		}
+	}
+	return crc;
+}
+
 ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 	m_camera_no = 0;
 	m_commands = 0;
-	m_timecode = new timecode_t();
+	m_timecode = 0;
 	m_packet_no = 0;
 	m_eye_position_right_m = 0;
 	m_eye_position_up_m = 0;
@@ -117,7 +138,7 @@ void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
 
 	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
 	m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
-	m_timecode = new timecode_t(&data[6]);
+	m_timecode = *reinterpret_cast<const uint32_t*>(&data[6]);
 	m_packet_no = *reinterpret_cast<const uint8_t*>(&data[10]);
 	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[11]);
 	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[15]);
