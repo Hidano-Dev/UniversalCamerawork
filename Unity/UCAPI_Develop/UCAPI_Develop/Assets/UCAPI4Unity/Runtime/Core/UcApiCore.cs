@@ -6,15 +6,12 @@ namespace UCAPI4Unity.Runtime.Core
 {
     public static class UcApiCore
     {
-        // Deserialize from MessagePack
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr UCAPI_Deserialize(byte[] buffer, UIntPtr payloadCount);
 
-        // Serialize to MessagePack
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern int UCAPI_Serialize(IntPtr obj, out IntPtr outBuffer, out UIntPtr outSize);
 
-        // Free buffer
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern void UCAPI_FreeBuffer(IntPtr buffer);
 
