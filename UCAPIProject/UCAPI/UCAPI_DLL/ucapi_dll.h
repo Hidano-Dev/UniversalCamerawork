@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "ucapi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +24,9 @@ extern "C" {
     /// </summary>
     typedef struct UCAPI_DllObject UCAPI_DllObject;
 
-    UCAPI_API UCAPI_DllObject* UCAPI_DeserializeMessagePack(const uint8_t* buffer, size_t size);
+    UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t size);
 
-    UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuffer, size_t* outSize);
+    UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize);
     
     UCAPI_API uint8_t* UCAPI_EncodeToBinary(UCAPI_DllObject* obj, size_t* outSize);
     

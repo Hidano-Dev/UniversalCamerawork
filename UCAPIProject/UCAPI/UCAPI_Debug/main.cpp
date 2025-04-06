@@ -73,7 +73,7 @@ int main() {
     // Serialize back via DLL
     uint8_t* outBuf = nullptr;
     size_t outSize = 0;
-    if (UCAPI_SerializeMessagePack(handle, &outBuf, &outSize) != 0) {
+    if (UCAPI_Serialize(handle, &outBuf, &outSize) != 0) {
         std::cerr << "Serialization failed." << std::endl;
         UCAPI_FreeObject(handle);
         return -1;

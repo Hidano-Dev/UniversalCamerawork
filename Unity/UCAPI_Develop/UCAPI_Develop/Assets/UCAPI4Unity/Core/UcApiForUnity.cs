@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using MessagePack;
 using UnityEngine;
 
 namespace UCAPI4Unity.Core
@@ -9,11 +8,11 @@ namespace UCAPI4Unity.Core
     {
         // Deserialize from MessagePack
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr UCAPI_DeserializeMessagePack(byte[] buffer, UIntPtr size);
+        private static extern IntPtr UCAPI_Deserialize(byte[] buffer, ulong size);
 
         // Serialize to MessagePack
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int UCAPI_SerializeMessagePack(IntPtr obj, out IntPtr outBuffer, out UIntPtr outSize);
+        private static extern int UCAPI_Serialize(IntPtr obj, out IntPtr outBuffer, out UIntPtr outSize);
 
         // Encode to binary
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
@@ -34,9 +33,27 @@ namespace UCAPI4Unity.Core
 
         public static void ApplyToCamera(byte[] raw, Camera camera)
         {
-            var dllObj = UcApiForUnity.DeserializeFromMessagePack(raw);
-            Debug.Assert(dllObj.Payloads.Length > 0);
-            var rec = dllObj.Payloads[0];
+            // DLL内でsize_t型として受け取る
+            var dllObj = UCAPI_Deserialize(raw, 138);
+            if (dllObj == IntPtr.Zero)
+            {
+                throw new Exception("Deserialization failed.");
+            }
+            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(dllObj);
+            if (ucApiObject.NumPayload == 0)
+            {
+                throw new Exception("No payloads found.");
+            }
+            var payloads = new UcApiRecord[ucApiObject.NumPayload];
+            var payloadPtr = ucApiObject.Payloads;
+            for (var i = 0; i < ucApiObject.NumPayload; i++)
+            {
+                var payload = Marshal.PtrToStructure<UcApiRecord>(payloadPtr);
+                payloads[i] = payload;
+                payloadPtr += Marshal.SizeOf(payload);
+            }
+            
+            var rec = payloads[0];
             
             // カメラ位置・回転を反映
             var position = new Vector3(
@@ -77,25 +94,10 @@ namespace UCAPI4Unity.Core
                 camera.aperture = rec.Aperture;
             }
         }
-        private static UcApiObject DeserializeFromMessagePack(byte[] messagePackData)
-        {
-            
-            var ucApiObject = MessagePackSerializer.Deserialize<UcApiObject>(messagePackData);
-            return ucApiObject;
-        }
-
+        
         public static byte[] SerializeFromCamera(Camera cam)
         {
-            var obj = new UcApiObject
-            {
-                Magic = 0xAA55,
-                Version = 0,
-                NumPayload = 1,
-                PayloadLength = 128,
-                CRC16 = 0, // CRC16 placeholder
-                Payloads = new UcApiRecord[1]
-            };
-            obj.Payloads[0] = new UcApiRecord
+            var payload = new UcApiRecord
             {
                 CameraNo = 1,
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
@@ -106,8 +108,8 @@ namespace UCAPI4Unity.Core
                     Second = 34,
                     Minute = 56,
                     Hour = 78,
-                    FrameRate = FrameRate.FrameRate60,
-                    DropFrame = false
+                    FrameRate = (byte)FrameRate.FrameRate60,
+                    DropFrame = 0
                 },
                 EyePositionRightM = cam.transform.position.x,
                 EyePositionUpM = cam.transform.position.y,
@@ -134,13 +136,31 @@ namespace UCAPI4Unity.Core
                 LensDistortionCenterPointRightMm = 0f,
                 LensDistortionCenterPointUpMm = 0f
             };
+            var payloadPtr = Marshal.AllocHGlobal(Marshal.SizeOf(payload));
+            Marshal.StructureToPtr(payload, payloadPtr, false);
+            
+            var obj = new UcApiObject
+            {
+                Magic = 0xAA55,
+                Version = 0,
+                NumPayload = 1,
+                PayloadLength = 128,
+                CRC16 = 0, // CRC16 placeholder 
+                Payloads = payloadPtr
+            };
+            
+            var serializedData = SerializeInternal(obj);
 
-            return MessagePackSerializer.Serialize(obj);
+            Marshal.FreeHGlobal(payloadPtr);
+
+            return serializedData;
         }
         
-        public static byte[] SerializeToMessagePack(UcApiDllObject ucApiObject)
+        private static byte[] SerializeInternal(UcApiObject ucApiObject)
         {
-            var result = UCAPI_SerializeMessagePack(ucApiObject.NativePtr, out var buffer, out var size);
+            var ucApiObjectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(ucApiObject));
+            Marshal.StructureToPtr(ucApiObject, ucApiObjectPtr, false);
+            var result = UCAPI_Serialize(ucApiObjectPtr, out var buffer, out var size);
             if (result != 0 || buffer == IntPtr.Zero)
             {
                 throw new Exception("Serialization to MessagePack failed.");
@@ -150,39 +170,8 @@ namespace UCAPI4Unity.Core
             Marshal.Copy(buffer, managedBuffer, 0, (int)size);
             UCAPI_FreeBuffer(buffer);
 
+            Marshal.FreeHGlobal(ucApiObjectPtr);
             return managedBuffer;
-        }
-
-        public static UcApiDllObject DecodeFromBinary(byte[] binaryData)
-        {
-            var nativePtr = UCAPI_DecodeFromBinary(binaryData, (UIntPtr)binaryData.Length);
-            Debug.Assert(nativePtr != IntPtr.Zero, "Binary decode failed.");
-            return new UcApiDllObject(nativePtr);
-        }
-
-        public static byte[] EncodeToBinary(UcApiDllObject ucApiObject)
-        {
-            var buffer = UCAPI_EncodeToBinary(ucApiObject.NativePtr, out var size);
-
-            if (buffer == IntPtr.Zero || size == UIntPtr.Zero)
-            {
-                throw new Exception("Binary encode failed.");
-            }
-
-            var managedBuffer = new byte[(int)size];
-            Marshal.Copy(buffer, managedBuffer, 0, (int)size);
-            UCAPI_FreeBuffer(buffer);
-
-            return managedBuffer;
-        }
-
-        public static void Free(UcApiDllObject obj)
-        {
-            if (obj != null && obj.NativePtr != IntPtr.Zero)
-            {
-                UCAPI_FreeObject(obj.NativePtr);
-                obj.Invalidate();
-            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using MessagePack;
 
 namespace UCAPI4Unity.Core
@@ -10,6 +11,6 @@ namespace UCAPI4Unity.Core
         [Key(2)] public ushort NumPayload;
         [Key(3)] public ushort PayloadLength;
         [Key(4)] public ushort CRC16;
-        [Key(5)] public UcApiRecord[] Payloads;
+        [Key(5)] public IntPtr Payloads;
     }
 }

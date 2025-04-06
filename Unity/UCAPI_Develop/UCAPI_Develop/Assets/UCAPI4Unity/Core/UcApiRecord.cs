@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using MessagePack;
-using UnityEngine;
 
 namespace UCAPI4Unity.Core
 {
@@ -35,49 +32,5 @@ namespace UCAPI4Unity.Core
         [Key(24)] public float LensDistortionRadialCoefficientsK2;
         [Key(25)] public float LensDistortionCenterPointRightMm;
         [Key(26)] public float LensDistortionCenterPointUpMm;
-
-        public UcApiRecord(byte[] buffer)
-        {
-            using var ms = new MemoryStream(buffer);
-            using var br = new BinaryReader(ms);
-
-            CameraNo = br.ReadUInt32();
-            Commands = br.ReadUInt16();
-            var timeCodeBytes = br.ReadBytes(4);
-            TimeCode = new UcApiTimeCode(timeCodeBytes);
-            PacketNo = br.ReadByte();
-
-            EyePositionRightM = br.ReadSingle();
-            EyePositionUpM = br.ReadSingle();
-            EyePositionForwardM = br.ReadSingle();
-
-            LookVectorRightM = br.ReadSingle();
-            LookVectorUpM = br.ReadSingle();
-            LookVectorForwardM = br.ReadSingle();
-
-            UpVectorRightM = br.ReadSingle();
-            UpVectorUpM = br.ReadSingle();
-            UpVectorForwardM = br.ReadSingle();
-
-            FocalLengthMm = br.ReadSingle();
-            AspectRatio = br.ReadSingle();
-            FocusDistanceM = br.ReadSingle();
-            Aperture = br.ReadSingle();
-            SensorSizeWidthMm = br.ReadSingle();
-            SensorSizeHeightMm = br.ReadSingle();
-            NearClipM = br.ReadSingle();
-            var raw = new byte[4];
-            Buffer.BlockCopy(buffer, 75, raw, 0, 4);
-            Debug.Log($"FarClipM raw bytes @75: {BitConverter.ToString(raw)}");
-            FarClipM = br.ReadSingle();
-            LensShiftHorizontalRatio = br.ReadSingle();
-            LensShiftVerticalRatio = br.ReadSingle();
-            LensDistortionRadialCoefficientsK1 = br.ReadSingle();
-            LensDistortionRadialCoefficientsK2 = br.ReadSingle();
-            LensDistortionCenterPointRightMm = br.ReadSingle();
-            LensDistortionCenterPointUpMm = br.ReadSingle();
-
-            br.ReadBytes(25); // reserved
-        }
     }
 }

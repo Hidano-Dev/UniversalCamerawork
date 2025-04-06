@@ -1,4 +1,3 @@
-using System;
 using MessagePack;
 
 namespace UCAPI4Unity.Core
@@ -16,37 +15,37 @@ namespace UCAPI4Unity.Core
     [MessagePackObject]
     public struct UcApiTimeCode
     {
-        [Key(0)] public int FrameNumber { get; set; }
-        [Key(1)] public int Second { get; set; }
-        [Key(2)] public int Minute { get; set; }
-        [Key(3)] public int Hour { get; set; }
-        [Key(4)] public FrameRate FrameRate { get; set; }
-        [Key(5)] public bool DropFrame { get; set; }
+        [Key(0)] public byte FrameNumber;
+        [Key(1)] public byte Second;
+        [Key(2)] public byte Minute;
+        [Key(3)] public byte Hour;
+        [Key(4)] public byte FrameRate;
+        [Key(5)] public byte DropFrame;
 
-        private readonly int _reserved;
+        private byte _reserved;
 
-        public UcApiTimeCode(byte[] data)
-        {
-            if (data == null || data.Length != 4)
-                throw new ArgumentException("Timecode data must be 4 bytes.");
-
-            // Little-endianでintに変換
-            var raw = BitConverter.ToInt32(data, 0);
-
-            FrameNumber = raw & 0xFF;
-            Second = (raw >> 8) & 0x3F;
-            Minute = (raw >> 14) & 0x3F;
-            Hour = (raw >> 20) & 0x1F;
-            FrameRate = (FrameRate)((raw >> 25) & 0xF);
-            DropFrame = ((raw >> 29) & 0x1) == 1;
-            _reserved = (raw >> 30) & 0x3;
-        }
+        // public UcApiTimeCode(byte[] data)
+        // {
+        //     if (data == null || data.Length != 4)
+        //         throw new ArgumentException("Timecode data must be 4 bytes.");
+        //
+        //     // Little-endianでintに変換
+        //     var raw = BitConverter.ToInt32(data, 0);
+        //
+        //     FrameNumber = raw & 0xFF;
+        //     Second = (raw >> 8) & 0x3F;
+        //     Minute = (raw >> 14) & 0x3F;
+        //     Hour = (raw >> 20) & 0x1F;
+        //     FrameRate = (FrameRate)((raw >> 25) & 0xF);
+        //     DropFrame = ((raw >> 29) & 0x1) == 1;
+        //     _reserved = (raw >> 30) & 0x3;
+        // }
 
         public override string ToString()
         {
             return $"{Hour:D2}:{Minute:D2}:{Second:D2}:{FrameNumber:D2} " +
                    $"({(int)FrameRate}) " +
-                   $"{(DropFrame ? "Drop" : "Non-Drop")} " +
+                   $"{(DropFrame == 1 ? "Drop" : "Non-Drop")} " +
                    $"Reserved: {_reserved}";
         }
     }

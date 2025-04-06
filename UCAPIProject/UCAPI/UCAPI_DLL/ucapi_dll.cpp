@@ -2,6 +2,7 @@
 #include "ucapi_dll.h"
 #include <iostream>
 #include <msgpack.hpp>
+#include "ucapi.h"
 #include "ucapi_msgpack_converter.h"
 #include "ucapi_serializer_utility.h"
 
@@ -9,7 +10,7 @@ struct UCAPI_DllObject {
     ucapi_t* obj;
 };
 
-UCAPI_API UCAPI_DllObject* UCAPI_DeserializeMessagePack(const uint8_t* buffer, size_t size) {
+UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t size) {
     try {
         msgpack::object_handle oh = msgpack::unpack(reinterpret_cast<const char*>(buffer), size);
         msgpack::object obj = oh.get();
@@ -18,20 +19,17 @@ UCAPI_API UCAPI_DllObject* UCAPI_DeserializeMessagePack(const uint8_t* buffer, s
         obj.convert(msgpack_obj);
 
         ucapi_t* native = convert_to_ucapi(msgpack_obj);
-
-        UCAPI_DllObject* wrapper = new UCAPI_DllObject;
-        wrapper->obj = native;
-        return wrapper;
+        return native;
     }
     catch (const std::exception& e) {
-        std::cerr << "[UCAPI_DeserializeMessagePack] " << e.what() << std::endl;
+        std::cerr << "[UCAPI_Deserialize] " << e.what() << std::endl;
         return nullptr;
     }
 }
 
-UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuffer, size_t* outSize) {
+UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize) {
     try {
-        ucapi_msgpack_t packed = convert_to_msgpack(obj->obj);
+        ucapi_msgpack_t packed = convert_to_msgpack(obj);
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, packed);
 
@@ -41,7 +39,7 @@ UCAPI_API int UCAPI_SerializeMessagePack(UCAPI_DllObject* obj, uint8_t** outBuff
         return 0;
     }
     catch (const std::exception& e) {
-        std::cerr << "[UCAPI_SerializeMessagePack] " << e.what() << std::endl;
+        std::cerr << "[UCAPI_Serialize] " << e.what() << std::endl;
         return -1;
     }
 }
