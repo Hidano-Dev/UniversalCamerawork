@@ -33,27 +33,8 @@ namespace UCAPI4Unity.Core
 
         public static void ApplyToCamera(byte[] raw, Camera camera)
         {
-            // DLL内でsize_t型として受け取る
-            var ucApiObjPtr = UCAPI_Deserialize(raw, 138);
-            if (ucApiObjPtr == IntPtr.Zero)
-            {
-                throw new Exception("Deserialization failed.");
-            }
-            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(ucApiObjPtr);
-            if (ucApiObject.NumPayload == 0)
-            {
-                throw new Exception("No payloads found.");
-            }
-            var payloads = new UcApiRecord[ucApiObject.NumPayload];
-            var payloadPtr = ucApiObject.Payloads;
-            for (var i = 0; i < ucApiObject.NumPayload; i++)
-            {
-                var payload = Marshal.PtrToStructure<UcApiRecord>(payloadPtr);
-                payloads[i] = payload;
-                payloadPtr += Marshal.SizeOf(payload);
-            }
-            
-            var rec = payloads[0];
+            var ucApiRecords = DeserializeInternal(raw);
+            var rec = ucApiRecords[0];
             
             // カメラ位置・回転を反映
             var position = new Vector3(
@@ -93,8 +74,6 @@ namespace UCAPI4Unity.Core
                 camera.focusDistance = rec.FocusDistanceM;
                 camera.aperture = rec.Aperture;
             }
-            
-            UCAPI_FreeBuffer(ucApiObjPtr);
         }
         
         public static byte[] SerializeFromCamera(Camera cam)
@@ -156,6 +135,31 @@ namespace UCAPI4Unity.Core
             Marshal.FreeHGlobal(payloadPtr);
 
             return serializedData;
+        }
+        
+        private static UcApiRecord[] DeserializeInternal(byte[] buffer)
+        {
+            var ucApiObjPtr = UCAPI_Deserialize(buffer, 138);
+            if (ucApiObjPtr == IntPtr.Zero)
+            {
+                throw new Exception("Deserialization failed.");
+            }
+            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(ucApiObjPtr);
+            if (ucApiObject.NumPayload == 0)
+            {
+                throw new Exception("No payloads found.");
+            }
+            var payloads = new UcApiRecord[ucApiObject.NumPayload];
+            var payloadPtr = ucApiObject.Payloads;
+            for (var i = 0; i < ucApiObject.NumPayload; i++)
+            {
+                var payload = Marshal.PtrToStructure<UcApiRecord>(payloadPtr);
+                payloads[i] = payload;
+                payloadPtr += Marshal.SizeOf(payload);
+            }
+            
+            UCAPI_FreeBuffer(ucApiObjPtr);
+            return payloads;
         }
         
         private static byte[] SerializeInternal(UcApiObject ucApiObject)
