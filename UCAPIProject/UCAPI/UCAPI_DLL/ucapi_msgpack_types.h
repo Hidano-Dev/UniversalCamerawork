@@ -34,8 +34,6 @@ struct ucapi_msgpack_record_t {
     float lens_distortion_center_point_right_mm;
     float lens_distortion_center_point_up_mm;
 
-    std::vector<uint8_t> reserved;  // 25ƒoƒCƒg•ª
-
     MSGPACK_DEFINE(
         camera_no, commands, timecode, packet_no,
         eye_position_right_m, eye_position_up_m, eye_position_forward_m,
@@ -46,8 +44,7 @@ struct ucapi_msgpack_record_t {
         near_clip_m, far_clip_m,
         lens_shift_horizontal_ratio, lens_shift_vertical_ratio,
         lens_distortion_radial_coefficients_k1, lens_distortion_radial_coefficients_k2,
-        lens_distortion_center_point_right_mm, lens_distortion_center_point_up_mm,
-        reserved
+        lens_distortion_center_point_right_mm, lens_distortion_center_point_up_mm
     );
 };
 

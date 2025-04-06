@@ -41,8 +41,6 @@ int main() {
 	record.lens_distortion_radial_coefficients_k2 = 0.0f;
 	record.lens_distortion_center_point_right_mm = 0.0f;
 	record.lens_distortion_center_point_up_mm = 0.0f;
-	// 25バイト分の予約領域を確保
-    record.reserved = std::vector<uint8_t>(25, 0);
 
     ucapi_msgpack_t data;
     data.magic = 0x55AA;

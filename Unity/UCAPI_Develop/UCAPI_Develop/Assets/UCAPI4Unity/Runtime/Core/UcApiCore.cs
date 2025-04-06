@@ -29,9 +29,6 @@ namespace UCAPI4Unity.Runtime.Core
                 Payloads = payloadPtr
             };
             
-            Debug.Log("Serializing TimeCode: " + UcApiTimeCode.FromRaw(record.TimeCode));
-            DumpRecord(record);
-            
             var serializedData = SerializeFromObject(obj);
             // serializedDataにコピーした後、ポインタを解放
             Marshal.FreeHGlobal(payloadPtr);
@@ -55,11 +52,9 @@ namespace UCAPI4Unity.Runtime.Core
             }
             
             var crc = ComputeChecksum(payloads[0]);
-            Debug.Log("Deserializing TimeCode: " + UcApiTimeCode.FromRaw(payloads[0].TimeCode));
-            DumpRecord(payloads[0]);
             if(ucApiObject.CRC16 != crc)
             {
-                throw new Exception("CRC16 checksum mismatch. Header: " + ucApiObject.CRC16 + ", Payload: " + crc);
+                Debug.LogError("CRC16 checksum mismatch. Header: " + ucApiObject.CRC16 + ", Payload: " + crc);
             }
             
             return payloads;
@@ -158,6 +153,24 @@ namespace UCAPI4Unity.Runtime.Core
             + $"\n  LensDistortionCenterPointRightMm: {record.LensDistortionCenterPointRightMm}"
             + $"\n  LensDistortionCenterPointUpMm: {record.LensDistortionCenterPointUpMm}"
             + $"\n  CRC16: {ComputeChecksum(record)}");
+        }
+        
+        
+        /// <summary>
+        /// デバッグ用にレコードの内容を出力します。
+        /// </summary>
+        /// <param name="record"></param>
+        private static void DumpRecordBinary(UcApiRecord record)
+        {
+            var buffer = new byte[Marshal.SizeOf(record)];
+            var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(record));
+            Marshal.StructureToPtr(record, ptr, false);
+            Marshal.Copy(ptr, buffer, 0, buffer.Length);
+            Marshal.FreeHGlobal(ptr);
+
+            Debug.Log("Record Dump:"
+                      + $"\n  CRC16: {ComputeChecksum(record)}"
+                      + $"\n  Binary: {BitConverter.ToString(buffer).Replace("-", " ")}");
         }
     }
 }

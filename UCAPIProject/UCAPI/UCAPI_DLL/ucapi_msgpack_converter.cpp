@@ -5,6 +5,7 @@
 
 ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
     ucapi_t* ucapi = new ucapi_t();
+
     ucapi->m_magic = msgpack_obj.magic;
     ucapi->m_version = msgpack_obj.version;
     ucapi->m_num_payload = msgpack_obj.num_payload;
@@ -15,7 +16,8 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
 
     for (const auto& rec : msgpack_obj.payload) {
 		ucapi->m_payload.emplace_back(payload_length);
-        auto& crec = ucapi->m_payload.back();
+        ucapi_t::record_t& crec = ucapi->m_payload.back();
+		memset(&crec, 0, sizeof(ucapi_t::record_t));
 
         crec.m_camera_no = rec.camera_no;
         crec.m_commands = rec.commands;
@@ -97,7 +99,6 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
         r.lens_distortion_radial_coefficients_k2 = rec.m_lens_distortion_radial_coefficients_k2;
         r.lens_distortion_center_point_right_mm = rec.m_lens_distortion_center_point_right_mm;
         r.lens_distortion_center_point_up_mm = rec.m_lens_distortion_center_point_up_mm;
-        r.reserved = std::vector<uint8_t>(25, 0); // •K—v‚É‰ž‚¶‚Ä‘Î‰ž
 
         out.payload.push_back(r);
     }
