@@ -1,4 +1,6 @@
 using UCAPI4Unity.Runtime;
+using UCAPI4Unity.Runtime.CinemachineCamera;
+using UCAPI4Unity.Runtime.UnityCamera;
 using Unity.Cinemachine;
 using UnityEngine;
 using uOSC;
@@ -7,7 +9,7 @@ namespace UCAPI4Unity.Sample.Scripts
 {
     public class UcApiSender : MonoBehaviour
     {
-        public enum Mode
+        private enum Mode
         {
             UnityCamera,
             CinemachineCamera,
@@ -16,7 +18,7 @@ namespace UCAPI4Unity.Sample.Scripts
         [SerializeField] private uOscClient client;
         [SerializeField] private Mode mode;
         [SerializeField] private new Camera camera;
-        [SerializeField] private ICinemachineCamera virtualCamera;
+        [SerializeField] private CinemachineCamera virtualCamera;
 
         private void Update()
         {
@@ -24,10 +26,11 @@ namespace UCAPI4Unity.Sample.Scripts
             switch (mode)
             {
                 case Mode.UnityCamera:
-                    ucapi = UcApi4Unity.SerializeFromCamera(camera);
+                    ucapi = UcApi4UnityCamera.SerializeFromCamera(camera);
                     break;
                 case Mode.CinemachineCamera:
-                    ucapi = UcApi4Unity.SerializeFromVirtualCamera(virtualCamera);
+                    ucapi = UcApi4CinemachineCamera.SerializeFromVirtualCamera(virtualCamera);
+                    break;
             }
             client.Send("/ucapi/data", ucapi);
         }

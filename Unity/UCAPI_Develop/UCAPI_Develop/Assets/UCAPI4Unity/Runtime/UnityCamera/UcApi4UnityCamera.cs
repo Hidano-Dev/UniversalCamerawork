@@ -1,10 +1,9 @@
 using UCAPI4Unity.Runtime.Core;
-using UCAPI4Unity.Runtime.UnityCamera;
 using UnityEngine;
 
-namespace UCAPI4Unity.Runtime
+namespace UCAPI4Unity.Runtime.UnityCamera
 {
-    public static class UcApi4Unity
+    public static class UcApi4UnityCamera
     {
         public static void ApplyToCamera(byte[] raw, Camera camera)
         {
@@ -16,12 +15,6 @@ namespace UCAPI4Unity.Runtime
         public static byte[] SerializeFromCamera(Camera cam)
         {
             var payload = UcApiRecordParser.FromCamera(cam);
-            return UcApiCore.SerializeFromRecord(payload);
-        }
-        
-        public static byte[] SerializeFromVirtualCamera(ICinemachineCamera cam)
-        {
-            var payload = UcApiRecordParser.FromVirtualCamera(cam);
             return UcApiCore.SerializeFromRecord(payload);
         }
     }

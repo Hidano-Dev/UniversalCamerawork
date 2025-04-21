@@ -2,9 +2,10 @@
     "name": "UcApi4Unity.Sample",
     "rootNamespace": "",
     "references": [
-        "GUID:dc60844e34fd6b24d94afb3a5cc82e30",
-        "GUID:e8063cf3a345f9c46b7c7c4f14d54285",
-        "GUID:4307f53044263cf4b835bd812fc161a4"
+        "GUID:289590f5ab423464899e33ce89b23a4b",
+        "GUID:398fac1736544b33ab8b7d5c148315b3",
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "GUID:e8063cf3a345f9c46b7c7c4f14d54285"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
