@@ -67,39 +67,35 @@ namespace UCAPI4Unity.Runtime.CinemachineCamera
                 record.UpVectorForwardM
             );
             
-            var cam = camera as CinemachineVirtualCameraBase;
+            var cam = camera as Unity.Cinemachine.CinemachineCamera;
             if (cam != null)
             {
                 cam.transform.position = position;
                 cam.transform.rotation = Quaternion.LookRotation(forward, up);
-                var lens = new LensSettings();
-                lens.FieldOfView = Camera.FocalLengthToFieldOfView(record.FocalLengthMm, record.SensorSizeHeightMm);
-                lens.PhysicalProperties.FocusDistance = record.FocusDistanceM;
-                lens.PhysicalProperties.Aperture = record.Aperture;
-                lens.PhysicalProperties.SensorSize = new Vector2(record.SensorSizeWidthMm, record.SensorSizeHeightMm);
-                lens.NearClipPlane = record.NearClipM;
-                lens.FarClipPlane = record.FarClipM;
-                lens.PhysicalProperties.LensShift.x = record.LensShiftHorizontalRatio;
-                lens.PhysicalProperties.LensShift.y = record.LensShiftVerticalRatio;
-                cam.State.Lens.CopyCameraMode(ref lens);
-                if(volumeSettings.Profile != null && volumeSettings.Profile.Has<DepthOfField>())
+                
+                cam.Lens.FieldOfView = Camera.FocalLengthToFieldOfView(record.FocalLengthMm, record.SensorSizeHeightMm);
+                cam.Lens.PhysicalProperties.SensorSize = new Vector2(record.SensorSizeWidthMm, record.SensorSizeHeightMm);
+                cam.Lens.NearClipPlane = record.NearClipM;
+                cam.Lens.FarClipPlane = record.FarClipM;
+                cam.Lens.PhysicalProperties.LensShift.x = record.LensShiftHorizontalRatio;
+                cam.Lens.PhysicalProperties.LensShift.y = record.LensShiftVerticalRatio;
+                cam.Lens.PhysicalProperties.Aperture = record.Aperture;
+                cam.Lens.PhysicalProperties.FocusDistance = record.FocusDistanceM;
+                
+                if (volumeSettings.Profile == null || !volumeSettings.Profile.Has<LensDistortion>())
                 {
-                    foreach (var profileComponent in volumeSettings.Profile.components)
+                    return;
+                }
+                
+                foreach (var profileComponent in volumeSettings.Profile.components)
+                {
+                    if (profileComponent is not LensDistortion lensDistortion)
                     {
-                        if (profileComponent is DepthOfField dof)
-                        {
-                            dof.aperture.Override(record.Aperture);
-                            dof.focusDistance.Override(record.FocusDistanceM);
-                            dof.focalLength.Override(record.FocalLengthMm);
-                        }
-
-                        if (profileComponent is LensDistortion lensDistortion)
-                        {
-                            lensDistortion.xMultiplier.Override(record.LensDistortionRadialCoefficientsK1);
-                            lensDistortion.yMultiplier.Override(record.LensDistortionRadialCoefficientsK2);
-                            lensDistortion.center.Override(new Vector2(record.LensDistortionCenterPointRightMm, record.LensDistortionCenterPointUpMm));
-                        }
+                        continue;
                     }
+                    lensDistortion.xMultiplier.Override(record.LensDistortionRadialCoefficientsK1);
+                    lensDistortion.yMultiplier.Override(record.LensDistortionRadialCoefficientsK2);
+                    lensDistortion.center.Override(new Vector2(record.LensDistortionCenterPointRightMm, record.LensDistortionCenterPointUpMm));
                 }
             }
             else
