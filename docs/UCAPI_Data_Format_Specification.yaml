@@ -27,6 +27,7 @@ Record:
   cameraNo: uint32_t         # Camera number
   commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
   timecode: Timecode         # Timecode information (bit allocations defined elsewhere)
+  subframe: float            # Precise timing that cannot be expressed by timecode
   packetNo: uint8_t          # Packet number
 
   # Camera position and orientation (units: meters or as appropriate)

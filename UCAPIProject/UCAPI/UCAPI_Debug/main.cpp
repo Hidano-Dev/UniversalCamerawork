@@ -17,6 +17,7 @@ int main() {
     record.camera_no = 1;
     record.commands = 0x0A;
 	record.timecode = 0x12345678; // 32ƒrƒbƒg‚Ìtimecode
+	record.subframe = 0;
     record.packet_no = 5;
     record.eye_position_right_m = 1.0f;
 	record.eye_position_up_m = 2.0f;
@@ -90,6 +91,7 @@ void Dump(ucapi_t* obj) {
         std::cout << "CameraNo " << m_payload.m_camera_no << std::endl;
         std::cout << "Commands " << m_payload.m_commands << std::endl;
 		std::cout << "Timecode Binary " << std::hex << std::setw(8) << std::setfill('0') << m_payload.m_timecode << std::dec << std::endl;
+		std::cout << "Subframe " << m_payload.m_subframe << std::endl;
 		std::cout << "Packet No " << m_payload.m_packet_no << std::endl;
 		std::cout << "Eye Position Right " << m_payload.m_eye_position_right_m << std::endl;
 		std::cout << "Eye Position Up " << m_payload.m_eye_position_up_m << std::endl;

@@ -22,6 +22,7 @@ namespace UCAPI4Unity.Runtime.UnityCamera
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
                 PacketNo = 1,
                 TimeCode = UcApiTimeCode.ToRaw(timeCode),
+                SubFrame = 0,
                 EyePositionRightM = cam.transform.position.x,
                 EyePositionUpM = cam.transform.position.y,
                 EyePositionForwardM = cam.transform.position.z,

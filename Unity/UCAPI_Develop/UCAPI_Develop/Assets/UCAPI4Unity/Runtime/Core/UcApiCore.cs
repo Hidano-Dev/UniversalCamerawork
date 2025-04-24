@@ -128,6 +128,7 @@ namespace UCAPI4Unity.Runtime.Core
             + $"\n  CameraNo: {record.CameraNo}"
             + $"\n  Commands: {record.Commands}"
             + $"\n  TimeCode: {record.TimeCode}"
+            + $"\n  SubFrame: {record.SubFrame}"
             + $"\n  PacketNo: {record.PacketNo}"
             + $"\n  EyePositionRightM: {record.EyePositionRightM}"
             + $"\n  EyePositionUpM: {record.EyePositionUpM}"

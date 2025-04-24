@@ -22,6 +22,7 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
         crec.m_camera_no = rec.camera_no;
         crec.m_commands = rec.commands;
         crec.m_timecode = rec.timecode;
+		crec.m_subframe = rec.subframe;
         crec.m_packet_no = rec.packet_no;
 
         crec.m_eye_position_right_m = rec.eye_position_right_m;
@@ -70,7 +71,7 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
         r.commands = rec.m_commands;
 
 		r.timecode = rec.m_timecode;
-
+        r.subframe = rec.m_subframe;
         r.packet_no = rec.m_packet_no;
 
         r.eye_position_right_m = rec.m_eye_position_right_m;

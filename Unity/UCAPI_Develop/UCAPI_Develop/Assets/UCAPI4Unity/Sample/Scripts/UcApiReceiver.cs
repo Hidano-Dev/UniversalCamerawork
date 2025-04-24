@@ -16,7 +16,10 @@ namespace UCAPI4Unity.Sample.Scripts
 
         private void Start()
         {
-            _volumeSettings = virtualCamera.GetComponent<CinemachineVolumeSettings>();
+            if (cameraMode == CameraMode.CinemachineCamera)
+            {
+                _volumeSettings = virtualCamera.GetComponent<CinemachineVolumeSettings>();   
+            }
         }
 
         public void OnDataReceived(Message message)
