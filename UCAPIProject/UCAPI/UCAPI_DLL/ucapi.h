@@ -36,8 +36,8 @@ public:
 
         uint32_t m_camera_no;
         uint16_t m_commands;
-        uint32_t m_timecode;
-		uint32_t m_subframe;
+        smpte_ltc_t m_timecode;  // Changed from uint32_t to smpte_ltc_t (80-bit SMPTE LTC)
+		float m_subframe;        // Changed from uint32_t to float for precision
         uint8_t m_packet_no;
         float m_eye_position_right_m;
         float m_eye_position_up_m;

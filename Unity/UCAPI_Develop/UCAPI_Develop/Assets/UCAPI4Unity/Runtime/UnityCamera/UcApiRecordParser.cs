@@ -7,22 +7,24 @@ namespace UCAPI4Unity.Runtime.UnityCamera
     {
         public static UcApiRecord FromCamera(Camera cam)
         {
-            var timeCode = new UcApiTimeCode
-            {
-                FrameNumber = 12,
-                Second = 34,
-                Minute = 56,
-                Hour = 14,
-                FrameRate = FrameRate.FrameRate60,
-                DropFrame = false
-            };
+            // Create SMPTE timecode with current time (example values)
+            var smpteTimeCode = new UcApiSmpteTimecode();
+            smpteTimeCode.Clear();
+            smpteTimeCode.Frame = 12;
+            smpteTimeCode.Second = 34;
+            smpteTimeCode.Minute = 56;
+            smpteTimeCode.Hour = 14;
+            smpteTimeCode.DropFrame = false;
+            smpteTimeCode.ColorFrame = false;
+            smpteTimeCode.SetSyncWord();
+            
             var record = new UcApiRecord
             {
                 CameraNo = 1,
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
                 PacketNo = 1,
-                TimeCode = UcApiTimeCode.ToRaw(timeCode),
-                SubFrame = 0,
+                TimeCode = smpteTimeCode,  // Now using SMPTE LTC format
+                SubFrame = 0.0f,           // Now using float for precision
                 EyePositionRightM = cam.transform.position.x,
                 EyePositionUpM = cam.transform.position.y,
                 EyePositionForwardM = cam.transform.position.z,
@@ -92,6 +94,9 @@ namespace UCAPI4Unity.Runtime.UnityCamera
                 camera.focusDistance = record.FocusDistanceM;
                 camera.aperture = record.Aperture;
             }
+            
+            // タイムコード情報をログ出力（デバッグ用）
+            Debug.Log($"Received timecode: {record.TimeCode}");
         } 
     }
 }

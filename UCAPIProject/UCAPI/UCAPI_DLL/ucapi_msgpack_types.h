@@ -2,12 +2,20 @@
 #include <msgpack.hpp>
 #include <vector>
 #include <cstdint>
+#include <array>
+
+// SMPTE LTC data structure for MessagePack serialization
+struct smpte_ltc_msgpack_t {
+    std::array<uint8_t, 10> data;  // 80 bits = 10 bytes
+    
+    MSGPACK_DEFINE(data);
+};
 
 struct ucapi_msgpack_record_t {
     uint32_t camera_no;
     uint16_t commands;
-    uint32_t timecode;
-    uint32_t subframe;
+    smpte_ltc_msgpack_t timecode;  // Changed from uint32_t to smpte_ltc_msgpack_t
+    float subframe;                // Changed from uint32_t to float
     uint8_t packet_no;
 
     float eye_position_right_m;

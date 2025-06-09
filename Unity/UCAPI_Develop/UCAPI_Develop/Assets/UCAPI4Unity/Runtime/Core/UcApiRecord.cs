@@ -4,8 +4,8 @@ namespace UCAPI4Unity.Runtime.Core
     {
         public uint CameraNo;
         public ushort Commands;
-        public uint TimeCode;
-        public float SubFrame;
+        public UcApiSmpteTimecode TimeCode;  // Changed from uint to UcApiSmpteTimecode (80-bit SMPTE LTC)
+        public float SubFrame;               // Changed from uint to float for precision
         public byte PacketNo;
         public float EyePositionRightM;
         public float EyePositionUpM;
