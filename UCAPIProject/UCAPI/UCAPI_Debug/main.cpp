@@ -10,13 +10,25 @@
 
 void Dump(ucapi_t* handle);
 
-// Å¬\¬‚Ì MessagePack ƒIƒuƒWƒFƒNƒg‚ğ\’z‚µ‚ÄƒeƒXƒg
+// ï¿½Åï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ MessagePack ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½\ï¿½zï¿½ï¿½ï¿½Äƒeï¿½Xï¿½g
 int main() {
-    // MessagePack\‘¢‘Ì‚Ì‰Šú‰»
+    // MessagePackï¿½\ï¿½ï¿½ï¿½Ì‚Ìï¿½ï¿½ï¿½ï¿½ï¿½
     ucapi_msgpack_record_t record;
     record.camera_no = 1;
     record.commands = 0x0A;
-	record.timecode = 0x12345678; // 32ƒrƒbƒg‚Ìtimecode
+	timecode_t tc;
+	tc.m_hour_number = 12;
+	tc.m_minute_number = 34;
+	tc.m_second_number = 56;
+	tc.m_frame_number = 15;
+	tc.m_frame_rate = timecode_t::FRAME_RATE_60;
+	tc.m_drop_frame = 0;
+	tc.m_color_frame = 0;
+	memset(tc.m_user_bits, 0, sizeof(tc.m_user_bits));
+	
+	uint8_t smpte_data[10];
+	timecode_t::pack_smpte(tc, smpte_data);
+	record.timecode.assign(smpte_data, smpte_data + 10);
 	record.subframe = 0;
     record.packet_no = 5;
     record.eye_position_right_m = 1.0f;
@@ -50,7 +62,7 @@ int main() {
     data.crc16 = 0;
     data.payload.push_back(record);
 
-    // MessagePackƒoƒCƒiƒŠ‚ÉƒGƒ“ƒR[ƒh
+    // MessagePackï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½ÉƒGï¿½ï¿½ï¿½Rï¿½[ï¿½h
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, data);
 
@@ -74,7 +86,7 @@ int main() {
 
     std::cout << "Serialization succeeded! Size: " << outSize << " bytes" << std::endl;
 
-    // Œãn––
+    // ï¿½ï¿½nï¿½ï¿½
     UCAPI_FreeBuffer(outBuf);
     return 0;
 }
@@ -90,7 +102,11 @@ void Dump(ucapi_t* obj) {
         std::cout << "--- Payload " << i << " ---" << std::endl;
         std::cout << "CameraNo " << m_payload.m_camera_no << std::endl;
         std::cout << "Commands " << m_payload.m_commands << std::endl;
-		std::cout << "Timecode Binary " << std::hex << std::setw(8) << std::setfill('0') << m_payload.m_timecode << std::dec << std::endl;
+		std::cout << "Timecode SMPTE Data: ";
+		for (int j = 0; j < 10; ++j) {
+			std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)m_payload.m_timecode[j] << " ";
+		}
+		std::cout << std::dec << std::endl;
 		std::cout << "Subframe " << m_payload.m_subframe << std::endl;
 		std::cout << "Packet No " << m_payload.m_packet_no << std::endl;
 		std::cout << "Eye Position Right " << m_payload.m_eye_position_right_m << std::endl;
