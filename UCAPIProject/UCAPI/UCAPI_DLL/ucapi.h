@@ -36,7 +36,7 @@ public:
 
         uint32_t m_camera_no;
         uint16_t m_commands;
-        uint32_t m_timecode;
+        uint8_t m_timecode[10];
 		uint32_t m_subframe;
         uint8_t m_packet_no;
         float m_eye_position_right_m;

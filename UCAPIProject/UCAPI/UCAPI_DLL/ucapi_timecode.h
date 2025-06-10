@@ -27,6 +27,8 @@ private:
 
 public:
 	~timecode_t();
+	static void pack_smpte(timecode_t timecode, uint8_t smpte_data[10]);
+	static timecode_t unpack_smpte(const uint8_t smpte_data[10]);
 	static uint32_t pack(timecode_t timecode);
 	static timecode_t unpack(uint32_t packed);
 
@@ -36,5 +38,6 @@ public:
 	uint8_t m_hour_number;
 	uint8_t m_frame_rate;
 	uint8_t m_drop_frame;
-	uint8_t m_reserved;
+	uint8_t m_color_frame;
+	uint8_t m_user_bits[4];
 };

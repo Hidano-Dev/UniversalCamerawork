@@ -4,7 +4,7 @@ namespace UCAPI4Unity.Runtime.Core
     {
         public uint CameraNo;
         public ushort Commands;
-        public uint TimeCode;
+        public byte[] TimeCode;
         public float SubFrame;
         public byte PacketNo;
         public float EyePositionRightM;

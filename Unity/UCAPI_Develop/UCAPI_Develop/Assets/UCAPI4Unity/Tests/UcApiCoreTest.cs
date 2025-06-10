@@ -87,6 +87,47 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(maxObj.CRC16, maxDeserialized.CRC16);
 
             yield return null;
+        
+        [Test]
+        public void TimeCodeTest()
+        {
+            var timeCode = new UcApiTimeCode
+            {
+                FrameNumber = 15,
+                Second = 30,
+                Minute = 45,
+                Hour = 12,
+                FrameRate = FrameRate.FrameRate60,
+                DropFrame = true,
+                ColorFrame = false,
+                UserBits = new byte[] { 0x1, 0x2, 0x3, 0x4 }
+            };
+
+            var smpteData = timeCode.ToSmpteData();
+            var decoded = UcApiTimeCode.FromSmpteData(smpteData);
+
+            Assert.AreEqual(timeCode.FrameNumber, decoded.FrameNumber);
+            Assert.AreEqual(timeCode.Second, decoded.Second);
+            Assert.AreEqual(timeCode.Minute, decoded.Minute);
+            Assert.AreEqual(timeCode.Hour, decoded.Hour);
+            Assert.AreEqual(timeCode.DropFrame, decoded.DropFrame);
+            Assert.AreEqual(timeCode.ColorFrame, decoded.ColorFrame);
+            Assert.AreEqual(timeCode.UserBits[0], decoded.UserBits[0]);
+            Assert.AreEqual(timeCode.UserBits[1], decoded.UserBits[1]);
+            Assert.AreEqual(timeCode.UserBits[2], decoded.UserBits[2]);
+            Assert.AreEqual(timeCode.UserBits[3], decoded.UserBits[3]);
+
+            var raw = UcApiTimeCode.ToRaw(timeCode);
+            var decodedRaw = UcApiTimeCode.FromRaw(raw);
+            Assert.AreEqual(timeCode.FrameNumber, decodedRaw.FrameNumber);
+            Assert.AreEqual(timeCode.Second, decodedRaw.Second);
+            Assert.AreEqual(timeCode.Minute, decodedRaw.Minute);
+            Assert.AreEqual(timeCode.Hour, decodedRaw.Hour);
+            Assert.AreEqual(timeCode.FrameRate, decodedRaw.FrameRate);
+            Assert.AreEqual(timeCode.DropFrame, decodedRaw.DropFrame);
+            Assert.AreEqual(timeCode.ColorFrame, decodedRaw.ColorFrame);
+        }
+
         }
 
         private static byte[] SerializeObject(UcApiObject obj)

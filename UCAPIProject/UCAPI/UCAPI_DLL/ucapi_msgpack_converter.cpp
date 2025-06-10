@@ -21,7 +21,11 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
 
         crec.m_camera_no = rec.camera_no;
         crec.m_commands = rec.commands;
-        crec.m_timecode = rec.timecode;
+        if (rec.timecode.size() >= 10) {
+            memcpy(crec.m_timecode, rec.timecode.data(), 10);
+        } else {
+            memset(crec.m_timecode, 0, 10);
+        }
 		crec.m_subframe = rec.subframe;
         crec.m_packet_no = rec.packet_no;
 
@@ -70,7 +74,7 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
         r.camera_no = rec.m_camera_no;
         r.commands = rec.m_commands;
 
-		r.timecode = rec.m_timecode;
+		r.timecode.assign(rec.m_timecode, rec.m_timecode + 10);
         r.subframe = rec.m_subframe;
         r.packet_no = rec.m_packet_no;
 

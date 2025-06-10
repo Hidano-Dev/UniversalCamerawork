@@ -14,20 +14,21 @@ Payload:
   repeat: numPayload         # Number of records = numPayload
 
 Timecode:
-  frameNumber: bits[8]       # 8-bit frame number
-  secondNumber: bits[6]      # 6-bit second number
-  minuteNumber: bits[6]      # 6-bit minute number
-  hourNumber: bits[5]        # 5-bit hour number
-  frameRate: bits[4]         # 4-bit frame rate (23.976, 24, 25, 29.97, 30, 48, 50, 59.94, 60, 119.88, 120, 144, 239.76, 240)
-  dropFrame: bits[1]         # 1-bit drop frame (0=NonDrop, 1=Drop)
-  reserved: bits[2]          # 3-bit reserved
+  format: SMPTE_80_bit       # SMPTE Linear Timecode 80-bit format
+  structure:
+    time_address: bits[26]   # BCD encoded time (hours, minutes, seconds, frames)
+    user_bits: bits[32]      # 8 groups of 4-bit user data
+    sync_word: bits[16]      # SMPTE sync word (0x3FFD)
+    control_bits: bits[6]    # Drop frame, color frame, phase correction flags
+  encoding: BCD              # Binary Coded Decimal for time components
+  subframe: float            # Separate subframe concept (game engine specific)
 
 Record:
   # Structure of each fixed-length data record
   cameraNo: uint32_t         # Camera number
   commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
-  timecode: Timecode         # Timecode information (bit allocations defined elsewhere)
-  subframe: float            # Precise timing that cannot be expressed by timecode
+  timecode: SMPTE_80_bit     # SMPTE Linear Timecode 80-bit format (10 bytes)
+  subframe: float            # Precise timing that cannot be expressed by timecode (game engine specific)
   packetNo: uint8_t          # Packet number
 
   # Camera position and orientation (units: meters or as appropriate)

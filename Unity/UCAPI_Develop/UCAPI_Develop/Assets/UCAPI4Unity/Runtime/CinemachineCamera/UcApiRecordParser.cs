@@ -25,7 +25,7 @@ namespace UCAPI4Unity.Runtime.CinemachineCamera
                 CameraNo = 1,
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
                 PacketNo = 1,
-                TimeCode = UcApiTimeCode.ToRaw(timeCode),
+                TimeCode = timeCode.ToSmpteData(),
                 EyePositionRightM = position.x,
                 EyePositionUpM = position.y,
                 EyePositionForwardM = position.z,
