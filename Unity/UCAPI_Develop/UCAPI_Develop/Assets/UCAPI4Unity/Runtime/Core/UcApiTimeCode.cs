@@ -1,59 +1,51 @@
 namespace UCAPI4Unity.Runtime.Core
 {
     /// <summary>
-    /// 8bit...Frame Number
-    /// 6bit...Second
-    /// 6bit...Minute
-    /// 5bit...Hour
-    /// 4bit...Frame Rate
-    /// 1bit...Drop Frame
-    /// 2bit...Reserved
-    /// Total 32bit
+    /// SMPTE 80bit (10byte) + subframe (2byte) タイムコード
     /// </summary>
     public struct UcApiTimeCode
     {
-        public uint FrameNumber;
-        public uint Second;
-        public uint Minute;
-        public uint Hour;
-        public FrameRate FrameRate;
-        public bool DropFrame;
-        private uint _reserved;
+        public byte Hour;      // BCD
+        public byte Minute;    // BCD
+        public byte Second;    // BCD
+        public byte Frame;     // BCD
+        public byte[] UserBits; // 4バイト
+        public ushort Subframe; // サブフレーム（ゲームエンジン拡張）
 
-        public static UcApiTimeCode FromRaw(uint raw)
+        public static UcApiTimeCode FromBytes(byte[] data)
         {
-            var timeCode = new UcApiTimeCode
+            if (data == null || data.Length < 12) throw new System.ArgumentException("TimeCode data must be 12 bytes");
+            return new UcApiTimeCode
             {
-                FrameNumber = raw & 0xFF,
-                Second = (raw >> 8) & 0x3F,
-                Minute = (raw >> 14) & 0x3F,
-                Hour = (raw >> 20) & 0x1F,
-                FrameRate = (FrameRate)((raw >> 25) & 0xF),
-                DropFrame = ((raw >> 29) & 0x1) == 1,
-                _reserved = (raw >> 30) & 0x3
+                Frame = FromBcd(data[0]),
+                Second = FromBcd(data[1]),
+                Minute = FromBcd(data[2]),
+                Hour = FromBcd(data[3]),
+                UserBits = new byte[] { data[4], data[5], data[6], data[7] },
+                Subframe = (ushort)((data[8] << 8) | data[9])
             };
-            
-            return timeCode;
+        }
+
+        public byte[] ToBytes()
+        {
+            var data = new byte[12];
+            data[0] = ToBcd(Frame);
+            data[1] = ToBcd(Second);
+            data[2] = ToBcd(Minute);
+            data[3] = ToBcd(Hour);
+            for (int i = 0; i < 4; i++) data[4 + i] = (UserBits != null && UserBits.Length > i) ? UserBits[i] : (byte)0;
+            data[8] = (byte)((Subframe >> 8) & 0xFF);
+            data[9] = (byte)(Subframe & 0xFF);
+            // 10,11バイト目は将来拡張用に0
+            return data;
         }
 
         public override string ToString()
         {
-            return $"{Hour:D2}:{Minute:D2}:{Second:D2}:{FrameNumber:D2} " +
-                   $"({(int)FrameRate}) " +
-                   $"{(DropFrame ? "Drop" : "Non-Drop")} " +
-                   $"Reserved: {_reserved}";
+            return $"{Hour:D2}:{Minute:D2}:{Second:D2}:{Frame:D2} Sub:{Subframe} UserBits:[{string.Join(",", UserBits ?? new byte[4])}]";
         }
-        
-        public static uint ToRaw(UcApiTimeCode timeCode)
-        {
-            var raw = timeCode.FrameNumber;
-            raw |= timeCode.Second << 8;
-            raw |= timeCode.Minute << 14;
-            raw |= timeCode.Hour << 20;
-            raw |= (uint)((int)timeCode.FrameRate << 25);
-            raw |= (uint)(timeCode.DropFrame ? 1 : 0) << 29;
-            raw |= timeCode._reserved << 30;
-            return raw;
-        }
+
+        private static byte ToBcd(byte val) => (byte)(((val / 10) << 4) | (val % 10));
+        private static byte FromBcd(byte bcd) => (byte)(((bcd >> 4) * 10) + (bcd & 0x0F));
     }
 }

@@ -127,7 +127,7 @@ namespace UCAPI4Unity.Runtime.Core
             Debug.Log("Record Dump:"
             + $"\n  CameraNo: {record.CameraNo}"
             + $"\n  Commands: {record.Commands}"
-            + $"\n  TimeCode: {record.TimeCode}"
+            + $"\n  TimeCode: {(record.TimeCode != null ? System.BitConverter.ToString(record.TimeCode) : "null")}"
             + $"\n  SubFrame: {record.SubFrame}"
             + $"\n  PacketNo: {record.PacketNo}"
             + $"\n  EyePositionRightM: {record.EyePositionRightM}"

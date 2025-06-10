@@ -5,7 +5,7 @@
 #include "ucapi.h"
 
 ucapi_t::ucapi_t(const void* dataPtr){
-    // magic‚Í0x55AA‚Å‰Šú‰»
+    // magicï¿½ï¿½0x55AAï¿½Åï¿½ï¿½ï¿½ï¿½ï¿½
     m_magic = 0x55AA;
 	m_version = 0;
 	m_num_payload = 1;
@@ -29,7 +29,7 @@ ucapi_t::ucapi_t(const void* dataPtr){
 
 void ucapi_t::_read(const void* dataPtr) {
     try {
-		// ‘S‘Ì‚ÌƒoƒCƒg”‚ğ”cˆ¬‚·‚é‚½‚ßAÅ‰‚Ì8ƒoƒCƒg‚ğ“Ç‚İæ‚é
+		// ï¿½Sï¿½Ì‚Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½cï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ßAï¿½Åï¿½ï¿½ï¿½8ï¿½oï¿½Cï¿½gï¿½ï¿½Ç‚İï¿½ï¿½
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 		m_magic = (data[1] << 8) | data[0];
 		m_version = (data[3] << 8) | data[2];
@@ -38,15 +38,15 @@ void ucapi_t::_read(const void* dataPtr) {
 
 		auto payloadLength = sizeof(record_t);
 
-		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ğŒvZ‚·‚é
+		// ï¿½yï¿½Cï¿½ï¿½ï¿½[ï¿½hï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½
 		size_t payloadSize = m_num_payload * payloadLength;
 
-		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ª0‚Ìê‡‚Í“Ç‚İæ‚ç‚È‚¢
+		// ï¿½yï¿½Cï¿½ï¿½ï¿½[ï¿½hï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½0ï¿½Ìê‡ï¿½Í“Ç‚İï¿½ï¿½È‚ï¿½
 		if (payloadSize == 0) {
 			return;
 		}
 
-		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ª•s³‚Èê‡‚Í—áŠO‚ğƒXƒ[‚·‚é
+		// ï¿½yï¿½Cï¿½ï¿½ï¿½[ï¿½hï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Èê‡ï¿½Í—ï¿½Oï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½
 		if (payloadSize > 0x10000) {
 			throw std::runtime_error("Invalid payload size");
 		}
@@ -92,34 +92,34 @@ uint16_t ucapi_t::computeCRC16(record_t* record, size_t length, uint16_t poly, u
 }
 
 ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
-	m_camera_no = 0;
-	m_commands = 0;
-	m_timecode = 0;
-	m_subframe = 0;
-	m_packet_no = 0;
-	m_eye_position_right_m = 0;
-	m_eye_position_up_m = 0;
-	m_eye_position_forward_m = 0;
-	m_look_vector_right_m = 0;
-	m_look_vector_up_m = 0;
-	m_look_vector_forward_m = 0;
-	m_up_vector_right_m = 0;
-	m_up_vector_up_m = 0;
-	m_up_vector_forward_m = 0;
-	m_focal_length_mm = 0;
-	m_aspect_ratio = 0;
-	m_focus_distance_m = 0;
-	m_aperture = 0;
-	m_sensor_size_width_mm = 0;
-	m_sensor_size_height_mm = 0;
-	m_near_clip_m = 0;
-	m_far_clip_m = 0;
-	m_lens_shift_horizontal_ratio = 0;
-	m_lens_shift_vertical_ratio = 0;
-	m_lens_distortion_radial_coefficients_k1 = 0;
-	m_lens_distortion_radial_coefficients_k2 = 0;
-	m_lens_distortion_center_point_right_mm = 0;
-	m_lens_distortion_center_point_up_mm = 0;
+    m_camera_no = 0;
+    m_commands = 0;
+    m_timecode.fill(0); // 12ãƒã‚¤ãƒˆé…åˆ—åˆæœŸåŒ–
+    m_subframe = 0;
+    m_packet_no = 0;
+    m_eye_position_right_m = 0;
+    m_eye_position_up_m = 0;
+    m_eye_position_forward_m = 0;
+    m_look_vector_right_m = 0;
+    m_look_vector_up_m = 0;
+    m_look_vector_forward_m = 0;
+    m_up_vector_right_m = 0;
+    m_up_vector_up_m = 0;
+    m_up_vector_forward_m = 0;
+    m_focal_length_mm = 0;
+    m_aspect_ratio = 0;
+    m_focus_distance_m = 0;
+    m_aperture = 0;
+    m_sensor_size_width_mm = 0;
+    m_sensor_size_height_mm = 0;
+    m_near_clip_m = 0;
+    m_far_clip_m = 0;
+    m_lens_shift_horizontal_ratio = 0;
+    m_lens_shift_vertical_ratio = 0;
+    m_lens_distortion_radial_coefficients_k1 = 0;
+    m_lens_distortion_radial_coefficients_k2 = 0;
+    m_lens_distortion_center_point_right_mm = 0;
+    m_lens_distortion_center_point_up_mm = 0;
 	uint8_t* reserved = new uint8_t[25];
 
 	if (dataPtr == nullptr) {
@@ -134,37 +134,36 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
     }
 }
 
-void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
-	const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
-
-	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
-	m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
-	m_timecode = *reinterpret_cast<const uint32_t*>(&data[6]);
-	m_subframe = *reinterpret_cast<const uint32_t*>(&data[10]);
-	m_packet_no = *reinterpret_cast<const uint8_t*>(&data[14]);
-	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[15]);
-	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[19]);
-	m_eye_position_forward_m = *reinterpret_cast<const float*>(&data[23]);
-	m_look_vector_right_m = *reinterpret_cast<const float*>(&data[27]);
-	m_look_vector_up_m = *reinterpret_cast<const float*>(&data[31]);
-	m_look_vector_forward_m = *reinterpret_cast<const float*>(&data[35]);
-	m_up_vector_right_m = *reinterpret_cast<const float*>(&data[39]);
-	m_up_vector_up_m = *reinterpret_cast<const float*>(&data[43]);
-	m_up_vector_forward_m = *reinterpret_cast<const float*>(&data[47]);
-	m_focal_length_mm = *reinterpret_cast<const float*>(&data[51]);
-	m_aspect_ratio = *reinterpret_cast<const float*>(&data[55]);
-	m_focus_distance_m = *reinterpret_cast<const float*>(&data[59]);
-	m_aperture = *reinterpret_cast<const float*>(&data[63]);
-	m_sensor_size_width_mm = *reinterpret_cast<const float*>(&data[67]);
-	m_sensor_size_height_mm = *reinterpret_cast<const float*>(&data[71]);
-	m_near_clip_m = *reinterpret_cast<const float*>(&data[75]);
-	m_far_clip_m = *reinterpret_cast<const float*>(&data[79]);
-	m_lens_shift_horizontal_ratio = *reinterpret_cast<const float*>(&data[83]);
-	m_lens_shift_vertical_ratio = *reinterpret_cast<const float*>(&data[87]);
-	m_lens_distortion_radial_coefficients_k1 = *reinterpret_cast<const float*>(&data[91]);
-	m_lens_distortion_radial_coefficients_k2 = *reinterpret_cast<const float*>(&data[95]);
-	m_lens_distortion_center_point_right_mm = *reinterpret_cast<const float*>(&data[99]);
-	m_lens_distortion_center_point_up_mm = *reinterpret_cast<const float*>(&data[103]);
+void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length) {
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
+    m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
+    m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
+    std::memcpy(m_timecode.data(), &data[6], 12); // 12ãƒã‚¤ãƒˆã‚³ãƒ”ãƒ¼
+    m_subframe = *reinterpret_cast<const uint32_t*>(&data[18]);
+    m_packet_no = *reinterpret_cast<const uint8_t*>(&data[22]);
+	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[23]);
+	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[27]);
+	m_eye_position_forward_m = *reinterpret_cast<const float*>(&data[31]);
+	m_look_vector_right_m = *reinterpret_cast<const float*>(&data[35]);
+	m_look_vector_up_m = *reinterpret_cast<const float*>(&data[39]);
+	m_look_vector_forward_m = *reinterpret_cast<const float*>(&data[43]);
+	m_up_vector_right_m = *reinterpret_cast<const float*>(&data[47]);
+	m_up_vector_up_m = *reinterpret_cast<const float*>(&data[51]);
+	m_up_vector_forward_m = *reinterpret_cast<const float*>(&data[55]);
+	m_focal_length_mm = *reinterpret_cast<const float*>(&data[59]);
+	m_aspect_ratio = *reinterpret_cast<const float*>(&data[63]);
+	m_focus_distance_m = *reinterpret_cast<const float*>(&data[67]);
+	m_aperture = *reinterpret_cast<const float*>(&data[71]);
+	m_sensor_size_width_mm = *reinterpret_cast<const float*>(&data[75]);
+	m_sensor_size_height_mm = *reinterpret_cast<const float*>(&data[79]);
+	m_near_clip_m = *reinterpret_cast<const float*>(&data[83]);
+	m_far_clip_m = *reinterpret_cast<const float*>(&data[87]);
+	m_lens_shift_horizontal_ratio = *reinterpret_cast<const float*>(&data[91]);
+	m_lens_shift_vertical_ratio = *reinterpret_cast<const float*>(&data[95]);
+	m_lens_distortion_radial_coefficients_k1 = *reinterpret_cast<const float*>(&data[99]);
+	m_lens_distortion_radial_coefficients_k2 = *reinterpret_cast<const float*>(&data[103]);
+	m_lens_distortion_center_point_right_mm = *reinterpret_cast<const float*>(&data[107]);
+	m_lens_distortion_center_point_up_mm = *reinterpret_cast<const float*>(&data[111]);
 }
 
 ucapi_t::record_t::~record_t() {

@@ -10,14 +10,13 @@
 
 void Dump(ucapi_t* handle);
 
-// Å¬\¬‚Ì MessagePack ƒIƒuƒWƒFƒNƒg‚ğ\’z‚µ‚ÄƒeƒXƒg
+// ï¿½Åï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ MessagePack ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½\ï¿½zï¿½ï¿½ï¿½Äƒeï¿½Xï¿½g
 int main() {
-    // MessagePack\‘¢‘Ì‚Ì‰Šú‰»
+    // MessagePackï¿½\ï¿½ï¿½ï¿½Ì‚Ìï¿½ï¿½ï¿½ï¿½ï¿½
     ucapi_msgpack_record_t record;
     record.camera_no = 1;
     record.commands = 0x0A;
-	record.timecode = 0x12345678; // 32ƒrƒbƒg‚Ìtimecode
-	record.subframe = 0;
+    record.timecode = {0x12,0x34,0x56,0x78,0,0,0,0,0,0,0,0}; // 12ãƒã‚¤ãƒˆé…åˆ—ã§åˆæœŸåŒ–
     record.packet_no = 5;
     record.eye_position_right_m = 1.0f;
 	record.eye_position_up_m = 2.0f;
@@ -50,7 +49,7 @@ int main() {
     data.crc16 = 0;
     data.payload.push_back(record);
 
-    // MessagePackƒoƒCƒiƒŠ‚ÉƒGƒ“ƒR[ƒh
+    // MessagePackï¿½oï¿½Cï¿½iï¿½ï¿½ï¿½ÉƒGï¿½ï¿½ï¿½Rï¿½[ï¿½h
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, data);
 
@@ -74,7 +73,7 @@ int main() {
 
     std::cout << "Serialization succeeded! Size: " << outSize << " bytes" << std::endl;
 
-    // Œãn––
+    // ï¿½ï¿½nï¿½ï¿½
     UCAPI_FreeBuffer(outBuf);
     return 0;
 }
@@ -90,7 +89,11 @@ void Dump(ucapi_t* obj) {
         std::cout << "--- Payload " << i << " ---" << std::endl;
         std::cout << "CameraNo " << m_payload.m_camera_no << std::endl;
         std::cout << "Commands " << m_payload.m_commands << std::endl;
-		std::cout << "Timecode Binary " << std::hex << std::setw(8) << std::setfill('0') << m_payload.m_timecode << std::dec << std::endl;
+		std::cout << "Timecode Binary ";
+		for (const auto& b : m_payload.m_timecode) {
+			std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)b;
+		}
+		std::cout << std::dec << std::endl;
 		std::cout << "Subframe " << m_payload.m_subframe << std::endl;
 		std::cout << "Packet No " << m_payload.m_packet_no << std::endl;
 		std::cout << "Eye Position Right " << m_payload.m_eye_position_right_m << std::endl;

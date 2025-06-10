@@ -9,19 +9,19 @@ namespace UCAPI4Unity.Runtime.UnityCamera
         {
             var timeCode = new UcApiTimeCode
             {
-                FrameNumber = 12,
-                Second = 34,
-                Minute = 56,
                 Hour = 14,
-                FrameRate = FrameRate.FrameRate60,
-                DropFrame = false
+                Minute = 56,
+                Second = 34,
+                Frame = 12,
+                UserBits = new byte[4],
+                Subframe = 0
             };
             var record = new UcApiRecord
             {
                 CameraNo = 1,
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
                 PacketNo = 1,
-                TimeCode = UcApiTimeCode.ToRaw(timeCode),
+                TimeCode = timeCode.ToBytes(),
                 SubFrame = 0,
                 EyePositionRightM = cam.transform.position.x,
                 EyePositionUpM = cam.transform.position.y,

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <array>
 #include "ucapi_timecode.h"
 
 class ucapi_t{
@@ -36,7 +37,7 @@ public:
 
         uint32_t m_camera_no;
         uint16_t m_commands;
-        uint32_t m_timecode;
+        std::array<uint8_t, 12> m_timecode; // SMPTE 80bit + subframe
 		uint32_t m_subframe;
         uint8_t m_packet_no;
         float m_eye_position_right_m;
