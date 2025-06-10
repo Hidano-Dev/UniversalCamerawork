@@ -5,7 +5,6 @@
 #include "ucapi.h"
 
 ucapi_t::ucapi_t(const void* dataPtr){
-    // magic��0x55AA�ŏ�����
     m_magic = 0x55AA;
 	m_version = 0;
 	m_num_payload = 1;
@@ -29,7 +28,6 @@ ucapi_t::ucapi_t(const void* dataPtr){
 
 void ucapi_t::_read(const void* dataPtr) {
     try {
-		// �S�̂̃o�C�g����c�����邽�߁A�ŏ���8�o�C�g��ǂݎ��
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 		m_magic = (data[1] << 8) | data[0];
 		m_version = (data[3] << 8) | data[2];
@@ -38,15 +36,12 @@ void ucapi_t::_read(const void* dataPtr) {
 
 		auto payloadLength = sizeof(record_t);
 
-		// �y�C���[�h�̃o�C�g�����v�Z����
 		size_t payloadSize = m_num_payload * payloadLength;
 
-		// �y�C���[�h�̃o�C�g����0�̏ꍇ�͓ǂݎ��Ȃ�
 		if (payloadSize == 0) {
 			return;
 		}
 
-		// �y�C���[�h�̃o�C�g�����s���ȏꍇ�͗�O���X���[����
 		if (payloadSize > 0x10000) {
 			throw std::runtime_error("Invalid payload size");
 		}
@@ -60,7 +55,6 @@ void ucapi_t::_read(const void* dataPtr) {
 	}
 	catch (std::exception& e) {
 		_clean_up();
-		// Print the exception message to the console.
 		std::cerr << e.what() << std::endl;
 		throw;
     }

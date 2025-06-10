@@ -10,9 +10,7 @@
 
 void Dump(ucapi_t* handle);
 
-// �ŏ��\���� MessagePack �I�u�W�F�N�g���\�z���ăe�X�g
 int main() {
-    // MessagePack�\���̂̏�����
     ucapi_msgpack_record_t record;
     record.camera_no = 1;
     record.commands = 0x0A;
@@ -62,7 +60,6 @@ int main() {
     data.crc16 = 0;
     data.payload.push_back(record);
 
-    // MessagePack�o�C�i���ɃG���R�[�h
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, data);
 
@@ -86,7 +83,6 @@ int main() {
 
     std::cout << "Serialization succeeded! Size: " << outSize << " bytes" << std::endl;
 
-    // ��n��
     UCAPI_FreeBuffer(outBuf);
     return 0;
 }
