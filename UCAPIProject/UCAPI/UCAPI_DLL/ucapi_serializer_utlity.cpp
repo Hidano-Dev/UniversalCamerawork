@@ -14,7 +14,8 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_camera_no), sizeof(rec.m_camera_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_commands), sizeof(rec.m_commands));
 
-		os.write(reinterpret_cast<const char*>(&rec.m_timecode), sizeof(rec.m_timecode));
+		os.write(reinterpret_cast<const char*>(rec.m_timecode.data), 10);
+		os.write(reinterpret_cast<const char*>(&rec.m_subframe), sizeof(rec.m_subframe));
 		os.write(reinterpret_cast<const char*>(&rec.m_packet_no), sizeof(rec.m_packet_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_right_m), sizeof(rec.m_eye_position_right_m));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_up_m), sizeof(rec.m_eye_position_up_m));

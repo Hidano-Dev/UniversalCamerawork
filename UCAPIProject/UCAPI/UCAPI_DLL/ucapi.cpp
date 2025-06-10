@@ -94,8 +94,8 @@ uint16_t ucapi_t::computeCRC16(record_t* record, size_t length, uint16_t poly, u
 ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 	m_camera_no = 0;
 	m_commands = 0;
-	m_timecode = 0;
-	m_subframe = 0;
+	m_timecode.clear();
+	m_subframe = 0.0f;
 	m_packet_no = 0;
 	m_eye_position_right_m = 0;
 	m_eye_position_up_m = 0;
@@ -139,15 +139,15 @@ void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
 
 	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
 	m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
-	m_timecode = *reinterpret_cast<const uint32_t*>(&data[6]);
-	m_subframe = *reinterpret_cast<const uint32_t*>(&data[10]);
-	m_packet_no = *reinterpret_cast<const uint8_t*>(&data[14]);
-	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[15]);
-	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[19]);
-	m_eye_position_forward_m = *reinterpret_cast<const float*>(&data[23]);
-	m_look_vector_right_m = *reinterpret_cast<const float*>(&data[27]);
-	m_look_vector_up_m = *reinterpret_cast<const float*>(&data[31]);
-	m_look_vector_forward_m = *reinterpret_cast<const float*>(&data[35]);
+	memcpy(m_timecode.data, &data[6], 10);
+	m_subframe = *reinterpret_cast<const float*>(&data[16]);
+	m_packet_no = *reinterpret_cast<const uint8_t*>(&data[20]);
+	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[21]);
+	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[25]);
+	m_eye_position_forward_m = *reinterpret_cast<const float*>(&data[29]);
+	m_look_vector_right_m = *reinterpret_cast<const float*>(&data[33]);
+	m_look_vector_up_m = *reinterpret_cast<const float*>(&data[37]);
+	m_look_vector_forward_m = *reinterpret_cast<const float*>(&data[41]);
 	m_up_vector_right_m = *reinterpret_cast<const float*>(&data[39]);
 	m_up_vector_up_m = *reinterpret_cast<const float*>(&data[43]);
 	m_up_vector_forward_m = *reinterpret_cast<const float*>(&data[47]);
