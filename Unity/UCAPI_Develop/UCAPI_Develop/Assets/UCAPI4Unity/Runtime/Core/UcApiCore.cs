@@ -42,13 +42,23 @@ namespace UCAPI4Unity.Runtime.Core
             {
                 throw new Exception("No payloads found.");
             }
+
+            var recordSize = Marshal.SizeOf<UcApiRecord>();
             var payloads = new UcApiRecord[ucApiObject.NumPayload];
             var payloadPtr = ucApiObject.Payloads;
+
             for (var i = 0; i < ucApiObject.NumPayload; i++)
             {
-                var payload = Marshal.PtrToStructure<UcApiRecord>(payloadPtr);
-                payloads[i] = payload;
-                payloadPtr += Marshal.SizeOf(payload);
+                // Marshal.PtrToStructureを直接使用して新しいUcApiRecordインスタンスを作成
+                payloads[i] = Marshal.PtrToStructure<UcApiRecord>(payloadPtr);
+                
+                // TimeCodeバッファが正しく初期化されているか確認
+                if (payloads[i].TimeCode == null)
+                {
+                    payloads[i].TimeCode = new byte[12];
+                }
+                
+                payloadPtr += recordSize;
             }
             
             var crc = ComputeChecksum(payloads[0]);
@@ -97,24 +107,41 @@ namespace UCAPI4Unity.Runtime.Core
         
         private static ushort ComputeChecksum(UcApiRecord record, ushort poly = 0x1021, ushort initValue = 0xFFFF)
         {
-            var data = new byte[Marshal.SizeOf(record)];
-            var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(record));
-            Marshal.StructureToPtr(record, ptr, false);
-            Marshal.Copy(ptr, data, 0, data.Length);
-            Marshal.FreeHGlobal(ptr);
+            // レコード全体のサイズを計算（25バイトのパディングを含む）
+            var recordSize = Marshal.SizeOf<UcApiRecord>();
+            var totalSize = recordSize + 25; // パディングを含む
+            var data = new byte[totalSize];
             
-            var crc = initValue;
-            foreach (var b in data)
+            // レコードをバイト配列に変換
+            var ptr = Marshal.AllocHGlobal(recordSize);
+            try
             {
-                crc ^= (ushort)(b << 8);
-                for (var i = 0; i < 8; i++)
+                Marshal.StructureToPtr(record, ptr, false);
+                Marshal.Copy(ptr, data, 0, recordSize);
+                // パディング部分は0で埋める（C++側と同じように）
+                for (int i = recordSize; i < totalSize; i++)
                 {
-                    if ((crc & 0x8000) != 0)
-                        crc = (ushort)((crc << 1) ^ poly);
-                    else
-                        crc <<= 1;
+                    data[i] = 0;
                 }
             }
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
+            }
+
+            // CRC16を計算
+            var crc = initValue;
+            for (var i = 0; i < totalSize; i++)
+            {
+                crc ^= (ushort)(data[i] << 8);
+                for (var j = 0; j < 8; j++)
+                {
+                    crc = (crc & 0x8000) != 0
+                        ? (ushort)((crc << 1) ^ poly)
+                        : (ushort)(crc << 1);
+                }
+            }
+
             return crc;
         }
 

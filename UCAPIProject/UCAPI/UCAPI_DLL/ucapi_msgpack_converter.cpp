@@ -10,18 +10,19 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
     ucapi->m_version = msgpack_obj.version;
     ucapi->m_num_payload = msgpack_obj.num_payload;
     ucapi->m_crc16 = msgpack_obj.crc16;
-	ucapi->m_payload.reserve(msgpack_obj.num_payload);
+    ucapi->m_payload.reserve(msgpack_obj.num_payload);
 
-	auto payload_length = sizeof(ucapi_t::record_t);
+    auto payload_length = sizeof(ucapi_t::record_t);
 
     for (const auto& rec : msgpack_obj.payload) {
-		ucapi->m_payload.emplace_back(payload_length);
+        ucapi->m_payload.emplace_back(payload_length);
         ucapi_t::record_t& crec = ucapi->m_payload.back();
-		memset(&crec, 0, sizeof(ucapi_t::record_t));
+        memset(&crec, 0, sizeof(ucapi_t::record_t));
 
         crec.m_camera_no = rec.camera_no;
         crec.m_commands = rec.commands;
         std::copy(rec.timecode.begin(), rec.timecode.end(), crec.m_timecode.begin());
+        crec.m_subframe = rec.subframe;  // Added subframe conversion
         crec.m_packet_no = rec.packet_no;
 
         crec.m_eye_position_right_m = rec.eye_position_right_m;
@@ -68,8 +69,8 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
 
         r.camera_no = rec.m_camera_no;
         r.commands = rec.m_commands;
-
-		r.timecode = rec.m_timecode;
+        r.timecode = rec.m_timecode;
+        r.subframe = rec.m_subframe;  // Added subframe conversion
         r.packet_no = rec.m_packet_no;
 
         r.eye_position_right_m = rec.m_eye_position_right_m;

@@ -8,6 +8,7 @@ struct ucapi_msgpack_record_t {
     uint32_t camera_no;
     uint16_t commands;
     std::array<uint8_t, 12> timecode; // SMPTE 80bit + subframe
+    uint32_t subframe;  // Added subframe field
     uint8_t packet_no;
 
     float eye_position_right_m;
@@ -36,7 +37,7 @@ struct ucapi_msgpack_record_t {
     float lens_distortion_center_point_up_mm;
 
     MSGPACK_DEFINE(
-        camera_no, commands, timecode, packet_no,
+        camera_no, commands, timecode, subframe, packet_no,  // Added subframe to MSGPACK_DEFINE
         eye_position_right_m, eye_position_up_m, eye_position_forward_m,
         look_vector_right_m, look_vector_up_m, look_vector_forward_m,
         up_vector_right_m, up_vector_up_m, up_vector_forward_m,
