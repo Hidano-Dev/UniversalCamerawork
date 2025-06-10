@@ -6,9 +6,6 @@ class timecode_t {
 public:
 	timecode_t();
 
-private:
-	void _clean_up();
-
 	enum {
 		FRAME_RATE_23_976 = 0,
 		FRAME_RATE_24 = 1,
@@ -24,6 +21,9 @@ private:
 		FRAME_RATE_239_76 = 11,
 		FRAME_RATE_240 = 12,
 	};
+
+private:
+	void _clean_up();
 
 public:
 	~timecode_t();
