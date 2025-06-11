@@ -13,10 +13,11 @@ public:
 
     ucapi_t(const void* dataPtr = nullptr);
 
+    static uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = 0x1021, uint16_t initValue = 0xFFFF);
+
 private:
     void _read(const void* dataPtr);
     void _clean_up();
-    uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = 0x1021, uint16_t initValue = 0xFFFF);
 
 public:
     ~ucapi_t();

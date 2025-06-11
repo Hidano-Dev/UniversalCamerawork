@@ -47,3 +47,7 @@ UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize
 UCAPI_API void UCAPI_FreeBuffer(uint8_t* buffer) {
     delete[] buffer;
 }
+
+UCAPI_API uint16_t UCAPI_CalcCRC16(const void* recordPtr, size_t length, uint16_t poly, uint16_t initValue) {
+    return ucapi_t::computeCRC16(reinterpret_cast<ucapi_t::record_t*>(const_cast<void*>(recordPtr)), length, poly, initValue);
+}

@@ -5,7 +5,7 @@
 #include "ucapi.h"
 
 ucapi_t::ucapi_t(const void* dataPtr){
-    // magic‚Í0x55AA‚Å‰Šú‰»
+    // magicï¿½ï¿½0x55AAï¿½Åï¿½ï¿½ï¿½ï¿½ï¿½
     m_magic = 0x55AA;
 	m_version = 0;
 	m_num_payload = 1;
@@ -29,7 +29,7 @@ ucapi_t::ucapi_t(const void* dataPtr){
 
 void ucapi_t::_read(const void* dataPtr) {
     try {
-		// ‘S‘Ì‚ÌƒoƒCƒg”‚ğ”cˆ¬‚·‚é‚½‚ßAÅ‰‚Ì8ƒoƒCƒg‚ğ“Ç‚İæ‚é
+		// ï¿½Sï¿½Ì‚Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½cï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ßAï¿½Åï¿½ï¿½ï¿½8ï¿½oï¿½Cï¿½gï¿½ï¿½Ç‚İï¿½ï¿½
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 		m_magic = (data[1] << 8) | data[0];
 		m_version = (data[3] << 8) | data[2];
@@ -38,15 +38,15 @@ void ucapi_t::_read(const void* dataPtr) {
 
 		auto payloadLength = sizeof(record_t);
 
-		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ğŒvZ‚·‚é
+		// ï¿½yï¿½Cï¿½ï¿½ï¿½[ï¿½hï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½
 		size_t payloadSize = m_num_payload * payloadLength;
 
-		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ª0‚Ìê‡‚Í“Ç‚İæ‚ç‚È‚¢
+		// ï¿½yï¿½Cï¿½ï¿½ï¿½[ï¿½hï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½0ï¿½Ìê‡ï¿½Í“Ç‚İï¿½ï¿½È‚ï¿½
 		if (payloadSize == 0) {
 			return;
 		}
 
-		// ƒyƒCƒ[ƒh‚ÌƒoƒCƒg”‚ª•s³‚Èê‡‚Í—áŠO‚ğƒXƒ[‚·‚é
+		// ï¿½yï¿½Cï¿½ï¿½ï¿½[ï¿½hï¿½Ìƒoï¿½Cï¿½gï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Èê‡ï¿½Í—ï¿½Oï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½
 		if (payloadSize > 0x10000) {
 			throw std::runtime_error("Invalid payload size");
 		}
@@ -75,20 +75,20 @@ void ucapi_t::_clean_up() {
 }
 
 uint16_t ucapi_t::computeCRC16(record_t* record, size_t length, uint16_t poly, uint16_t initValue) {
-	const uint8_t* data = reinterpret_cast<const uint8_t*>(record);
-	uint16_t crc = initValue;
-	for (size_t i = 0; i < length; ++i) {
-		crc ^= static_cast<uint16_t>(data[i]) << 8;
-		for (int j = 0; j < 8; ++j) {
-			if (crc & 0x8000) {
-				crc = (crc << 1) ^ poly;
-			}
-			else {
-				crc <<= 1;
-			}
-		}
-	}
-	return crc;
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(record);
+    uint16_t crc = initValue;
+    for (size_t i = 0; i < length; ++i) {
+        crc ^= static_cast<uint16_t>(data[i]) << 8;
+        for (int j = 0; j < 8; ++j) {
+            if (crc & 0x8000) {
+                crc = (crc << 1) ^ poly;
+            }
+            else {
+                crc <<= 1;
+            }
+        }
+    }
+    return crc;
 }
 
 ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
