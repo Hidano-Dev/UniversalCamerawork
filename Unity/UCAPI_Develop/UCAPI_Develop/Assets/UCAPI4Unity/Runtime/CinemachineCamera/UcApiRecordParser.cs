@@ -9,15 +9,17 @@ namespace UCAPI4Unity.Runtime.CinemachineCamera
     {
         public static UcApiRecord FromVirtualCamera(ICinemachineCamera cam)
         {
-            var timeCode = new UcApiTimeCode
-            {
-                FrameNumber = 12,
-                Second = 34,
-                Minute = 56,
-                Hour = 14,
-                FrameRate = FrameRate.FrameRate60,
-                DropFrame = false
-            };
+            // Create SMPTE timecode with current time (example values)
+            var smpteTimeCode = new UcApiSmpteTimecode();
+            smpteTimeCode.Clear();
+            smpteTimeCode.Frame = 12;
+            smpteTimeCode.Second = 34;
+            smpteTimeCode.Minute = 56;
+            smpteTimeCode.Hour = 14;
+            smpteTimeCode.DropFrame = false;
+            smpteTimeCode.ColorFrame = false;
+            smpteTimeCode.SetSyncWord();
+            
             var position = cam.State.GetFinalPosition();
             var rotation = cam.State.GetFinalOrientation();
             var record = new UcApiRecord
@@ -25,7 +27,8 @@ namespace UCAPI4Unity.Runtime.CinemachineCamera
                 CameraNo = 1,
                 Commands = 0x0B, // DOF_ENABLE | LENS_DISTORTION_ENABLE 仮
                 PacketNo = 1,
-                TimeCode = UcApiTimeCode.ToRaw(timeCode),
+                TimeCode = smpteTimeCode,  // Now using SMPTE LTC format
+                SubFrame = 0.0f,           // Now using float for precision
                 EyePositionRightM = position.x,
                 EyePositionUpM = position.y,
                 EyePositionForwardM = position.z,
@@ -43,6 +46,13 @@ namespace UCAPI4Unity.Runtime.CinemachineCamera
                 SensorSizeHeightMm = cam.State.Lens.PhysicalProperties.SensorSize.y,
                 NearClipM = cam.State.Lens.NearClipPlane,
                 FarClipM = cam.State.Lens.FarClipPlane,
+                LensShiftHorizontalRatio = cam.State.Lens.PhysicalProperties.LensShift.x,
+                LensShiftVerticalRatio = cam.State.Lens.PhysicalProperties.LensShift.y,
+                // Lens distortion と center point は 0 にしておく
+                LensDistortionRadialCoefficientsK1 = 0f,
+                LensDistortionRadialCoefficientsK2 = 0f,
+                LensDistortionCenterPointRightMm = 0f,
+                LensDistortionCenterPointUpMm = 0f
             };
 
             return record;
@@ -97,6 +107,9 @@ namespace UCAPI4Unity.Runtime.CinemachineCamera
                     lensDistortion.yMultiplier.Override(record.LensDistortionRadialCoefficientsK2);
                     lensDistortion.center.Override(new Vector2(record.LensDistortionCenterPointRightMm, record.LensDistortionCenterPointUpMm));
                 }
+                
+                // タイムコード情報をログ出力（デバッグ用）
+                Debug.Log($"Received timecode: {record.TimeCode}");
             }
             else
             {

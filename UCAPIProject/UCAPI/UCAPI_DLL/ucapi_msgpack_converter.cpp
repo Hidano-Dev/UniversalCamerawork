@@ -2,6 +2,7 @@
 #include "ucapi_msgpack_converter.h"
 #include "ucapi.h"
 #include "ucapi_msgpack_types.h"
+#include <cstring>
 
 ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
     ucapi_t* ucapi = new ucapi_t();
@@ -21,7 +22,10 @@ ucapi_t* convert_to_ucapi(const ucapi_msgpack_t& msgpack_obj) {
 
         crec.m_camera_no = rec.camera_no;
         crec.m_commands = rec.commands;
-        crec.m_timecode = rec.timecode;
+        
+        // Convert MessagePack timecode to smpte_ltc_t
+        memcpy(crec.m_timecode.data, rec.timecode.data.data(), 10);
+        
 		crec.m_subframe = rec.subframe;
         crec.m_packet_no = rec.packet_no;
 
@@ -70,7 +74,9 @@ ucapi_msgpack_t convert_to_msgpack(const ucapi_t* ucapi_obj) {
         r.camera_no = rec.m_camera_no;
         r.commands = rec.m_commands;
 
-		r.timecode = rec.m_timecode;
+        // Convert smpte_ltc_t to MessagePack timecode
+        memcpy(r.timecode.data.data(), rec.m_timecode.data, 10);
+        
         r.subframe = rec.m_subframe;
         r.packet_no = rec.m_packet_no;
 
