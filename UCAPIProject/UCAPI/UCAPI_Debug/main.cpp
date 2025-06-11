@@ -48,8 +48,13 @@ int main() {
     data.magic = 0x55AA;
     data.version = 1;
     data.num_payload = 1;
-    data.crc16 = 0;
     data.payload.push_back(record);
+
+    size_t recordSize = sizeof(ucapi_msgpack_record_t);
+    uint16_t crc = UCAPI_CalcCRC16(&record, recordSize, 0x1021, 0xFFFF);
+    data.crc16 = crc;
+
+    std::cout << "Calculated CRC16: 0x" << std::hex << std::setw(4) << std::setfill('0') << crc << std::dec << std::endl;
 
     // MessagePack�o�C�i���ɃG���R�[�h
     msgpack::sbuffer sbuf;
