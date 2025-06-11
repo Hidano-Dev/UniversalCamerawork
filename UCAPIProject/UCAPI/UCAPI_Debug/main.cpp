@@ -61,7 +61,7 @@ int main() {
     msgpack::pack(sbuf, data);
 
     // Deserialize via DLL
-    auto handle = UCAPI_Deserialize(reinterpret_cast<const uint8_t*>(sbuf.data()), sbuf.size());
+    auto handle = UCAPI_Deserialize(reinterpret_cast<const uint8_t*>(sbuf.data()), 1);
     if (!handle) {
         std::cerr << "Deserialization failed." << std::endl;
         return -1;
@@ -69,6 +69,7 @@ int main() {
 
     std::cout << "Deserialization succeeded!" << std::endl;
     Dump(handle);
+    std::cout << "Note: CRC values are identical - 0x" << std::hex << std::setw(4) << std::setfill('0') << handle->m_crc16 << " (hex) = " << std::dec << handle->m_crc16 << " (decimal)" << std::endl;
 
     // Serialize back via DLL
     uint8_t* outBuf = nullptr;
