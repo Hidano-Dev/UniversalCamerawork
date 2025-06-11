@@ -54,8 +54,6 @@ int main() {
     uint16_t crc = UCAPI_CalcCRC16(&record, recordSize, 0x1021, 0xFFFF);
     data.crc16 = crc;
 
-    std::cout << "Calculated CRC16: 0x" << std::hex << std::setw(4) << std::setfill('0') << crc << std::dec << std::endl;
-
     // MessagePack�o�C�i���ɃG���R�[�h
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, data);
@@ -69,7 +67,6 @@ int main() {
 
     std::cout << "Deserialization succeeded!" << std::endl;
     Dump(handle);
-    std::cout << "Note: CRC values are identical - 0x" << std::hex << std::setw(4) << std::setfill('0') << handle->m_crc16 << " (hex) = " << std::dec << handle->m_crc16 << " (decimal)" << std::endl;
 
     // Serialize back via DLL
     uint8_t* outBuf = nullptr;
@@ -90,7 +87,7 @@ void Dump(ucapi_t* obj) {
     std::cout << "Magic: " << obj->m_magic << std::endl;
     std::cout << "Version: " << obj->m_version << std::endl;
     std::cout << "Num Payload: " << obj->m_num_payload << std::endl;
-    std::cout << "CRC16: " << obj->m_crc16 << std::endl;
+    std::cout << "CRC16: 0x" << std::hex << std::setw(4) << std::setfill('0') << obj->m_crc16 << std::dec << std::endl;
 
     for (size_t i = 0; i < obj->m_num_payload; ++i) {
         const auto& m_payload = obj->m_payload[i];
