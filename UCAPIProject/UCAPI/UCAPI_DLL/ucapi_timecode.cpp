@@ -190,6 +190,17 @@ bool smpte_ltc_t::is_valid_sync() const {
     return sync_word == 0x3FFD;
 }
 
+void smpte_ltc_t::set_time(uint8_t hour, uint8_t minute, uint8_t second, uint8_t frame) {
+    set_hour(hour);
+    set_minute(minute);
+    set_second(second);
+    set_frame(frame);
+}
+
+bool smpte_ltc_t::is_valid_sync_word() const {
+    return is_valid_sync();
+}
+
 // Legacy timecode implementation
 timecode_t::timecode_t() {
 	m_frame_number = 0;
@@ -261,4 +272,3 @@ timecode_t::~timecode_t() {
 
 void timecode_t::_clean_up() {
 }
-

@@ -41,6 +41,10 @@ struct smpte_ltc_t {
     // Validate sync word
     bool is_valid_sync() const;
     
+    // Convenience methods
+    void set_time(uint8_t hour, uint8_t minute, uint8_t second, uint8_t frame);
+    bool is_valid_sync_word() const;
+    
 private:
     void _clean_up();
     void _set_bcd_value(uint8_t byte_offset, uint8_t bit_offset, uint8_t value, uint8_t max_value);
@@ -93,4 +97,3 @@ public:
 	uint8_t m_drop_frame;
 	uint8_t m_reserved;
 };
-

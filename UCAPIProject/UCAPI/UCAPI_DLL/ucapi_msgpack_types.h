@@ -9,6 +9,35 @@ struct smpte_ltc_msgpack_t {
     std::array<uint8_t, 10> data;  // 80 bits = 10 bytes
     
     MSGPACK_DEFINE(data);
+    
+    // Convenience methods
+    void clear() {
+        data.fill(0);
+        set_sync_word();
+    }
+    
+    void set_time(uint8_t hour, uint8_t minute, uint8_t second, uint8_t frame);
+    void set_drop_frame(bool drop_frame);
+    void set_color_frame(bool color_frame);
+    void set_sync_word();
+    bool is_valid_sync_word() const;
+    
+    // Individual field access
+    uint8_t get_frame() const;
+    uint8_t get_second() const;
+    uint8_t get_minute() const;
+    uint8_t get_hour() const;
+    bool get_drop_frame() const;
+    bool get_color_frame() const;
+    
+    void set_frame(uint8_t frame);
+    void set_second(uint8_t second);
+    void set_minute(uint8_t minute);
+    void set_hour(uint8_t hour);
+    
+    // Convenience properties for backward compatibility
+    uint8_t frame, second, minute, hour;
+    bool drop_frame, color_frame;
 };
 
 struct ucapi_msgpack_record_t {
