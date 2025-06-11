@@ -15,6 +15,9 @@ namespace UCAPI4Unity.Runtime.Core
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern void UCAPI_FreeBuffer(IntPtr buffer);
 
+        [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
+        private static extern ushort UCAPI_CalcCRC16(IntPtr recordPtr, UIntPtr length, ushort poly, ushort initValue);
+
         public static byte[] SerializeFromRecord(UcApiRecord record)
         {
             var payloadPtr = Marshal.AllocHGlobal(Marshal.SizeOf(record));
@@ -97,25 +100,17 @@ namespace UCAPI4Unity.Runtime.Core
         
         private static ushort ComputeChecksum(UcApiRecord record, ushort poly = 0x1021, ushort initValue = 0xFFFF)
         {
-            var data = new byte[Marshal.SizeOf(record)];
-            var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(record));
-            Marshal.StructureToPtr(record, ptr, false);
-            Marshal.Copy(ptr, data, 0, data.Length);
-            Marshal.FreeHGlobal(ptr);
-            
-            var crc = initValue;
-            foreach (var b in data)
+            int size = Marshal.SizeOf(record);
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            try
             {
-                crc ^= (ushort)(b << 8);
-                for (var i = 0; i < 8; i++)
-                {
-                    if ((crc & 0x8000) != 0)
-                        crc = (ushort)((crc << 1) ^ poly);
-                    else
-                        crc <<= 1;
-                }
+                Marshal.StructureToPtr(record, ptr, false);
+                return UCAPI_CalcCRC16(ptr, (UIntPtr)size, poly, initValue);
             }
-            return crc;
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
+            }
         }
 
         /// <summary>

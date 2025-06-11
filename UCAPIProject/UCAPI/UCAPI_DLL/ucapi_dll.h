@@ -29,6 +29,8 @@ extern "C" {
     /// <param name="buffer">Pointer to the buffer to free.</param>
     UCAPI_API void UCAPI_FreeBuffer(uint8_t* buffer);
 
+    UCAPI_API uint16_t UCAPI_CalcCRC16(const void* recordPtr, size_t length, uint16_t poly, uint16_t initValue);
+
 #ifdef __cplusplus
 }
 #endif
