@@ -48,15 +48,18 @@ int main() {
     data.magic = 0x55AA;
     data.version = 1;
     data.num_payload = 1;
-    data.crc16 = 0;
     data.payload.push_back(record);
+
+    size_t recordSize = sizeof(ucapi_msgpack_record_t);
+    uint16_t crc = UCAPI_CalcCRC16(&record, recordSize, 0x1021, 0xFFFF);
+    data.crc16 = crc;
 
     // MessagePack�o�C�i���ɃG���R�[�h
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, data);
 
     // Deserialize via DLL
-    auto handle = UCAPI_Deserialize(reinterpret_cast<const uint8_t*>(sbuf.data()), sbuf.size());
+    auto handle = UCAPI_Deserialize(reinterpret_cast<const uint8_t*>(sbuf.data()), 1);
     if (!handle) {
         std::cerr << "Deserialization failed." << std::endl;
         return -1;
@@ -84,7 +87,7 @@ void Dump(ucapi_t* obj) {
     std::cout << "Magic: " << obj->m_magic << std::endl;
     std::cout << "Version: " << obj->m_version << std::endl;
     std::cout << "Num Payload: " << obj->m_num_payload << std::endl;
-    std::cout << "CRC16: " << obj->m_crc16 << std::endl;
+    std::cout << "CRC16: 0x" << std::hex << std::setw(4) << std::setfill('0') << obj->m_crc16 << std::dec << std::endl;
 
     for (size_t i = 0; i < obj->m_num_payload; ++i) {
         const auto& m_payload = obj->m_payload[i];
