@@ -49,7 +49,7 @@ TEST(UcapiDll_Deserialize, NullBuffer) {
   EXPECT_EQ(obj, nullptr);
 }
 
-// Deserialize 準異常系: 不正データ
+// Deserialize 準正常系: 不正データ
 TEST(UcapiDll_Deserialize, InvalidData) {
   uint8_t bad[] = {0xFF, 0x00, 0xAA};
   ucapi_t* obj = UCAPI_Deserialize(bad, sizeof(bad));
