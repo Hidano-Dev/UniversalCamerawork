@@ -31,6 +31,10 @@ extern "C" {
 
     UCAPI_API uint16_t UCAPI_CalcCRC16(const void* recordPtr, size_t length, uint16_t poly, uint16_t initValue);
 
+    // Create and destroy API object
+    UCAPI_API ucapi_t* UCAPI_Create();
+    UCAPI_API void UCAPI_Destroy(ucapi_t* obj);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build UCAPI_DLL",
+			"type": "shell",
+			"command": "msbuild UCAPI_DLL.sln /p:Configuration=Debug /p:Platform=x64",
+			"group": "build"
+		}
+	]
+}
