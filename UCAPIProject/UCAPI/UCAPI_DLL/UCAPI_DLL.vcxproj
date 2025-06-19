@@ -81,7 +81,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/;%(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -105,7 +105,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/;%(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -129,7 +129,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/;%(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -153,7 +153,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include/;%(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -178,6 +178,10 @@
     <ClInclude Include="ucapi_msgpack_types.h" />
     <ClInclude Include="ucapi_serializer_utility.h" />
     <ClInclude Include="ucapi_timecode.h" />
+    <ClInclude Include="include\ucapi_transport.h" />
+    <ClInclude Include="ucapi_transport_factory.h" />
+    <ClInclude Include="ucapi_local_transport.h" />
+    <ClInclude Include="ucapi_udp_transport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -192,6 +196,9 @@
     <ClCompile Include="ucapi_msgpack_converter.cpp" />
     <ClCompile Include="ucapi_serializer_utlity.cpp" />
     <ClCompile Include="ucapi_timecode.cpp" />
+    <ClCompile Include="ucapi_transport_factory.cpp" />
+    <ClCompile Include="ucapi_local_transport.cpp" />
+    <ClCompile Include="ucapi_udp_transport.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
