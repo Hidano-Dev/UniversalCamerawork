@@ -6,9 +6,13 @@
 #include "ucapi_msgpack_converter.h"
 
 UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount) {
+    // Guard against null or empty buffer
+    if (buffer == nullptr || payloadCount == 0) {
+        return nullptr;
+    }
     try {
-		size_t size = payloadCount * sizeof(ucapi_msgpack_record_t);
-        msgpack::object_handle oh = msgpack::unpack(reinterpret_cast<const char*>(buffer), size);
+       // Use payloadCount as buffer size in bytes for unpack
+       msgpack::object_handle oh = msgpack::unpack(reinterpret_cast<const char*>(buffer), payloadCount);
         msgpack::object obj = oh.get();
 
         ucapi_msgpack_t msgpack_obj;
@@ -24,6 +28,10 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
 }
 
 UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize) {
+    // Guard against null inputs
+    if (obj == nullptr || outBuffer == nullptr || outSize == nullptr) {
+        return -1;
+    }
     try {
         ucapi_msgpack_t packed = convert_to_msgpack(obj);
         msgpack::sbuffer sbuf;

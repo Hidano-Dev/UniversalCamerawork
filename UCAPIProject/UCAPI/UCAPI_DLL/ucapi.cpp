@@ -8,7 +8,8 @@ ucapi_t::ucapi_t(const void* dataPtr){
     // magic��0x55AA�ŏ�����
     m_magic = 0x55AA;
 	m_version = 0;
-	m_num_payload = 1;
+	// Default to no payload when created without data
+	m_num_payload = 0;
 	m_payload.clear();
 	m_payload.reserve(m_num_payload);
 
