@@ -4,6 +4,7 @@
 #include <msgpack.hpp>
 #include "ucapi.h"
 #include "ucapi_msgpack_converter.h"
+#include "ucapi_config.h"
 
 UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount) {
     // Guard against null or empty buffer
@@ -11,14 +12,27 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
         return nullptr;
     }
     try {
-       // Use payloadCount as buffer size in bytes for unpack
-       msgpack::object_handle oh = msgpack::unpack(reinterpret_cast<const char*>(buffer), payloadCount);
-        msgpack::object obj = oh.get();
-
-        ucapi_msgpack_t msgpack_obj;
-        obj.convert(msgpack_obj);
-
-        ucapi_t* native = convert_to_ucapi(msgpack_obj);
+        auto serializer = ucapi::Config::GetSerializerFactory().CreateSerializer("MsgPack");
+        if (!serializer) {
+            std::cerr << "[UCAPI_Deserialize] Failed to create MsgPack serializer" << std::endl;
+            return nullptr;
+        }
+        
+        ucapi::CameraState cameraState(sizeof(ucapi::CameraState));
+        HRESULT hr = serializer->Deserialize(buffer, payloadCount, cameraState);
+        if (FAILED(hr)) {
+            std::cerr << "[UCAPI_Deserialize] Deserialization failed" << std::endl;
+            return nullptr;
+        }
+        
+        ucapi_t* native = new ucapi_t();
+        native->m_magic = 0x55AA;
+        native->m_version = 1;
+        native->m_num_payload = 1;
+        native->m_crc16 = 0;
+        native->m_payload.emplace_back(sizeof(ucapi_t::record_t));
+        native->m_payload[0] = cameraState;
+        
         return native;
     }
     catch (const std::exception& e) {
@@ -33,13 +47,31 @@ UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize
         return -1;
     }
     try {
-        ucapi_msgpack_t packed = convert_to_msgpack(obj);
-        msgpack::sbuffer sbuf;
-        msgpack::pack(sbuf, packed);
-
-        *outSize = sbuf.size();
+        auto serializer = ucapi::Config::GetSerializerFactory().CreateSerializer("MsgPack");
+        if (!serializer) {
+            std::cerr << "[UCAPI_Serialize] Failed to create MsgPack serializer" << std::endl;
+            return -1;
+        }
+        
+        std::vector<uint8_t> buffer;
+        if (obj->m_num_payload > 0) {
+            HRESULT hr = serializer->Serialize(obj->m_payload[0], buffer);
+            if (FAILED(hr)) {
+                std::cerr << "[UCAPI_Serialize] Serialization failed" << std::endl;
+                return -1;
+            }
+        } else {
+            ucapi::CameraState emptyState(sizeof(ucapi::CameraState));
+            HRESULT hr = serializer->Serialize(emptyState, buffer);
+            if (FAILED(hr)) {
+                std::cerr << "[UCAPI_Serialize] Serialization failed" << std::endl;
+                return -1;
+            }
+        }
+        
+        *outSize = buffer.size();
         *outBuffer = new uint8_t[*outSize];
-        std::memcpy(*outBuffer, sbuf.data(), *outSize);
+        std::memcpy(*outBuffer, buffer.data(), *outSize);
         return 0;
     }
     catch (const std::exception& e) {
