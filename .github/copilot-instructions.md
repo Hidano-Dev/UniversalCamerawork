@@ -60,11 +60,10 @@
 - `memory-bank/techContext.md`: 使用技術、開発環境、依存関係や技術制約をまとめた技術コンテキスト
 - `memory-bank/tasks.md`: P0〜P2の優先タスクリストと進捗管理
 - `memory-bank/progress.md`: 完了/未完了タスク、既知課題、現在ステータスを記録
-- `memory-bank/context.md`: プロジェクトコンテキスト（正式版）
-- `memory-bank/project-knowledge.md`: 技術的知見、設計決定、実装パターンとアンチパターン
-- `memory-bank/project-improvements.md`: 改善履歴、試行錯誤の記録と教訓
+- `memory-bank/context.md`: 正式版のプロジェクトコンテキストをまとめたファイル
+- `memory-bank/project-knowledge.md`: 技術的知見、設計決定、実装パターンとアンチパターンを集約
+- `memory-bank/project-improvements.md`: 改善履歴、試行錯誤の記録と教訓を記述
 - `memory-bank/common-patterns.md`: よく使用するコマンドやテンプレートをまとめたリファレンス
-- `memory-bank/debug-log.md`: 永続化する重要なデバッグ記録フォーマットとルール
-- `memory-bank/commands/learnings.md`: カスタムスラッシュコマンド定義と使用方法
+- `memory-bank/commands/learnings.md`: カスタムスラッシュコマンド定義と使用方法を説明
 
 *更新時は必ず上記ファイルに知見を追記し、後続作業で参照すること。*
