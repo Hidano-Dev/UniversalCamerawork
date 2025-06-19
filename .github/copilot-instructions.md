@@ -50,5 +50,21 @@
 1. メモリバンク構造の定義と初期ドキュメント作成 (2025-06-19)
 2. DLLコア機能の実装計画
 
----
-*更新時は必ず本ファイルにパターンや設定を追記し、後続作業で参照すること。*
+## 知見管理システム
+以下のファイルで知見を体系的に管理しています (`memory-bank/` 配下):
+- `memory-bank/activeContext.md`: 現在の作業フォーカスと最新変更履歴を管理するアクティブコンテキスト
+- `memory-bank/chatContext.md`: AIアシスタントやチームとのチャットログや議論内容を記録
+- `memory-bank/productContext.md`: プロジェクト背景、狙い、解決する問題を整理する製品コンテキスト
+- `memory-bank/projectbrief.md`: プロジェクト概要、ゴール、制約条件をまとめたブリーフ
+- `memory-bank/systemPatterns.md`: アーキテクチャ、デザインパターン、コンポーネント関係を記述したシステムパターン
+- `memory-bank/techContext.md`: 使用技術、開発環境、依存関係や技術制約をまとめた技術コンテキスト
+- `memory-bank/tasks.md`: P0〜P2の優先タスクリストと進捗管理
+- `memory-bank/progress.md`: 完了/未完了タスク、既知課題、現在ステータスを記録
+- `memory-bank/context.md`: プロジェクトコンテキスト（正式版）
+- `memory-bank/project-knowledge.md`: 技術的知見、設計決定、実装パターンとアンチパターン
+- `memory-bank/project-improvements.md`: 改善履歴、試行錯誤の記録と教訓
+- `memory-bank/common-patterns.md`: よく使用するコマンドやテンプレートをまとめたリファレンス
+- `memory-bank/debug-log.md`: 永続化する重要なデバッグ記録フォーマットとルール
+- `memory-bank/commands/learnings.md`: カスタムスラッシュコマンド定義と使用方法
+
+*更新時は必ず上記ファイルに知見を追記し、後続作業で参照すること。*
