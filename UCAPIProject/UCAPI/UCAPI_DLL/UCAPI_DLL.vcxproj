@@ -178,6 +178,9 @@
     <ClInclude Include="ucapi_msgpack_types.h" />
     <ClInclude Include="ucapi_serializer_utility.h" />
     <ClInclude Include="ucapi_timecode.h" />
+    <ClInclude Include="include\ucapi_message_serializer.h" />
+    <ClInclude Include="include\ucapi_message_serializer_factory.h" />
+    <ClInclude Include="include\ucapi_dummy_serializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -192,6 +195,7 @@
     <ClCompile Include="ucapi_msgpack_converter.cpp" />
     <ClCompile Include="ucapi_serializer_utlity.cpp" />
     <ClCompile Include="ucapi_timecode.cpp" />
+    <ClCompile Include="ucapi_dummy_serializer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
