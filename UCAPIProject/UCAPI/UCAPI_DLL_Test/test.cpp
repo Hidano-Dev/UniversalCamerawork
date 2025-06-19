@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "ucapi_dll.h"
-#include "../UCAPI_DLL/ucapi_config.h"
-#include "../UCAPI_DLL/include/ucapi_message_serializer_factory.h"
-#include <algorithm>
 
 // Deserialize 正常系
 TEST(UcapiDll_Deserialize, ValidBuffer) {
@@ -80,21 +77,20 @@ TEST(UcapiDll_CreateDestroy, Basic) {
   UCAPI_Destroy(obj);
 }
 
-TEST(MessageSerializerFactory, CreateMsgPackSerializer) {
-  auto& factory = ucapi::Config::GetSerializerFactory();
-  auto serializer = factory.CreateSerializer("MsgPack");
-  EXPECT_NE(serializer, nullptr);
-}
-
-TEST(MessageSerializerFactory, GetSupportedFormats) {
-  auto& factory = ucapi::Config::GetSerializerFactory();
-  auto formats = factory.GetSupportedFormats();
-  EXPECT_GT(formats.size(), 0u);
-  EXPECT_NE(std::find(formats.begin(), formats.end(), "MsgPack"), formats.end());
-}
-
-TEST(MessageSerializerFactory, CreateUnsupportedSerializer) {
-  auto& factory = ucapi::Config::GetSerializerFactory();
-  auto serializer = factory.CreateSerializer("UnsupportedFormat");
-  EXPECT_EQ(serializer, nullptr);
+TEST(UcapiDll_Factory, SerializationStillWorks) {
+  ucapi_t* obj = UCAPI_Create();
+  uint8_t* buf = nullptr;
+  size_t sz = 0;
+  
+  int res = UCAPI_Serialize(obj, &buf, &sz);
+  EXPECT_EQ(res, 0);
+  EXPECT_GT(sz, 0u);
+  EXPECT_NE(buf, nullptr);
+  
+  ucapi_t* deserialized = UCAPI_Deserialize(buf, sz);
+  EXPECT_NE(deserialized, nullptr);
+  
+  UCAPI_FreeBuffer(buf);
+  UCAPI_Destroy(obj);
+  UCAPI_Destroy(deserialized);
 }
