@@ -178,6 +178,8 @@
     <ClInclude Include="ucapi_msgpack_types.h" />
     <ClInclude Include="ucapi_serializer_utility.h" />
     <ClInclude Include="ucapi_timecode.h" />
+    <ClInclude Include="include\ucapi_message_serializer.h" />
+    <ClInclude Include="include\ucapi_message_serializer_factory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
