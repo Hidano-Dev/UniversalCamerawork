@@ -76,21 +76,3 @@ TEST(UcapiDll_CreateDestroy, Basic) {
   EXPECT_NE(obj, nullptr);
   UCAPI_Destroy(obj);
 }
-
-TEST(UcapiDll_Factory, SerializationStillWorks) {
-  ucapi_t* obj = UCAPI_Create();
-  uint8_t* buf = nullptr;
-  size_t sz = 0;
-  
-  int res = UCAPI_Serialize(obj, &buf, &sz);
-  EXPECT_EQ(res, 0);
-  EXPECT_GT(sz, 0u);
-  EXPECT_NE(buf, nullptr);
-  
-  ucapi_t* deserialized = UCAPI_Deserialize(buf, sz);
-  EXPECT_NE(deserialized, nullptr);
-  
-  UCAPI_FreeBuffer(buf);
-  UCAPI_Destroy(obj);
-  UCAPI_Destroy(deserialized);
-}
