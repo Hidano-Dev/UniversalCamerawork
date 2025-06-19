@@ -39,6 +39,21 @@
     <ClInclude Include="ucapi_timecode.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="include\ucapi_message_serializer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ucapi_message_serializer_factory.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ucapi_msgpack_serializer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ucapi_message_serializer_factory_impl.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ucapi_config.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -60,6 +75,15 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ucapi_timecode.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ucapi_msgpack_serializer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ucapi_message_serializer_factory_impl.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ucapi_config.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
