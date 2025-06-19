@@ -5,8 +5,12 @@
 
 ## 最近の変更
 - `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md` の作成
+- `tasks.md` の作成
+- `chatContext.md` の作成
 
 ## 次のステップ
+- P0タスク（serialize/transport/test環境構築）着手
+- 各メモリバンクファイルの継続的更新
 - `activeContext.md` と `progress.md` の追加
 - `.github/copilot-instructions.md` の初期ドキュメント作成を検討
 
