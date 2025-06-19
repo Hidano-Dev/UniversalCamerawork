@@ -1,11 +1,6 @@
 #include "pch.h"
 #include "ucapi_dll.h"
 
-TEST(TestCaseName, TestName) {
-  EXPECT_EQ(1, 1);
-  EXPECT_TRUE(true);
-}
-
 // CRC16 zero length returns init value
 TEST(UcapiDll_CalcCRC16, ZeroLength) {
   uint16_t crc = UCAPI_CalcCRC16(nullptr, 0, 0x1021, 0xFFFF);
