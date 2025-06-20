@@ -40,7 +40,7 @@ jobs:
       # ⑤ テスト exe を実行して JUnit 互換 XML を出力
       - name: Run GoogleTest
         run: |
-          cd x64\Release
+          cd UCAPIProject\UCAPI\x64\Release
           .\UCAPI_DLL_Test.exe --gtest_output=xml:report.xml   # :contentReference[oaicite:1]{index=1}
 
       # ⑥ レポートをアップロード（失敗時も残るよう if: always()）
