@@ -23,7 +23,7 @@ jobs:
           setupOnly: true
 
       - name: vcpkg install
-        run: vcpkg/vcpkg.exe install msgpack-cpp gtest --triplet x64-windows
+        run: vcpkg/vcpkg.exe install msgpack gtest --triplet x64-windows
 
       # ③ MSBuild を PATH へ
       - name: Add MSBuild to PATH
