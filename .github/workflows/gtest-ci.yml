@@ -22,7 +22,9 @@ jobs:
           vcpkgGitCommitId: 7adc2e4d49e8d0efc07a369079faa6bc3dbb90f3
 
       - name: vcpkg install
-        run: vcpkg/vcpkg.exe install msgpack gtest --triplet x64-windows
+        run: |
+            vcpkg/vcpkg.exe install msgpack gtest --triplet x64-windows
+            vcpkg/vcpkg.exe integrate install
 
       # ③ MSBuild を PATH へ
       - name: Add MSBuild to PATH
