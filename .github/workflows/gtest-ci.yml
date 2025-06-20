@@ -1,0 +1,35 @@
+name: C++ / GoogleTest CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest        # VS2022 & cl がプリインストール
+    steps:
+      - uses: actions/checkout@v4
+
+      # ① MSBuild を PATH へ
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2          # :contentReference[oaicite:0]{index=0}
+
+      # ② ソリューションをビルド
+      - name: Build (x64-Release)
+        run: msbuild UCAPIProject\UCAPI\UCAPI.sln /m /p:Configuration=Release /p:Platform=x64
+
+      # ③ テスト exe を実行して JUnit 互換 XML を出力
+      - name: Run GoogleTest
+        run: |
+          cd x64\Release
+          .\UCAPI_DLL_Test.exe --gtest_output=xml:report.xml   # :contentReference[oaicite:1]{index=1}
+
+      # ④ レポートをアップロード（失敗時も残るよう if: always()）
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if:  always()
+        with:
+          name: gtest-report
+          path: x64\Release\report.xml
