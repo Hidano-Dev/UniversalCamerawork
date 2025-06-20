@@ -17,7 +17,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2          # :contentReference[oaicite:0]{index=0}
 
       - name: Restore NuGet packages
-        run: msbuild UCAPI.sln -t:Restore -p:RestorePackagesConfig=true
+        run: msbuild UCAPIProject\UCAPI\UCAPI.sln -t:Restore -p:RestorePackagesConfig=true
 
       # ② ソリューションをビルド
       - name: Build (x64-Release)
