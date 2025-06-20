@@ -23,7 +23,7 @@ jobs:
 
       - name: vcpkg install
         run: |
-            vcpkg/vcpkg.exe install msgpack gtest --triplet x64-windows
+            vcpkg/vcpkg.exe install msgpack boost-predef gtest --triplet x64-windows
             vcpkg/vcpkg.exe integrate install
 
       # ③ MSBuild を PATH へ
