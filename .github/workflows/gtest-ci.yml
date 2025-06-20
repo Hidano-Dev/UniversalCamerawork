@@ -1,4 +1,4 @@
-name: C++ / GoogleTest CI
+name: C++ / vcpkg + GoogleTest CI
 
 on:
   push:
@@ -10,26 +10,35 @@ jobs:
   build-and-test:
     runs-on: windows-latest        # VS2022 & cl がプリインストール
     steps:
+      # ① ソース取得（vcpkg をサブモジュールにしている場合は --recursive）
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      # ① MSBuild を PATH へ
+      # ② vcpkg をセットアップ
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11          # vcpkg 専用 Action :contentReference[oaicite:0]{index=0}
+        with:
+          # vcpkg をサブモジュールにしているならルートを指示
+          vcpkgDirectory: ${{ github.workspace }}/vcpkg
+          # vcpkg.json がある場合は自動で install。ない場合は下で手動 install。
+          triplet: x64-windows            # ← "x64-windows-static" など手元に合わせる
+
+      # ③ MSBuild を PATH へ
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2          # :contentReference[oaicite:0]{index=0}
 
-      - name: Restore NuGet packages
-        run: msbuild UCAPIProject\UCAPI\UCAPI.sln -t:Restore -p:RestorePackagesConfig=true
-
-      # ② ソリューションをビルド
+      # ④ ソリューションをビルド
       - name: Build (x64-Release)
         run: msbuild UCAPIProject\UCAPI\UCAPI.sln /m /p:Configuration=Release /p:Platform=x64
 
-      # ③ テスト exe を実行して JUnit 互換 XML を出力
+      # ⑤ テスト exe を実行して JUnit 互換 XML を出力
       - name: Run GoogleTest
         run: |
           cd x64\Release
           .\UCAPI_DLL_Test.exe --gtest_output=xml:report.xml   # :contentReference[oaicite:1]{index=1}
 
-      # ④ レポートをアップロード（失敗時も残るよう if: always()）
+      # ⑥ レポートをアップロード（失敗時も残るよう if: always()）
       - name: Upload test report
         uses: actions/upload-artifact@v4
         if:  always()
