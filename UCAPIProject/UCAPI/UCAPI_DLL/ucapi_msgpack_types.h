@@ -7,7 +7,7 @@ struct ucapi_msgpack_record_t {
     uint32_t camera_no;
     uint16_t commands;
     uint32_t timecode;
-    uint32_t subframe;
+    float subframe;
     uint8_t packet_no;
 
     float eye_position_right_m;
