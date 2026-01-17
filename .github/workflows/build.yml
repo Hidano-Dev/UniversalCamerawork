@@ -1,10 +1,9 @@
-name: Build and Test
+name: Release Build (CD)
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    tags:
+      - 'v[0-9]*'  # v1.0.0, v2.0.0-beta など
 
 env:
   SOLUTION_PATH: UCAPIProject/UCAPI/UCAPI.sln
@@ -56,11 +55,11 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: UCAPI_DLL-Release-x64
+          name: UCAPI_DLL-${{ replace(github.ref_name, '/', '-') }}-x64
           path: |
             UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.dll
             UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.lib
-          retention-days: 30
+          retention-days: 90
 
   asan-test:
     name: AddressSanitizer Test
