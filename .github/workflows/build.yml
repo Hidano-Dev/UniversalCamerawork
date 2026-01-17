@@ -105,5 +105,8 @@ jobs:
         run: |
           echo === ASan Test Starting ===
           set ASAN_OPTIONS=halt_on_error=1:print_stacktrace=1:verbosity=1
+          set PATH=%cd%\UCAPIProject\UCAPI\x64\ASan;%PATH%
+          echo PATH includes: %cd%\UCAPIProject\UCAPI\x64\ASan
+          dir .\UCAPIProject\UCAPI\x64\ASan\*.dll
           .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe 2>&1
           echo === ASan Test Exit Code: %ERRORLEVEL% ===
