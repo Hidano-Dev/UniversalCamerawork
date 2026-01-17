@@ -81,4 +81,29 @@ UCAPI_API uint16_t UCAPI_CalcCRC16(const void* recordPtr, size_t length, uint16_
 
 - `docs/UCAPI_Data_Format_Specification.yaml` - バイナリフォーマット仕様（Header 10bytes + Record 128bytes）
 - `docs/UCAPI_DLL_Specification.md` - DLL仕様書
-- `memory-bank/` - 知見管理システム（設計決定、進捗、タスク管理）
+
+## Memory Bank（知見管理システム）
+
+`memory-bank/` ディレクトリには、プロジェクトの知見・タスク管理・設計決定が集約されています。
+
+### 作業開始時に確認すべきファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `activeContext.md` | 現在の作業フォーカス、最新の変更履歴 |
+| `progress.md` | 進捗状況、完了タスク、既知の課題 |
+| `technical-debt-tasks.md` | 技術的負債・バグ修正タスクリスト（P0〜P2優先度） |
+
+### 技術調査時に参照すべきファイル
+
+| ファイル | 内容 |
+|----------|------|
+| `systemPatterns.md` | アーキテクチャ、デザインパターン |
+| `project-knowledge.md` | 設計決定、実装パターンとアンチパターン |
+| `common-patterns.md` | よく使用するコマンドやテンプレート |
+
+### 作業完了時の更新ルール
+
+- タスク完了時は `progress.md` と `technical-debt-tasks.md` を更新
+- 重要な設計決定や教訓は `project-improvements.md` に記録
+- 議論内容や決定事項は `chatContext.md` に追記

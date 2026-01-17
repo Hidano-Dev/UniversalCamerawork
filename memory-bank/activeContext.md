@@ -1,20 +1,28 @@
 # アクティブコンテキスト (activeContext.md)
 
 ## 現在の作業フォーカス
-- プロジェクトのMemory Bank構造の初期設定
+- P1タスク（テスト強化・品質向上）の実施
+- Memory Bankドキュメントの整備・CLAUDE.mdとの整合性維持
 
-## 最近の変更
-- `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md` の作成
-- `tasks.md` の作成
-- `chatContext.md` の作成
+## 最近の変更 (2026-01-17)
+- P0タスク全6件完了（メモリリーク修正、バッファオーバーフロー修正、スレッドセーフ化、RAII化）
+- P1-1完了（_clean_up()関数のドキュメント追加）
+- `technical-debt-tasks.md` 作成（コードレビュー結果の技術的負債リスト）
+- `ucapi4unity-todo.md` 作成（Unityプラグイン改善項目）
+- Memory Bankファイルの整合性確認・更新
 
 ## 次のステップ
-- P0タスク（serialize/transport/test環境構築）着手
-- 各メモリバンクファイルの継続的更新
-- `activeContext.md` と `progress.md` の追加
-- `.github/copilot-instructions.md` の初期ドキュメント作成を検討
+- P1-2: CRC16テストに参照値を追加
+- P1-3: エッジケーステスト・異常系テストの追加
+- P1-4: AddressSanitizer/メモリリークテストの導入
+- Unityプラグイン（UCAPI4Unity）のUPMパッケージ化検討
 
 ## 決定事項・考慮点
 - ファイル名と階層はMemory Bank仕様に準拠
 - 日本語ドキュメントで統一
 - 継続的に更新し、常に現状反映を維持
+- CLAUDE.mdをプロジェクトの正式なガイドとして参照
+
+## 更新履歴
+- 2026-01-17: P0完了を反映、作業フォーカスをP1タスクに更新
+- 2025-06-19: 初版作成
