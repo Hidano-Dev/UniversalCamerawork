@@ -64,9 +64,19 @@
 - **ファイル**:
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp`
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.h`
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_dll.cpp`
 - **問題**: `0x10000`（64KB制限）などのマジックナンバーがハードコーディング
 - **対応**: 名前付き定数として定義し、ドキュメントコメントを追加
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - `UCAPI_MAGIC` (0x55AA): マジックバイト
+  - `UCAPI_HEADER_SIZE` (10): ヘッダーサイズ（バイト）
+  - `UCAPI_MAX_PAYLOAD_SIZE` (0x10000): 最大ペイロードサイズ（64KB）
+  - `UCAPI_MIN_RECORD_SIZE` (107): 最小レコードサイズ
+  - `UCAPI_CRC16_POLYNOMIAL` (0x1021): CRC16-CCITT多項式
+  - `UCAPI_CRC16_INIT_VALUE` (0xFFFF): CRC16初期値
+  - `UCAPI_CRC16_MSB_MASK` (0x8000): CRC16最上位ビットマスク
+  - `UCAPI_BITS_PER_BYTE` (8): バイトあたりのビット数
 
 ### P2-3: Singletonロガーの実装
 - **ファイル**:
@@ -222,10 +232,17 @@
 - トリガー: mainへのpush + mainへのPR、構成: Release x64
 - README.mdにビルドバッジを追加
 
+### P2-2: マジックナンバーの定数化 ✓
+- 2026-01-17 完了
+- ucapi.hに8つの定数を追加（UCAPI_MAGIC, UCAPI_HEADER_SIZE, UCAPI_MAX_PAYLOAD_SIZE, UCAPI_MIN_RECORD_SIZE, CRC16関連4定数）
+- ucapi.cpp, ucapi_dll.cppのハードコーディングを定数参照に置換
+- 全定数にドキュメントコメントを追加
+
 ---
 
 ## 更新履歴
 
+- 2026-01-17: P2-2完了（マジックナンバーの定数化、8定数をucapi.hに定義）
 - 2026-01-17: P1-3完了（エッジケーステスト・異常系テスト22個追加）
 - 2026-01-17: P2-7完了（GitHub Actions CI/CD環境構築、ビルドバッジ追加）
 - 2026-01-17: P2-1完了（vcpkg.json作成、マニフェストモード有効化、MSGPACK_NO_BOOST追加）
