@@ -1,0 +1,121 @@
+@startuml UCAPI_DLL
+' 基本型
+class ucapi_t {
+    +record_t
+    +ucapi_t(const void* dataPtr = nullptr)
+    +~ucapi_t()
+    +static uint16_t computeCRC16(...)
+    -void _read(...)
+    -void _clean_up()
+    uint16_t m_magic
+    uint16_t m_version
+    uint16_t m_num_payload
+    uint16_t m_crc16
+    vector<record_t> m_payload
+}
+
+class ucapi_t::record_t {
+    +record_t(size_t, const void* dataPtr = nullptr)
+    +~record_t()
+    -void _read(...)
+    -void _clean_up()
+    uint32_t m_camera_no
+    uint16_t m_commands
+    uint32_t m_timecode
+    uint32_t m_subframe
+    uint8_t m_packet_no
+    float m_eye_position_right_m
+    float m_eye_position_up_m
+    float m_eye_position_forward_m
+    float m_look_vector_right_m
+    float m_look_vector_up_m
+    float m_look_vector_forward_m
+    float m_up_vector_right_m
+    float m_up_vector_up_m
+    float m_up_vector_forward_m
+    float m_focal_length_mm
+    float m_aspect_ratio
+    float m_focus_distance_m
+    float m_aperture
+    float m_sensor_size_width_mm
+    float m_sensor_size_height_mm
+    float m_near_clip_m
+    float m_far_clip_m
+    float m_lens_shift_horizontal_ratio
+    float m_lens_shift_vertical_ratio
+    float m_lens_distortion_radial_coefficients_k1
+    float m_lens_distortion_radial_coefficients_k2
+    float m_lens_distortion_center_point_right_mm
+    float m_lens_distortion_center_point_up_mm
+}
+
+class timecode_t {
+    +timecode_t()
+    +~timecode_t()
+    +static uint32_t pack(timecode_t)
+    +static timecode_t unpack(uint32_t)
+    uint8_t m_frame_number
+    uint8_t m_second_number
+    uint8_t m_minute_number
+    uint8_t m_hour_number
+    uint8_t m_frame_rate
+    uint8_t m_drop_frame
+    uint8_t m_reserved
+}
+
+' シリアライザ関連
+interface IMessageSerializer {
+    +Serialize(const CameraState&, vector<uint8_t>&) : HRESULT
+    +Deserialize(const uint8_t*, size_t, CameraState&) : HRESULT
+}
+
+class MessagePackSerializer {
+    +Serialize(...)
+    +Deserialize(...)
+    -ConvertToMsgPack(...)
+    -ConvertFromMsgPack(...)
+}
+
+IMessageSerializer <|.. MessagePackSerializer
+
+interface IMessageSerializerFactory {
+    +CreateSerializer(string) : unique_ptr<IMessageSerializer>
+    +RegisterSerializer(string, function) : HRESULT
+    +GetSupportedFormats() : vector<string>
+}
+
+class MessageSerializerFactoryImpl {
+    +CreateSerializer(string)
+    +RegisterSerializer(string, function)
+    +GetSupportedFormats()
+    -m_factories : unordered_map<string, function>
+}
+
+IMessageSerializerFactory <|.. MessageSerializerFactoryImpl
+
+class Config {
+    +static IMessageSerializerFactory& GetSerializerFactory()
+    +static void Initialize()
+    +static void Shutdown()
+    -static unique_ptr<IMessageSerializerFactory> s_factory
+    -static bool s_initialized
+}
+
+' MsgPackデータ型
+class ucapi_msgpack_record_t
+class ucapi_msgpack_t
+
+' 変換ユーティリティ
+class "convert_to_ucapi()/convert_to_msgpack()" as Converter
+
+' 関連
+ucapi_t "1" *-- "0..n" ucapi_t::record_t
+ucapi_t::record_t o-- timecode_t
+MessagePackSerializer ..> ucapi_msgpack_record_t
+MessagePackSerializer ..> ucapi_msgpack_t
+MessageSerializerFactoryImpl o-- IMessageSerializer
+Config o-- IMessageSerializerFactory
+Converter ..> ucapi_t
+Converter ..> ucapi_msgpack_t
+
+@enduml
