@@ -5,8 +5,10 @@
         "UcApi4Unity.CinemachineCamera",
         "UcApi4Unity.UnityCamera",
         "Unity.Cinemachine",
-        "Cinemachine",
-        "Unity.Timeline"
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.Timeline",
+        "uOSC.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

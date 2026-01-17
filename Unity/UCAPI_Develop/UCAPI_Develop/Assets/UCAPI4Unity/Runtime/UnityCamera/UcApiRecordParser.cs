@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UCAPI4Unity.Runtime.UnityCamera
 {
-    public static class UcApiRecordParser
+    internal static class UcApiRecordParser
     {
         public static UcApiRecord FromCamera(Camera cam)
         {

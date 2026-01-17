@@ -4,8 +4,9 @@
     "references": [
         "UcApi.Core",
         "Unity.Cinemachine",
-        "Cinemachine",
-        "Unity.Timeline"
+        "Unity.Timeline",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

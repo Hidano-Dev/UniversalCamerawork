@@ -5,7 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace UCAPI4Unity.Runtime.CinemachineCamera
 {
-    public static class UcApiRecordParser
+    internal static class UcApiRecordParser
     {
         public static UcApiRecord FromVirtualCamera(ICinemachineCamera cam)
         {

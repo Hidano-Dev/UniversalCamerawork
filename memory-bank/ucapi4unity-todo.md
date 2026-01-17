@@ -40,7 +40,7 @@ Unity側スクリプト群の構成レビューで発見された改善項目一
 ## 🟡 中優先度 (P1)
 
 ### UNITY-004: UcApiRecordParserのアクセス修飾子変更
-- **ステータス**: [ ] 未着手
+- **ステータス**: [x] 完了
 - **概要**: 内部実装詳細が `public` として露出している
 - **対応内容**:
   - `UcApiRecordParser` クラスを `internal` に変更
@@ -48,6 +48,7 @@ Unity側スクリプト群の構成レビューで発見された改善項目一
 - **対象ファイル**:
   - `Runtime/UnityCamera/UcApiRecordParser.cs`
   - `Runtime/CinemachineCamera/UcApiRecordParser.cs`
+- **備考**: 2026-01-17 両ファイルのアクセス修飾子を `public` から `internal` に変更完了
 
 ### UNITY-005: エラーハンドリングの強化
 - **ステータス**: [ ] 未着手
@@ -117,3 +118,4 @@ Unity側スクリプト群の構成レビューで発見された改善項目一
 |------|----------|
 | 2026-01-17 | 初版作成（構成レビュー結果より10項目抽出） |
 | 2026-01-17 | UNITY-003削除（設計思想に反するため：タイムコードは送信側が厳密に定義すべき） |
+| 2026-01-17 | UNITY-004完了（UcApiRecordParserを`internal`に変更） |
