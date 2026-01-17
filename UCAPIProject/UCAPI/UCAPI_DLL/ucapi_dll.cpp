@@ -100,3 +100,19 @@ UCAPI_API ucapi_t* UCAPI_Create() {
 UCAPI_API void UCAPI_Destroy(ucapi_t* obj) {
     delete obj;
 }
+
+// Add an empty record to the payload
+UCAPI_API int UCAPI_AddRecord(ucapi_t* obj) {
+    if (obj == nullptr) {
+        return -1;
+    }
+    try {
+        obj->m_payload.emplace_back(0, nullptr);
+        obj->m_num_payload = static_cast<uint16_t>(obj->m_payload.size());
+        return 0;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[UCAPI_AddRecord] " << e.what() << std::endl;
+        return -1;
+    }
+}
