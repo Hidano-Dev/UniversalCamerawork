@@ -54,7 +54,12 @@
 - **対応**:
   - 使用箇所がなければ削除
   - または統合して単一の変換パスに整理
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - `ucapi_msgpack_converter.h`と`ucapi_msgpack_converter.cpp`を削除
+  - `ucapi_dll.cpp`から不要なincludeを削除
+  - `UCAPI_DLL.vcxproj`と`UCAPI_DLL.vcxproj.filters`からファイル参照を削除
+  - `UCAPI_DLL_class_diagram.puml`からConverter参照を削除
 
 ---
 
@@ -222,10 +227,17 @@
 - トリガー: mainへのpush + mainへのPR、構成: Release x64
 - README.mdにビルドバッジを追加
 
+### P1-6: 未使用コードの削除 - convert_to_ucapi ✓
+- 2026-01-17 完了
+- `ucapi_msgpack_converter.h`と`ucapi_msgpack_converter.cpp`を削除
+- `ucapi_dll.cpp`から不要なincludeを削除
+- プロジェクトファイルとクラス図を更新
+
 ---
 
 ## 更新履歴
 
+- 2026-01-17: P1-6完了（未使用コードの削除 - convert_to_ucapi/convert_to_msgpack）
 - 2026-01-17: P1-3完了（エッジケーステスト・異常系テスト22個追加）
 - 2026-01-17: P2-7完了（GitHub Actions CI/CD環境構築、ビルドバッジ追加）
 - 2026-01-17: P2-1完了（vcpkg.json作成、マニフェストモード有効化、MSGPACK_NO_BOOST追加）

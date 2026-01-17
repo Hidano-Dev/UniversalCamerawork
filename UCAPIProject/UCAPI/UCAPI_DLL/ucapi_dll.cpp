@@ -4,7 +4,6 @@
 #include <memory>
 #include <msgpack.hpp>
 #include "ucapi.h"
-#include "ucapi_msgpack_converter.h"
 #include "ucapi_config.h"
 
 UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount) {
