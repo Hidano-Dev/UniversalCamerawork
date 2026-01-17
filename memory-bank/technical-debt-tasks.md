@@ -18,8 +18,17 @@
 - **対応**:
   - 上記シナリオのテストケースを追加
   - 準異常系テストシナリオを定義・実装
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
 - **統合元**: tasks.md P1「準異常系テストシナリオ定義」「不足テストケース実装」
+- **実装詳細**:
+  - バッファオーバーフロー攻撃パターン: HeaderOnlyBuffer, MaliciousNumPayload, TruncatedBuffer
+  - 大量ペイロード: LargeBuffer_Over64KB (70KBバッファテスト)
+  - マルチスレッドシナリオ: ConcurrentCreateDestroy, ConcurrentSerialize, ConcurrentRoundTrip, ConcurrentCRC16
+  - msgpack失敗ケース: InvalidFormat_NotMapOrArray, EmptyMap, ReservedBytes, IncompleteString
+  - 境界値テスト: EmptyPayload, Length1, SmallValidBuffer
+  - 引数不正時: NullOutBuffer, NullOutSize, AllOutputsNull, ZeroSize, NonNullBufferZeroSize, NullPointer(Destroy)
+  - ラウンドトリップテスト: SerializeDeserialize
+  - 合計22個の新規テストを追加（14→36テスト）
 
 ### P1-4: AddressSanitizer/メモリリークテストの導入
 - **ファイル**:
@@ -196,6 +205,17 @@
 - `UCAPI_DLL.vcxproj`にマニフェストモード有効化 + MSGPACK_NO_BOOST追加
 - vcpkgをD:\vcpkgにインストール、VS2022にMSBuild統合
 
+### P1-3: エッジケーステスト・異常系テストの追加 ✓
+- 2026-01-17 完了
+- バッファオーバーフロー攻撃パターン: HeaderOnlyBuffer, MaliciousNumPayload, TruncatedBuffer
+- 大量ペイロード: LargeBuffer_Over64KB (70KBバッファテスト)
+- マルチスレッドシナリオ: ConcurrentCreateDestroy, ConcurrentSerialize, ConcurrentRoundTrip, ConcurrentCRC16
+- msgpack失敗ケース: InvalidFormat_NotMapOrArray, EmptyMap, ReservedBytes, IncompleteString
+- 境界値テスト: EmptyPayload, Length1, SmallValidBuffer
+- 引数不正時: NullOutBuffer, NullOutSize, AllOutputsNull, ZeroSize, NonNullBufferZeroSize, NullPointer(Destroy)
+- ラウンドトリップテスト: SerializeDeserialize
+- 合計22個の新規テストを追加（14→36テスト）
+
 ### P2-7: CI/CD環境構築 ✓
 - 2026-01-17 完了
 - `.github/workflows/build.yml`を作成（GitHub Actions）
@@ -206,6 +226,7 @@
 
 ## 更新履歴
 
+- 2026-01-17: P1-3完了（エッジケーステスト・異常系テスト22個追加）
 - 2026-01-17: P2-7完了（GitHub Actions CI/CD環境構築、ビルドバッジ追加）
 - 2026-01-17: P2-1完了（vcpkg.json作成、マニフェストモード有効化、MSGPACK_NO_BOOST追加）
 - 2026-01-17: P1-2完了（CRC16テストに業界標準参照値を追加）
