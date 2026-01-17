@@ -18,9 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Initialize vcpkg submodule
-        run: git submodule update --init --recursive
-
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
@@ -66,9 +63,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Initialize vcpkg submodule
-        run: git submodule update --init --recursive
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
