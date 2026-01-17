@@ -13,10 +13,10 @@ UniversalCamerawork (UCAPI) は、Unity/Unreal/Blender等の複数プラット�
 cd UCAPIProject/UCAPI
 
 # Debug x64 ビルド
-msbuild UCAPI_DLL.sln /p:Configuration=Debug /p:Platform=x64
+msbuild UCAPI.sln /p:Configuration=Debug /p:Platform=x64
 
 # Release x64 ビルド
-msbuild UCAPI_DLL.sln /p:Configuration=Release /p:Platform=x64
+msbuild UCAPI.sln /p:Configuration=Release /p:Platform=x64
 
 # 単体テストプロジェクトのみビルド
 msbuild UCAPI_DLL_Test.vcxproj /p:Configuration=Debug /p:Platform=x64
