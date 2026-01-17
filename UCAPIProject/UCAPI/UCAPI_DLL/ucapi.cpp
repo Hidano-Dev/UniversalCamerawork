@@ -4,8 +4,8 @@
 #include <iostream>
 #include "ucapi.h"
 
-ucapi_t::ucapi_t(const void* dataPtr){
-    // magic��0x55AA�ŏ�����
+ucapi_t::ucapi_t(const void* dataPtr, size_t bufferSize){
+    // magic is initialized with 0x55AA
     m_magic = 0x55AA;
 	m_version = 0;
 	// Default to no payload when created without data
@@ -13,13 +13,13 @@ ucapi_t::ucapi_t(const void* dataPtr){
 	m_payload.clear();
 	m_payload.reserve(m_num_payload);
 
-	if (dataPtr == nullptr) {
+	if (dataPtr == nullptr || bufferSize == 0) {
 		m_crc16 = 0;
 		return;
 	}
 
     try {
-        _read(dataPtr);
+        _read(dataPtr, bufferSize);
 		m_crc16 = computeCRC16(reinterpret_cast<record_t*>(m_payload.data()), sizeof(record_t) * m_num_payload);
 
     } catch(...) {
@@ -28,9 +28,17 @@ ucapi_t::ucapi_t(const void* dataPtr){
     }
 }
 
-void ucapi_t::_read(const void* dataPtr) {
+void ucapi_t::_read(const void* dataPtr, size_t bufferSize) {
     try {
-		// �S�̂̃o�C�g����c�����邽�߁A�ŏ���8�o�C�g��ǂݎ��
+		// Header size is 10 bytes (magic: 2, version: 2, num_payload: 2, crc16: 2, reserved: 2)
+		constexpr size_t HEADER_SIZE = 10;
+		constexpr size_t MAX_PAYLOAD_SIZE = 0x10000;
+
+		// Validate minimum buffer size for header
+		if (bufferSize < HEADER_SIZE) {
+			throw std::runtime_error("Buffer too small for header");
+		}
+
 		const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 		m_magic = (data[1] << 8) | data[0];
 		m_version = (data[3] << 8) | data[2];
@@ -39,24 +47,29 @@ void ucapi_t::_read(const void* dataPtr) {
 
 		auto payloadLength = sizeof(record_t);
 
-		// �y�C���[�h�̃o�C�g�����v�Z����
+		// Calculate payload byte size
 		size_t payloadSize = m_num_payload * payloadLength;
 
-		// �y�C���[�h�̃o�C�g����0�̏ꍇ�͓ǂݎ��Ȃ�
+		// Return early if no payload
 		if (payloadSize == 0) {
 			return;
 		}
 
-		// �y�C���[�h�̃o�C�g����s���ȏꍇ�͗�O���X���[����
-		if (payloadSize > 0x10000) {
+		// Reject invalid payload size
+		if (payloadSize > MAX_PAYLOAD_SIZE) {
 			throw std::runtime_error("Invalid payload size");
+		}
+
+		// Validate buffer size for all payloads
+		size_t requiredSize = HEADER_SIZE + payloadSize;
+		if (bufferSize < requiredSize) {
+			throw std::runtime_error("Buffer too small for payloads");
 		}
 
 		m_payload.clear();
 		m_payload.reserve(m_num_payload);
-		auto payloadArray = new std::vector<record_t>();
 		for (int i = 0; i < m_num_payload; i++) {
-			m_payload.emplace_back(payloadLength, &data[10 + i * payloadLength]);
+			m_payload.emplace_back(payloadLength, &data[HEADER_SIZE + i * payloadLength]);
 		}
 	}
 	catch (std::exception& e) {
@@ -121,7 +134,6 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 	m_lens_distortion_radial_coefficients_k2 = 0;
 	m_lens_distortion_center_point_right_mm = 0;
 	m_lens_distortion_center_point_up_mm = 0;
-	uint8_t* reserved = new uint8_t[25];
 
 	if (dataPtr == nullptr) {
 		return;
@@ -135,7 +147,14 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
     }
 }
 
-void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length = 0) {
+void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length) {
+	// Minimum required size: last access is data[103] + 4 bytes (float) = 107 bytes
+	constexpr size_t MIN_RECORD_SIZE = 107;
+
+	if (payload_length < MIN_RECORD_SIZE) {
+		throw std::runtime_error("Payload buffer too small for record");
+	}
+
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(dataPtr);
 
 	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
@@ -173,5 +192,7 @@ ucapi_t::record_t::~record_t() {
 }
 
 void ucapi_t::record_t::_clean_up() {
-	
+	// Currently no dynamically allocated resources to clean up.
+	// All members are POD types (uint32_t, uint16_t, uint8_t, float).
+	// If dynamic resources are added in the future, release them here.
 }
