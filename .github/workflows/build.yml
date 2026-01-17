@@ -101,18 +101,23 @@ jobs:
         run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=ASan /p:Platform=x64 /t:UCAPI_DLL_Test /p:VcpkgEnableManifest=true
 
       - name: Run tests with AddressSanitizer
-        shell: cmd
+        shell: pwsh
         run: |
-          echo === ASan Test Starting ===
-          set ASAN_OPTIONS=halt_on_error=1:print_stacktrace=1:verbosity=1
-          set PATH=%cd%\UCAPIProject\UCAPI\x64\ASan;%PATH%
-          for /d %%i in ("C:\Program Files\Microsoft Visual Studio\2022\*") do (
-            for /d %%j in ("%%i\VC\Tools\MSVC\*") do (
-              if exist "%%j\bin\Hostx64\x64\clang_rt.asan_dynamic-x86_64.dll" (
-                echo Found ASan runtime at: %%j\bin\Hostx64\x64
-                set PATH=%%j\bin\Hostx64\x64;%PATH%
-              )
-            )
-          )
-          .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe 2>&1
-          echo === ASan Test Exit Code: %ERRORLEVEL% ===
+          Write-Host "=== ASan Test Starting ==="
+          $env:ASAN_OPTIONS = "halt_on_error=1:print_stacktrace=1:verbosity=1"
+
+          # Add UCAPI DLL directory to PATH
+          $env:PATH = "$PWD\UCAPIProject\UCAPI\x64\ASan;$env:PATH"
+
+          # Find and add ASan runtime DLL directory to PATH
+          $asanDll = Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio\2022" -Recurse -Filter "clang_rt.asan_dynamic-x86_64.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($asanDll) {
+            Write-Host "Found ASan runtime at: $($asanDll.DirectoryName)"
+            $env:PATH = "$($asanDll.DirectoryName);$env:PATH"
+          } else {
+            Write-Host "WARNING: ASan runtime DLL not found"
+          }
+
+          & .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe
+          Write-Host "=== ASan Test Exit Code: $LASTEXITCODE ==="
+          exit $LASTEXITCODE
