@@ -175,7 +175,6 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="ucapi.h" />
     <ClInclude Include="ucapi_dll.h" />
-    <ClInclude Include="ucapi_msgpack_converter.h" />
     <ClInclude Include="ucapi_msgpack_types.h" />
     <ClInclude Include="ucapi_serializer_utility.h" />
     <ClInclude Include="ucapi_timecode.h" />
@@ -195,7 +194,6 @@
     </ClCompile>
     <ClCompile Include="ucapi.cpp" />
     <ClCompile Include="ucapi_dll.cpp" />
-    <ClCompile Include="ucapi_msgpack_converter.cpp" />
     <ClCompile Include="ucapi_serializer_utlity.cpp" />
     <ClCompile Include="ucapi_timecode.cpp" />
     <ClCompile Include="ucapi_msgpack_serializer.cpp" />
