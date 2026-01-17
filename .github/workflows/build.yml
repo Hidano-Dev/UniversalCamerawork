@@ -55,3 +55,36 @@ jobs:
             UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.dll
             UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.lib
           retention-days: 30
+
+  asan-test:
+    name: AddressSanitizer Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build UCAPI_DLL (ASan x64)
+        run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=ASan /p:Platform=x64 /t:UCAPI_DLL /p:VcpkgEnableManifest=true
+
+      - name: Build UCAPI_DLL_Test (ASan x64)
+        run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=ASan /p:Platform=x64 /t:UCAPI_DLL_Test /p:VcpkgEnableManifest=true
+
+      - name: Run tests with AddressSanitizer
+        run: ./UCAPIProject/UCAPI/x64/ASan/UCAPI_DLL_Test.exe
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1

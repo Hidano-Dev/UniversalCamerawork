@@ -34,11 +34,20 @@
 - **ファイル**:
   - `UCAPIProject/UCAPI/UCAPI_DLL/UCAPI_DLL.vcxproj`
   - `UCAPIProject/UCAPI/UCAPI_DLL_Test/UCAPI_DLL_Test.vcxproj`
+  - `UCAPIProject/UCAPI/UCAPI.sln`
+  - `.github/workflows/build.yml`
 - **問題**: メモリ安全性を検証する自動テストがない
 - **対応**:
   - MSVC の AddressSanitizer を有効化したビルド構成を追加
   - CI でメモリリークテストを実行
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - ASan|x64ビルド構成を追加（UCAPI_DLL.vcxproj, UCAPI_DLL_Test.vcxproj）
+  - EnableASAN=true でMSVC AddressSanitizerを有効化
+  - 最適化無効（/Od）、デバッグ情報有効（ProgramDatabase）、RuntimeLibrary=MultiThreadedDebugDLL
+  - BasicRuntimeChecks=Default（ASanと互換性のため）
+  - UCAPI.slnにASan|x64構成マッピングを追加
+  - GitHub ActionsにASanテストジョブを追加（ASAN_OPTIONS: detect_leaks=1:halt_on_error=1）
 
 ### P1-5: GoogleTestバージョン更新
 - **ファイル**:
@@ -248,6 +257,12 @@
 - ucapi.cpp, ucapi_dll.cppのハードコーディングを定数参照に置換
 - 全定数にドキュメントコメントを追加
 
+### P1-4: AddressSanitizer/メモリリークテストの導入 ✓
+- 2026-01-17 完了
+- ASan|x64ビルド構成を追加（UCAPI_DLL.vcxproj, UCAPI_DLL_Test.vcxproj, UCAPI.sln）
+- MSVC EnableASAN=true、最適化無効、デバッグ情報有効
+- GitHub ActionsにASanテストジョブを追加（detect_leaks=1, halt_on_error=1）
+
 ### P1-6: 未使用コードの削除 - convert_to_ucapi ✓
 - 2026-01-17 完了
 - `ucapi_msgpack_converter.h`と`ucapi_msgpack_converter.cpp`を削除
@@ -263,6 +278,7 @@
 
 ## 更新履歴
 
+- 2026-01-17: P1-4完了（AddressSanitizer/メモリリークテストの導入、ASan|x64ビルド構成追加、CIにASanテストジョブ追加）
 - 2026-01-17: P2-5完了（コメント言語の英語統一: dllmain.cpp, framework.h, pch.h, pch.cpp）
 - 2026-01-17: P1-6完了（未使用コードの削除 - convert_to_ucapi/convert_to_msgpack）
 - 2026-01-17: P2-2完了（マジックナンバーの定数化、8定数をucapi.hに定義）
