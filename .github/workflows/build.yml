@@ -3,7 +3,7 @@ name: Release Build (CD)
 on:
   push:
     tags:
-      - 'v*'  # v1.0.0, v2.0.0-beta など
+      - 'v[0-9]*'  # v1.0.0, v2.0.0-beta など
 
 env:
   SOLUTION_PATH: UCAPIProject/UCAPI/UCAPI.sln
