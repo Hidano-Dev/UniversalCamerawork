@@ -11,12 +11,12 @@ class ucapi_t{
 public:
     class record_t;
 
-    ucapi_t(const void* dataPtr = nullptr);
+    ucapi_t(const void* dataPtr = nullptr, size_t bufferSize = 0);
 
     static uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = 0x1021, uint16_t initValue = 0xFFFF);
 
 private:
-    void _read(const void* dataPtr);
+    void _read(const void* dataPtr, size_t bufferSize);
     void _clean_up();
 
 public:
