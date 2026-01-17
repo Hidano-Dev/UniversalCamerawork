@@ -8,6 +8,7 @@ on:
 env:
   SOLUTION_PATH: UCAPIProject/UCAPI/UCAPI.sln
   VCPKG_DEFAULT_TRIPLET: x64-windows
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
 jobs:
   build:
@@ -17,15 +18,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          cd "${{ github.workspace }}/vcpkg"
+          git checkout c82f74667287d3dc386bce81e44964370c91a289
+
+      - name: Bootstrap vcpkg
+        run: |
+          & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat"
 
       - name: vcpkg install
         run: |
-            & "$env:VCPKG_ROOT\vcpkg.exe" install msgpack gtest --triplet x64-windows
-            & "$env:VCPKG_ROOT\vcpkg.exe" integrate install
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" install msgpack gtest --triplet x64-windows
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" integrate install
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -54,3 +60,68 @@ jobs:
             UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.dll
             UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.lib
           retention-days: 90
+
+  asan-test:
+    name: AddressSanitizer Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          cd "${{ github.workspace }}/vcpkg"
+          git checkout c82f74667287d3dc386bce81e44964370c91a289
+
+      - name: Bootstrap vcpkg
+        run: |
+          & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat"
+
+      - name: vcpkg install
+        run: |
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" install msgpack gtest --triplet x64-windows
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" integrate install
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build UCAPI_DLL (ASan x64)
+        run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=ASan /p:Platform=x64 /t:UCAPI_DLL /p:VcpkgEnableManifest=true
+
+      - name: Build UCAPI_DLL_Test (ASan x64)
+        run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=ASan /p:Platform=x64 /t:UCAPI_DLL_Test /p:VcpkgEnableManifest=true
+
+      - name: Run tests with AddressSanitizer
+        shell: pwsh
+        run: |
+          Write-Host "=== ASan Test Starting ==="
+          $env:ASAN_OPTIONS = "halt_on_error=1:print_stacktrace=1:verbosity=1"
+
+          # Add UCAPI DLL directory to PATH
+          $env:PATH = "$PWD\UCAPIProject\UCAPI\x64\ASan;$env:PATH"
+
+          # Find MSVC ASan runtime (not LLVM) - it's in VC\Tools\MSVC\*\bin\Hostx64\x64
+          $msvcPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC"
+          $asanDll = Get-ChildItem -Path $msvcPath -Directory | ForEach-Object {
+            $dllPath = Join-Path $_.FullName "bin\Hostx64\x64\clang_rt.asan_dynamic-x86_64.dll"
+            if (Test-Path $dllPath) { Get-Item $dllPath }
+          } | Select-Object -First 1
+
+          if ($asanDll) {
+            Write-Host "Found MSVC ASan runtime at: $($asanDll.DirectoryName)"
+            $env:PATH = "$($asanDll.DirectoryName);$env:PATH"
+          } else {
+            Write-Host "WARNING: MSVC ASan runtime DLL not found"
+          }
+
+          & .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe
+          Write-Host "=== ASan Test Exit Code: $LASTEXITCODE ==="
+          exit $LASTEXITCODE
