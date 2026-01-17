@@ -15,6 +15,7 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_commands), sizeof(rec.m_commands));
 
 		os.write(reinterpret_cast<const char*>(&rec.m_timecode), sizeof(rec.m_timecode));
+		os.write(reinterpret_cast<const char*>(&rec.m_subframe), sizeof(rec.m_subframe));
 		os.write(reinterpret_cast<const char*>(&rec.m_packet_no), sizeof(rec.m_packet_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_right_m), sizeof(rec.m_eye_position_right_m));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_up_m), sizeof(rec.m_eye_position_up_m));
@@ -39,7 +40,7 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_radial_coefficients_k2), sizeof(rec.m_lens_distortion_radial_coefficients_k2));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_right_mm), sizeof(rec.m_lens_distortion_center_point_right_mm));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_up_mm), sizeof(rec.m_lens_distortion_center_point_up_mm));
-		// m_reserved‚Ì•ª25ƒoƒCƒg‚ð0‚Å–„‚ß‚é
+		// m_reservedï¿½Ì•ï¿½25ï¿½oï¿½Cï¿½gï¿½ï¿½0ï¿½Å–ï¿½ï¿½ß‚ï¿½
 		os.write(reinterpret_cast<const char*>(new uint8_t[25]()), 25);
 	}
 }

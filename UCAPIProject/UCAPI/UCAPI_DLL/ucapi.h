@@ -72,8 +72,12 @@ public:
         uint32_t m_camera_no;
         uint16_t m_commands;
         uint32_t m_timecode;
-		uint32_t m_subframe;
+        float m_subframe;
         uint8_t m_packet_no;
+
+        // Timecode accessors for convenient field access
+        timecode_t get_timecode() const { return timecode_t::unpack(m_timecode); }
+        void set_timecode(const timecode_t& tc) { m_timecode = timecode_t::pack(tc); }
         float m_eye_position_right_m;
         float m_eye_position_up_m;
         float m_eye_position_forward_m;
