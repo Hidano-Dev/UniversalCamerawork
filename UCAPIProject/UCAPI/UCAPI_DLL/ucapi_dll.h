@@ -35,6 +35,9 @@ extern "C" {
     UCAPI_API ucapi_t* UCAPI_Create();
     UCAPI_API void UCAPI_Destroy(ucapi_t* obj);
 
+    // Add an empty record to the payload
+    UCAPI_API int UCAPI_AddRecord(ucapi_t* obj);
+
 #ifdef __cplusplus
 }
 #endif
