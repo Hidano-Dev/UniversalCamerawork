@@ -45,7 +45,6 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_radial_coefficients_k2), sizeof(rec.m_lens_distortion_radial_coefficients_k2));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_right_mm), sizeof(rec.m_lens_distortion_center_point_right_mm));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_up_mm), sizeof(rec.m_lens_distortion_center_point_up_mm));
-		// m_reserved�̕�25�o�C�g��0�Ŗ��߂�
 		os.write(reinterpret_cast<const char*>(RESERVED_BYTES), sizeof(RESERVED_BYTES));
 	}
 }
