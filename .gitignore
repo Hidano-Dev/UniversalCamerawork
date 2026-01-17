@@ -258,3 +258,4 @@ vcpkg_installed/
 
 # Windows null device (accidentally created)
 nul
+.claude/settings.local.json
