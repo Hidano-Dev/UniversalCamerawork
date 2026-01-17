@@ -82,6 +82,31 @@ UCAPI_API uint16_t UCAPI_CalcCRC16(const void* recordPtr, size_t length, uint16_
 - `docs/UCAPI_Data_Format_Specification.yaml` - バイナリフォーマット仕様（Header 10bytes + Record 128bytes）
 - `docs/UCAPI_DLL_Specification.md` - DLL仕様書
 
+## Git ワークフロー
+
+### ブランチプッシュ前の必須手順
+
+ブランチをプッシュする前に、必ず以下の手順を実行してください：
+
+1. 最新の main ブランチを取得
+   ```bash
+   git fetch origin main
+   ```
+
+2. 現在のブランチに main をマージ
+   ```bash
+   git merge origin/main
+   ```
+
+3. コンフリクトがないことを確認
+   - コンフリクトが発生した場合は解消してからコミット
+   - マージ後にビルドとテストが通ることを確認
+
+4. プッシュを実行
+   ```bash
+   git push -u origin <branch-name>
+   ```
+
 ## Memory Bank（知見管理システム）
 
 `memory-bank/` ディレクトリには、プロジェクトの知見・タスク管理・設計決定が集約されています。
