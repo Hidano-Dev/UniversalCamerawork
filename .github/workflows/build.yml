@@ -1,3 +1,17 @@
+# =============================================================================
+# Release Build (CD - Continuous Deployment)
+# =============================================================================
+# This workflow is responsible for building and publishing release artifacts.
+# It is triggered only when a version tag (e.g., v1.0.0, v2.0.0-beta) is pushed.
+#
+# Purpose:
+#   - Build optimized Release and ASan configurations
+#   - Run comprehensive tests including AddressSanitizer checks
+#   - Upload release artifacts (DLL and LIB files) for distribution
+#
+# For continuous integration testing on every push/PR, see gtest-ci.yml
+# =============================================================================
+
 name: Release Build (CD)
 
 on:
