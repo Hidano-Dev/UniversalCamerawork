@@ -18,16 +18,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          cd "${{ github.workspace }}/vcpkg"
+          git checkout c82f74667287d3dc386bce81e44964370c91a289
+
+      - name: Bootstrap vcpkg
+        run: |
+          & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat"
 
       - name: vcpkg install
         run: |
-            & "$env:VCPKG_ROOT\vcpkg.exe" install msgpack gtest --triplet x64-windows
-            & "$env:VCPKG_ROOT\vcpkg.exe" integrate install
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" install msgpack gtest --triplet x64-windows
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" integrate install
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -65,16 +71,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      - name: Clone vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          cd "${{ github.workspace }}/vcpkg"
+          git checkout c82f74667287d3dc386bce81e44964370c91a289
+
+      - name: Bootstrap vcpkg
+        run: |
+          & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat"
 
       - name: vcpkg install
         run: |
-            & "$env:VCPKG_ROOT\vcpkg.exe" install msgpack gtest --triplet x64-windows
-            & "$env:VCPKG_ROOT\vcpkg.exe" integrate install
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" install msgpack gtest --triplet x64-windows
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" integrate install
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
