@@ -22,6 +22,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
 
       - name: vcpkg install
         run: |
@@ -68,6 +69,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
 
       - name: vcpkg install
         run: |
