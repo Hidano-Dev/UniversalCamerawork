@@ -85,6 +85,13 @@ void ucapi_t::_clean_up() {
 }
 
 uint16_t ucapi_t::computeCRC16(record_t* record, size_t length, uint16_t poly, uint16_t initValue) {
+    // Early return for empty input to avoid potential ASan warnings on null pointer cast
+    if (length == 0) {
+        return initValue;
+    }
+    if (record == nullptr) {
+        return initValue;
+    }
     const uint8_t* data = reinterpret_cast<const uint8_t*>(record);
     uint16_t crc = initValue;
     for (size_t i = 0; i < length; ++i) {
