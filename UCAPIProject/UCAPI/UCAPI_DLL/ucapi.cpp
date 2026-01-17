@@ -5,8 +5,8 @@
 #include "ucapi.h"
 
 ucapi_t::ucapi_t(const void* dataPtr, size_t bufferSize){
-    // magic is initialized with 0x55AA
-    m_magic = 0x55AA;
+    // magic is initialized with UCAPI_MAGIC (0x55AA)
+    m_magic = UCAPI_MAGIC;
 	m_version = 0;
 	// Default to no payload when created without data
 	m_num_payload = 0;
@@ -30,12 +30,8 @@ ucapi_t::ucapi_t(const void* dataPtr, size_t bufferSize){
 
 void ucapi_t::_read(const void* dataPtr, size_t bufferSize) {
     try {
-		// Header size is 10 bytes (magic: 2, version: 2, num_payload: 2, crc16: 2, reserved: 2)
-		constexpr size_t HEADER_SIZE = 10;
-		constexpr size_t MAX_PAYLOAD_SIZE = 0x10000;
-
 		// Validate minimum buffer size for header
-		if (bufferSize < HEADER_SIZE) {
+		if (bufferSize < UCAPI_HEADER_SIZE) {
 			throw std::runtime_error("Buffer too small for header");
 		}
 
@@ -56,12 +52,12 @@ void ucapi_t::_read(const void* dataPtr, size_t bufferSize) {
 		}
 
 		// Reject invalid payload size
-		if (payloadSize > MAX_PAYLOAD_SIZE) {
+		if (payloadSize > UCAPI_MAX_PAYLOAD_SIZE) {
 			throw std::runtime_error("Invalid payload size");
 		}
 
 		// Validate buffer size for all payloads
-		size_t requiredSize = HEADER_SIZE + payloadSize;
+		size_t requiredSize = UCAPI_HEADER_SIZE + payloadSize;
 		if (bufferSize < requiredSize) {
 			throw std::runtime_error("Buffer too small for payloads");
 		}
@@ -69,7 +65,7 @@ void ucapi_t::_read(const void* dataPtr, size_t bufferSize) {
 		m_payload.clear();
 		m_payload.reserve(m_num_payload);
 		for (int i = 0; i < m_num_payload; i++) {
-			m_payload.emplace_back(payloadLength, &data[HEADER_SIZE + i * payloadLength]);
+			m_payload.emplace_back(payloadLength, &data[UCAPI_HEADER_SIZE + i * payloadLength]);
 		}
 	}
 	catch (std::exception& e) {
@@ -92,9 +88,9 @@ uint16_t ucapi_t::computeCRC16(record_t* record, size_t length, uint16_t poly, u
     const uint8_t* data = reinterpret_cast<const uint8_t*>(record);
     uint16_t crc = initValue;
     for (size_t i = 0; i < length; ++i) {
-        crc ^= static_cast<uint16_t>(data[i]) << 8;
-        for (int j = 0; j < 8; ++j) {
-            if (crc & 0x8000) {
+        crc ^= static_cast<uint16_t>(data[i]) << UCAPI_BITS_PER_BYTE;
+        for (int j = 0; j < UCAPI_BITS_PER_BYTE; ++j) {
+            if (crc & UCAPI_CRC16_MSB_MASK) {
                 crc = (crc << 1) ^ poly;
             }
             else {
@@ -148,10 +144,7 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 }
 
 void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length) {
-	// Minimum required size: last access is data[103] + 4 bytes (float) = 107 bytes
-	constexpr size_t MIN_RECORD_SIZE = 107;
-
-	if (payload_length < MIN_RECORD_SIZE) {
+	if (payload_length < UCAPI_MIN_RECORD_SIZE) {
 		throw std::runtime_error("Payload buffer too small for record");
 	}
 

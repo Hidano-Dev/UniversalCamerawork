@@ -6,6 +6,40 @@
 #include <vector>
 #include "ucapi_timecode.h"
 
+// =============================================================================
+// UCAPI Constants
+// =============================================================================
+
+/// Magic number identifying valid UCAPI data (0x55AA in little-endian)
+constexpr uint16_t UCAPI_MAGIC = 0x55AA;
+
+/// Header size in bytes: magic(2) + version(2) + num_payload(2) + crc16(2) + reserved(2)
+constexpr size_t UCAPI_HEADER_SIZE = 10;
+
+/// Maximum payload size in bytes (64KB limit for safety)
+constexpr size_t UCAPI_MAX_PAYLOAD_SIZE = 0x10000;
+
+/// Minimum record size in bytes (last field offset 103 + 4 bytes for float)
+constexpr size_t UCAPI_MIN_RECORD_SIZE = 107;
+
+// =============================================================================
+// CRC16-CCITT Constants
+// =============================================================================
+
+/// CRC16-CCITT polynomial (x^16 + x^12 + x^5 + 1)
+constexpr uint16_t UCAPI_CRC16_POLYNOMIAL = 0x1021;
+
+/// CRC16-CCITT initial value
+constexpr uint16_t UCAPI_CRC16_INIT_VALUE = 0xFFFF;
+
+/// CRC16 most significant bit mask (for bit-by-bit calculation)
+constexpr uint16_t UCAPI_CRC16_MSB_MASK = 0x8000;
+
+/// Number of bits per byte (for CRC calculation loop)
+constexpr int UCAPI_BITS_PER_BYTE = 8;
+
+// =============================================================================
+
 class ucapi_t{
 
 public:
@@ -13,7 +47,7 @@ public:
 
     ucapi_t(const void* dataPtr = nullptr, size_t bufferSize = 0);
 
-    static uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = 0x1021, uint16_t initValue = 0xFFFF);
+    static uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = UCAPI_CRC16_POLYNOMIAL, uint16_t initValue = UCAPI_CRC16_INIT_VALUE);
 
 private:
     void _read(const void* dataPtr, size_t bufferSize);
