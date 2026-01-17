@@ -103,4 +103,4 @@ jobs:
       - name: Run tests with AddressSanitizer
         run: ./UCAPIProject/UCAPI/x64/ASan/UCAPI_DLL_Test.exe
         env:
-          ASAN_OPTIONS: halt_on_error=1
+          ASAN_OPTIONS: halt_on_error=0:print_stacktrace=1:verbosity=1
