@@ -1,3 +1,17 @@
+# =============================================================================
+# Continuous Integration (CI)
+# =============================================================================
+# This workflow runs on every push to main and on all pull requests.
+# It provides fast feedback for developers by building and testing the code.
+#
+# Purpose:
+#   - Build the solution in Release configuration
+#   - Run GoogleTest suite and generate test reports
+#   - Provide quick validation for pull requests
+#
+# For release builds with artifact publishing, see build.yml (triggered by tags)
+# =============================================================================
+
 name: C++ / vcpkg + GoogleTest CI
 
 on:
