@@ -511,7 +511,7 @@ TEST(UcapiDll_Subframe, FloatBinaryRepresentation) {
   
   // Verify that the buffer contains the float representation
   // The subframe field should be serialized as a 4-byte float in little-endian
-  // 0.5f in IEEE 754 = 0x3F000000 in little-endian bytes: 00 00 00 3F
+  // 0.5f in IEEE 754 = 0x3F000000 (big-endian), which in little-endian bytes is: 00 00 00 3F
   bool found = false;
   for (size_t i = 0; i + 3 < sz; ++i) {
     if (buf[i] == 0x00 && buf[i+1] == 0x00 && buf[i+2] == 0x00 && buf[i+3] == 0x3F) {
@@ -621,7 +621,8 @@ TEST(UcapiDll_Subframe, SpecialFloatValues) {
 // Test subframe precision - ensure float precision is maintained
 TEST(UcapiDll_Subframe, FloatPrecision) {
   // Test that we maintain float precision (not double or truncated to int)
-  float testValue = 0.123456789f;  // More precision than float can hold
+  // This value tests typical float precision scenarios
+  float testValue = 0.123456789f;
   
   ucapi_t* original = UCAPI_Create();
   ASSERT_NE(original, nullptr);
