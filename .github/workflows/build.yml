@@ -101,37 +101,6 @@ jobs:
         run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=ASan /p:Platform=x64 /t:UCAPI_DLL_Test /p:VcpkgEnableManifest=true
 
       - name: Run tests with AddressSanitizer
-        shell: cmd
-        continue-on-error: true
-        run: |
-          echo === Starting ASan Tests ===
-          echo ASAN_OPTIONS=%ASAN_OPTIONS%
-          .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe --gtest_output=xml:asan_test_results.xml 2>&1
-          echo === ASan Tests Exit Code: %ERRORLEVEL% ===
+        run: .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe
         env:
-          ASAN_OPTIONS: halt_on_error=0:print_stacktrace=1:verbosity=2:log_path=asan_log
-
-      - name: Display ASan log files
-        if: always()
-        shell: pwsh
-        run: |
-          Write-Host "=== Looking for ASan log files ==="
-          Get-ChildItem -Path . -Filter "asan_log*" -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
-            Write-Host "=== Content of $($_.FullName) ==="
-            Get-Content $_.FullName
-          }
-          if (Test-Path "asan_test_results.xml") {
-            Write-Host "=== Test Results XML ==="
-            Get-Content asan_test_results.xml
-          }
-
-      - name: Upload ASan artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: asan-logs
-          path: |
-            asan_log*
-            asan_test_results.xml
-          retention-days: 7
-          if-no-files-found: ignore
+          ASAN_OPTIONS: halt_on_error=1:print_stacktrace=1
