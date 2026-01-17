@@ -6,26 +6,32 @@
 namespace ucapi {
 
 std::unique_ptr<IMessageSerializerFactory> Config::s_factory = nullptr;
-bool Config::s_initialized = false;
+std::atomic<bool> Config::s_initialized{false};
+std::once_flag Config::s_init_flag;
 
 IMessageSerializerFactory& Config::GetSerializerFactory() {
-    if (!s_initialized || !s_factory) {
+    // Use memory_order_acquire to ensure s_factory is visible after s_initialized is true
+    if (!s_initialized.load(std::memory_order_acquire) || !s_factory) {
         throw std::runtime_error("Config not initialized. Call Config::Initialize() first.");
     }
     return *s_factory;
 }
 
 void Config::Initialize() {
-    if (!s_initialized) {
+    // Thread-safe initialization using std::call_once
+    std::call_once(s_init_flag, []() {
         s_factory = std::make_unique<MessageSerializerFactoryImpl>();
-        s_initialized = true;
-    }
+        // Use memory_order_release to ensure s_factory write is visible before s_initialized
+        s_initialized.store(true, std::memory_order_release);
+    });
 }
 
 void Config::Shutdown() {
-    if (s_initialized) {
+    // Shutdown is expected to be called only from DllMain DLL_PROCESS_DETACH
+    // where no other threads should be accessing Config
+    if (s_initialized.load(std::memory_order_acquire)) {
         s_factory.reset();
-        s_initialized = false;
+        s_initialized.store(false, std::memory_order_release);
     }
 }
 
