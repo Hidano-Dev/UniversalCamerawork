@@ -3,18 +3,24 @@
 #include <cstring>
 #include "ucapi.h"
 
+namespace {
+	// Zero-initialized array for reserved bytes in payload
+	constexpr uint8_t RESERVED_BYTES[25] = {0};
+}
+
 void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 	os.write(reinterpret_cast<const char*>(&obj->m_magic), sizeof(obj->m_magic));
 	os.write(reinterpret_cast<const char*>(&obj->m_version), sizeof(obj->m_version));
 	os.write(reinterpret_cast<const char*>(&obj->m_num_payload), sizeof(obj->m_num_payload));
 	os.write(reinterpret_cast<const char*>(&obj->m_crc16), sizeof(obj->m_crc16));
-
+	
 	for (int i = 0; i < obj->m_num_payload; i++) {
 		auto rec = obj->m_payload[i];
 		os.write(reinterpret_cast<const char*>(&rec.m_camera_no), sizeof(rec.m_camera_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_commands), sizeof(rec.m_commands));
 
 		os.write(reinterpret_cast<const char*>(&rec.m_timecode), sizeof(rec.m_timecode));
+		os.write(reinterpret_cast<const char*>(&rec.m_subframe), sizeof(rec.m_subframe));
 		os.write(reinterpret_cast<const char*>(&rec.m_packet_no), sizeof(rec.m_packet_no));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_right_m), sizeof(rec.m_eye_position_right_m));
 		os.write(reinterpret_cast<const char*>(&rec.m_eye_position_up_m), sizeof(rec.m_eye_position_up_m));
@@ -39,7 +45,6 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_radial_coefficients_k2), sizeof(rec.m_lens_distortion_radial_coefficients_k2));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_right_mm), sizeof(rec.m_lens_distortion_center_point_right_mm));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_up_mm), sizeof(rec.m_lens_distortion_center_point_up_mm));
-		// m_reserved‚Ì•ª25ƒoƒCƒg‚ð0‚Å–„‚ß‚é
-		os.write(reinterpret_cast<const char*>(new uint8_t[25]()), 25);
+		os.write(reinterpret_cast<const char*>(RESERVED_BYTES), sizeof(RESERVED_BYTES));
 	}
 }
