@@ -2,7 +2,7 @@
     "name": "UcApi4Unity.UnityCamera",
     "rootNamespace": "",
     "references": [
-        "GUID:2e3e0626734e26f42a277eae0f0bc283"
+        "UcApi.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

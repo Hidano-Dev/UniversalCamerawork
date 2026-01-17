@@ -23,16 +23,17 @@ Unity側スクリプト群の構成レビューで発見された改善項目一
 - **備考**: 2026-01-17 ファイル移動せずAssets以下にpackage.jsonとREADME.mdを作成
 
 ### UNITY-002: Assembly Definition参照方式の修正
-- **ステータス**: [ ] 未着手
+- **ステータス**: [x] 完了
 - **概要**: asmdefファイルでGUID参照を使用しており、ファイル移動時に破損リスクあり
 - **対応内容**:
   - 全asmdefファイルのGUID参照をアセットパス参照に変更
 - **対象ファイル**:
-  - `Runtime/Core/UcApi.Core.asmdef`
-  - `Runtime/UnityCamera/UcApi4Unity.UnityCamera.asmdef`
-  - `Runtime/CinemachineCamera/UcApi4Unity.CinemachineCamera.asmdef`
-  - `Sample/Scripts/UcApi4Unity.Sample.asmdef`
-  - `Tests/UcApiTest.asmdef`
+  - `Runtime/Core/UcApi.Core.asmdef` - 参照なし、変更不要
+  - `Runtime/UnityCamera/UcApi4Unity.UnityCamera.asmdef` - [x] 修正済み
+  - `Runtime/CinemachineCamera/UcApi4Unity.CinemachineCamera.asmdef` - [x] 修正済み
+  - `Sample/Scripts/UcApi4Unity.Sample.asmdef` - [x] 修正済み
+  - `Tests/UcApiTest.asmdef` - 既に名前参照使用
+- **備考**: 2026-01-17 GUID参照を名前参照に変換完了
 
 ### UNITY-003: TimeCode実時間取得機能の追加
 - **ステータス**: [ ] 未着手
