@@ -4,7 +4,6 @@
 #include <memory>
 #include <msgpack.hpp>
 #include "ucapi.h"
-#include "ucapi_msgpack_converter.h"
 #include "ucapi_config.h"
 
 UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount) {
@@ -27,7 +26,7 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
         }
         
         auto native = std::make_unique<ucapi_t>();
-        native->m_magic = 0x55AA;
+        native->m_magic = UCAPI_MAGIC;
         native->m_version = 1;
         native->m_num_payload = 1;
         native->m_crc16 = 0;

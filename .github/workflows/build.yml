@@ -23,6 +23,11 @@ jobs:
         with:
           vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
 
+      - name: vcpkg install
+        run: |
+            & "$env:VCPKG_ROOT\vcpkg.exe" install msgpack gtest --triplet x64-windows
+            & "$env:VCPKG_ROOT\vcpkg.exe" integrate install
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
