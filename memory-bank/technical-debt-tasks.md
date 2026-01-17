@@ -4,110 +4,7 @@
 
 ---
 
-## P0: 緊急対応（セキュリティ・安定性に直結）
-
-### P0-1: メモリリーク修正 - payloadArray
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp` 行57
-- **問題**: `new std::vector<record_t>()` が割り当てられたまま未使用・未削除
-- **対応**: 不要なコードを削除、または意図した用途があれば適切に使用・削除する
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**: 未使用の`payloadArray`変数を削除
-
-### P0-2: メモリリーク修正 - reserved配列
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp` 行124
-- **問題**: `record_t`コンストラクタで`uint8_t* reserved = new uint8_t[25]`が確保されるが、`_clean_up()`が空実装のためデストラクタで削除されない
-- **対応**:
-  - `_clean_up()`に削除処理を追加
-  - または`std::array<uint8_t, 25>`に変更してRAII化
-  - または`std::unique_ptr<uint8_t[]>`を使用
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**: クラスメンバとして使用されていないローカル変数`reserved`を削除
-
-### P0-3: バッファオーバーフロー修正 - record_t::_read()
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp` 行138-169
-- **問題**:
-  - `payload_length`パラメータが宣言されているが使用されていない
-  - 入力バッファの境界チェックがない
-  - offset 103までアクセスするが、データ長の検証なし
-- **対応**:
-  - `payload_length`を使用してアクセス前に境界チェック
-  - 最小必要サイズ（107バイト以上）の検証を追加
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**:
-  - `MIN_RECORD_SIZE = 107`の定数を追加
-  - `payload_length < MIN_RECORD_SIZE`の場合は例外をスロー
-
-### P0-4: バッファオーバーフロー修正 - ucapi_t::_read()
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp` 行31-68
-- **問題**:
-  - ヘッダ読み込み時に最小長（8バイト）のチェックがない
-  - `m_num_payload`が異常値の場合、ループが暴走
-  - `&data[10 + i * payloadLength]`へのアクセスが境界外になる可能性
-- **対応**:
-  - ヘッダ読み込み前に最小バッファ長を検証
-  - `m_num_payload`の上限値チェック
-  - ペイロードアクセス前にバッファ長との整合性を検証
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**:
-  - コンストラクタとヘッダに`bufferSize`パラメータを追加
-  - `HEADER_SIZE = 10`、`MAX_PAYLOAD_SIZE = 0x10000`の定数を追加
-  - ヘッダ読み込み前に`bufferSize < HEADER_SIZE`チェック
-  - ペイロード読み込み前に`bufferSize < requiredSize`チェック
-
-### P0-5: スレッド安全性修正 - Config初期化
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_config.cpp` 行18-23
-- **問題**:
-  - `s_initialized`と`s_factory`のチェック・設定がthread-unsafe
-  - DLL Mainから呼び出されるため、複数スレッドでの競合状態（TOCTOU問題）が発生可能
-- **対応**:
-  - `std::call_once`と`std::once_flag`を使用してthread-safe化
-  - またはC++11のスタティックローカル変数初期化（Magic Statics）を利用
-- **状態**: [x] 完了
-- **実装詳細**:
-  - `s_initialized`を`std::atomic<bool>`に変更
-  - `std::once_flag s_init_flag`を追加
-  - `Initialize()`で`std::call_once`を使用してスレッドセーフ化
-  - `memory_order_acquire/release`でメモリ順序を保証
-
-### P0-6: 例外時リソースリーク修正 - UCAPI_Deserialize
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_dll.cpp` 行9-42
-- **問題**: `new ucapi_t()`後に例外が発生した場合、割り当てたメモリが削除されない
-- **対応**:
-  - `std::unique_ptr<ucapi_t>`を使用してRAII化
-  - 成功時に`release()`でポインタを返却
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**:
-  - `<memory>`ヘッダを追加
-  - `new ucapi_t()`を`std::make_unique<ucapi_t>()`に変更
-  - 成功時に`native.release()`でポインタを返却
-  - 例外発生時は`unique_ptr`のデストラクタが自動的にメモリ解放
-
----
-
 ## P1: 重要（品質・保守性向上）
-
-### P1-1: _clean_up()関数の実装
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp` 行194-198
-- **問題**: `_clean_up()`が空実装のため、リソースクリーンアップが機能していない
-- **対応**: 動的確保したリソースの削除処理を実装
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**:
-  - 現在の`record_t`は全メンバがPOD型（uint32_t, uint16_t, uint8_t, float）で動的リソースなし
-  - `ucapi_t::_clean_up()`は既に`m_payload.clear()`を実装済み
-  - `record_t::_clean_up()`に将来の拡張に備えたドキュメントコメントを追加
-
-### P1-2: CRC16テストに参照値を追加
-- **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL_Test/test.cpp`
-- **問題**: CRC16テストが決定性のみを確認し、計算結果の正当性を検証していない
-- **対応**:
-  - 業界標準のCRC16-CCITT参照値との比較テストを追加
-  - 複数のテストベクタで正当性を検証
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**:
-  - CRC16-CCITT-FALSE標準テストベクタ "123456789" -> 0x29B1 を追加
-  - 単一バイトテスト (0x00 -> 0xE1F0, 0xFF -> 0xFF00) を追加
-  - CRC-16/XMODEMテストベクタ (init=0x0000) "123456789" -> 0x31C3 を追加
-  - 複数バイトテスト (4x0x00 -> 0x84C0, 4x0xFF -> 0x1D0F) を追加
 
 ### P1-3: エッジケーステスト・異常系テストの追加
 - **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL_Test/test.cpp`
@@ -153,19 +50,6 @@
 ---
 
 ## P2: 改善推奨（保守性・開発体験向上）
-
-### P2-1: vcpkg依存関係の明示化
-- **ファイル**:
-  - `vcpkg.json`（新規作成）
-  - `UCAPIProject/UCAPI/UCAPI_DLL/UCAPI_DLL.vcxproj`
-- **問題**: `vcpkg.json`がなく、msgpack等の依存関係バージョンが不明確
-- **対応**: `vcpkg.json`を作成し、依存ライブラリを明示
-- **状態**: [x] 完了 (2026-01-17)
-- **実装詳細**:
-  - `UCAPIProject/UCAPI/vcpkg.json`を作成（msgpack依存を明示）
-  - `UCAPI_DLL.vcxproj`に`VcpkgEnableManifest=true`を追加
-  - `MSGPACK_NO_BOOST`プリプロセッサ定義を追加（boost依存を削除、軽量化）
-  - vcpkgをD:\vcpkgにインストール、VS2022にMSBuild統合
 
 ### P2-2: マジックナンバーの定数化
 - **ファイル**:
@@ -234,8 +118,14 @@
 - **対応**:
   - GitHub Actionsでビルド・テスト自動化
   - ビルドバッジをREADMEに追加
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
 - **統合元**: tasks.md P2「CI定義＆README更新」
+- **実装詳細**:
+  - `.github/workflows/build.yml`を作成
+  - トリガー: mainへのpush + mainへのPR
+  - 構成: Release x64
+  - ステップ: vcpkgセットアップ → NuGet復元 → ビルド → テスト → アーティファクト保存
+  - README.mdにビルドバッジを追加
 
 ### P2-8: FlatBuffers対応シリアライザ実装（将来検討）
 - **ファイル**:
@@ -306,10 +196,17 @@
 - `UCAPI_DLL.vcxproj`にマニフェストモード有効化 + MSGPACK_NO_BOOST追加
 - vcpkgをD:\vcpkgにインストール、VS2022にMSBuild統合
 
+### P2-7: CI/CD環境構築 ✓
+- 2026-01-17 完了
+- `.github/workflows/build.yml`を作成（GitHub Actions）
+- トリガー: mainへのpush + mainへのPR、構成: Release x64
+- README.mdにビルドバッジを追加
+
 ---
 
 ## 更新履歴
 
+- 2026-01-17: P2-7完了（GitHub Actions CI/CD環境構築、ビルドバッジ追加）
 - 2026-01-17: P2-1完了（vcpkg.json作成、マニフェストモード有効化、MSGPACK_NO_BOOST追加）
 - 2026-01-17: P1-2完了（CRC16テストに業界標準参照値を追加）
 - 2026-01-17: tasks.mdから有効なタスクを統合（P1-3拡張、P2-6拡張、P2-7/P2-8/P2-9新規追加）

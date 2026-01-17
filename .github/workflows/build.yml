@@ -1,0 +1,52 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  SOLUTION_PATH: UCAPIProject/UCAPI/UCAPI.sln
+  VCPKG_DEFAULT_TRIPLET: x64-windows
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: 'c82f74667287d3dc386bce81e44964370c91a289'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build UCAPI_DLL (Release x64)
+        run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=Release /p:Platform=x64 /t:UCAPI_DLL /p:VcpkgEnableManifest=true
+
+      - name: Build UCAPI_DLL_Test (Release x64)
+        run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=Release /p:Platform=x64 /t:UCAPI_DLL_Test /p:VcpkgEnableManifest=true
+
+      - name: Run tests
+        run: ./UCAPIProject/UCAPI/x64/Release/UCAPI_DLL_Test.exe
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: UCAPI_DLL-Release-x64
+          path: |
+            UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.dll
+            UCAPIProject/UCAPI/x64/Release/UCAPI_DLL.lib
+          retention-days: 30
