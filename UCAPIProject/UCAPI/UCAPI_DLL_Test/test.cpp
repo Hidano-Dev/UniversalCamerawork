@@ -4,6 +4,8 @@
 #include <atomic>
 #include <vector>
 #include <cstring>
+#include <limits>
+#include <cmath>
 
 // Deserialize 正常系
 TEST(UcapiDll_Deserialize, ValidBuffer) {
@@ -484,4 +486,202 @@ TEST(UcapiDll_MultiThread, ConcurrentCRC16) {
 
   EXPECT_EQ(successCount.load(), NUM_THREADS * ITERATIONS);
   EXPECT_EQ(failureCount.load(), 0);
+}
+
+// =============================================================================
+// P2-4: m_subframe float serialization tests
+// =============================================================================
+
+// Test that m_subframe is correctly serialized as a float (4 bytes)
+TEST(UcapiDll_Subframe, FloatBinaryRepresentation) {
+  ucapi_t* obj = UCAPI_Create();
+  ASSERT_NE(obj, nullptr);
+  
+  // Add a payload record with a specific subframe value
+  obj->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
+  obj->m_num_payload = 1;
+  obj->m_payload[0].m_subframe = 0.5f;
+  
+  uint8_t* buf = nullptr;
+  size_t sz = 0;
+  int res = UCAPI_Serialize(obj, &buf, &sz);
+  ASSERT_EQ(res, 0);
+  ASSERT_NE(buf, nullptr);
+  ASSERT_GT(sz, 0u);
+  
+  // Verify that the buffer contains the float representation
+  // The subframe field should be serialized as a 4-byte float in little-endian
+  // 0.5f in IEEE 754 = 0x3F000000 in little-endian bytes: 00 00 00 3F
+  bool found = false;
+  for (size_t i = 0; i + 3 < sz; ++i) {
+    if (buf[i] == 0x00 && buf[i+1] == 0x00 && buf[i+2] == 0x00 && buf[i+3] == 0x3F) {
+      found = true;
+      break;
+    }
+  }
+  
+  EXPECT_TRUE(found) << "Expected to find 0.5f as bytes [00 00 00 3F] in serialized buffer";
+  
+  UCAPI_FreeBuffer(buf);
+  UCAPI_Destroy(obj);
+}
+
+// Test round-trip serialization/deserialization of various subframe float values
+TEST(UcapiDll_Subframe, RoundTripConsistency) {
+  // Test various float values including edge cases
+  std::vector<float> testValues = {
+    0.0f,
+    0.5f,
+    1.0f,
+    -0.5f,
+    0.25f,
+    0.75f,
+    1.5f,
+    -1.5f,
+    123.456f,
+    0.001f,
+    0.999f
+  };
+  
+  for (float testValue : testValues) {
+    ucapi_t* original = UCAPI_Create();
+    ASSERT_NE(original, nullptr);
+    
+    // Add a payload record with the test subframe value
+    original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
+    original->m_num_payload = 1;
+    original->m_payload[0].m_subframe = testValue;
+    
+    // Serialize
+    uint8_t* buf = nullptr;
+    size_t sz = 0;
+    int res = UCAPI_Serialize(original, &buf, &sz);
+    ASSERT_EQ(res, 0);
+    ASSERT_NE(buf, nullptr);
+    
+    // Deserialize
+    ucapi_t* restored = UCAPI_Deserialize(buf, sz);
+    ASSERT_NE(restored, nullptr);
+    ASSERT_EQ(restored->m_num_payload, 1);
+    
+    // Verify the subframe value is preserved exactly
+    EXPECT_FLOAT_EQ(restored->m_payload[0].m_subframe, testValue) 
+      << "Subframe value " << testValue << " was not preserved in round-trip";
+    
+    UCAPI_FreeBuffer(buf);
+    UCAPI_Destroy(original);
+    UCAPI_Destroy(restored);
+  }
+}
+
+// Test special float values (NaN, infinity)
+TEST(UcapiDll_Subframe, SpecialFloatValues) {
+  std::vector<float> specialValues = {
+    std::numeric_limits<float>::infinity(),
+    -std::numeric_limits<float>::infinity(),
+    std::numeric_limits<float>::quiet_NaN(),
+    std::numeric_limits<float>::min(),
+    std::numeric_limits<float>::max(),
+    std::numeric_limits<float>::epsilon()
+  };
+  
+  for (float testValue : specialValues) {
+    ucapi_t* original = UCAPI_Create();
+    ASSERT_NE(original, nullptr);
+    
+    original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
+    original->m_num_payload = 1;
+    original->m_payload[0].m_subframe = testValue;
+    
+    uint8_t* buf = nullptr;
+    size_t sz = 0;
+    int res = UCAPI_Serialize(original, &buf, &sz);
+    ASSERT_EQ(res, 0);
+    ASSERT_NE(buf, nullptr);
+    
+    ucapi_t* restored = UCAPI_Deserialize(buf, sz);
+    ASSERT_NE(restored, nullptr);
+    ASSERT_EQ(restored->m_num_payload, 1);
+    
+    // For NaN, we need special comparison since NaN != NaN
+    if (std::isnan(testValue)) {
+      EXPECT_TRUE(std::isnan(restored->m_payload[0].m_subframe)) 
+        << "NaN value was not preserved in round-trip";
+    } else {
+      EXPECT_FLOAT_EQ(restored->m_payload[0].m_subframe, testValue) 
+        << "Special float value was not preserved in round-trip";
+    }
+    
+    UCAPI_FreeBuffer(buf);
+    UCAPI_Destroy(original);
+    UCAPI_Destroy(restored);
+  }
+}
+
+// Test subframe precision - ensure float precision is maintained
+TEST(UcapiDll_Subframe, FloatPrecision) {
+  // Test that we maintain float precision (not double or truncated to int)
+  float testValue = 0.123456789f;  // More precision than float can hold
+  
+  ucapi_t* original = UCAPI_Create();
+  ASSERT_NE(original, nullptr);
+  
+  original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
+  original->m_num_payload = 1;
+  original->m_payload[0].m_subframe = testValue;
+  
+  uint8_t* buf = nullptr;
+  size_t sz = 0;
+  int res = UCAPI_Serialize(original, &buf, &sz);
+  ASSERT_EQ(res, 0);
+  
+  ucapi_t* restored = UCAPI_Deserialize(buf, sz);
+  ASSERT_NE(restored, nullptr);
+  
+  // The restored value should match exactly (not lose precision to double conversion)
+  EXPECT_FLOAT_EQ(restored->m_payload[0].m_subframe, testValue);
+  
+  // Verify the binary representation is exactly 4 bytes (float, not double)
+  float originalValue = original->m_payload[0].m_subframe;
+  float restoredValue = restored->m_payload[0].m_subframe;
+  
+  EXPECT_EQ(sizeof(originalValue), 4u) << "m_subframe should be 4-byte float";
+  EXPECT_EQ(sizeof(restoredValue), 4u) << "m_subframe should be 4-byte float";
+  
+  UCAPI_FreeBuffer(buf);
+  UCAPI_Destroy(original);
+  UCAPI_Destroy(restored);
+}
+
+// Test multiple records with different subframe values
+TEST(UcapiDll_Subframe, MultipleRecordsWithDifferentValues) {
+  ucapi_t* original = UCAPI_Create();
+  ASSERT_NE(original, nullptr);
+  
+  // Add multiple records with different subframe values
+  std::vector<float> subframeValues = {0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
+  for (float value : subframeValues) {
+    original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
+    original->m_payload.back().m_subframe = value;
+  }
+  original->m_num_payload = static_cast<uint16_t>(subframeValues.size());
+  
+  uint8_t* buf = nullptr;
+  size_t sz = 0;
+  int res = UCAPI_Serialize(original, &buf, &sz);
+  ASSERT_EQ(res, 0);
+  
+  ucapi_t* restored = UCAPI_Deserialize(buf, sz);
+  ASSERT_NE(restored, nullptr);
+  ASSERT_EQ(restored->m_num_payload, subframeValues.size());
+  
+  // Verify each record's subframe value is preserved
+  for (size_t i = 0; i < subframeValues.size(); ++i) {
+    EXPECT_FLOAT_EQ(restored->m_payload[i].m_subframe, subframeValues[i])
+      << "Record " << i << " subframe value mismatch";
+  }
+  
+  UCAPI_FreeBuffer(buf);
+  UCAPI_Destroy(original);
+  UCAPI_Destroy(restored);
 }
