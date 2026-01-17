@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(msbuild:*)",
+      "Bash(cmd //c \"where msbuild 2>nul\")",
+      "Bash(cmd //c:*)",
+      "Bash(cmd /c:*)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe\" \"D:/Personal/Repositries/UniversalCamerawork/UCAPIProject/UCAPI/UCAPI_DLL.sln\" /p:Configuration=Debug /p:Platform=x64 /v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe\" \"D:/Personal/Repositries/UniversalCamerawork/UCAPIProject/UCAPI/UCAPI_DLL.sln\" -p:Configuration=Debug -p:Platform=x64 -v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe\" \"D:/Personal/Repositries/UniversalCamerawork/UCAPIProject/UCAPI/UCAPI.sln\" -p:Configuration=Debug -p:Platform=x64 -v:minimal)",
+      "Bash(\"/c/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe\" /c /EHsc /std:c++17 /I\"D:/Personal/Repositries/UniversalCamerawork/UCAPIProject/UCAPI/UCAPI_DLL\" /Zs \"D:/Personal/Repositries/UniversalCamerawork/UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp\")",
+      "Bash(cmd /c \"cd /d \"\"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\"\" && \"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\"\" UCAPI_DLL.sln /p:Configuration=Debug /p:Platform=x64 /v:minimal\")",
+      "Bash(cmd /c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\Common7\\\\Tools\\\\VsDevCmd.bat\"\" && cd /d \"\"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\"\" && msbuild UCAPI_DLL.sln /p:Configuration=Debug /p:Platform=x64 /v:minimal\")",
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\\\\UCAPI_DLL.sln\" /p:Configuration=Debug /p:Platform=x64 /v:minimal)",
+      "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\\\\UCAPI_DLL.sln\" -p:Configuration=Debug -p:Platform=x64 -v:minimal)",
+      "Bash(git add:*)"
+    ]
+  }
+}
