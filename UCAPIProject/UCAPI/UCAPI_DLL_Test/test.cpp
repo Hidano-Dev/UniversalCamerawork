@@ -498,8 +498,8 @@ TEST(UcapiDll_Subframe, FloatBinaryRepresentation) {
   ASSERT_NE(obj, nullptr);
   
   // Add a payload record with a specific subframe value
-  obj->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
-  obj->m_num_payload = 1;
+  int res_add = UCAPI_AddRecord(obj);
+  ASSERT_EQ(res_add, 0);
   obj->m_payload[0].m_subframe = 0.5f;
   
   uint8_t* buf = nullptr;
@@ -548,8 +548,8 @@ TEST(UcapiDll_Subframe, RoundTripConsistency) {
     ASSERT_NE(original, nullptr);
     
     // Add a payload record with the test subframe value
-    original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
-    original->m_num_payload = 1;
+    int res_add = UCAPI_AddRecord(original);
+    ASSERT_EQ(res_add, 0);
     original->m_payload[0].m_subframe = testValue;
     
     // Serialize
@@ -589,8 +589,8 @@ TEST(UcapiDll_Subframe, SpecialFloatValues) {
     ucapi_t* original = UCAPI_Create();
     ASSERT_NE(original, nullptr);
     
-    original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
-    original->m_num_payload = 1;
+    int res_add = UCAPI_AddRecord(original);
+    ASSERT_EQ(res_add, 0);
     original->m_payload[0].m_subframe = testValue;
     
     uint8_t* buf = nullptr;
@@ -627,8 +627,8 @@ TEST(UcapiDll_Subframe, FloatPrecision) {
   ucapi_t* original = UCAPI_Create();
   ASSERT_NE(original, nullptr);
   
-  original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
-  original->m_num_payload = 1;
+  int res_add = UCAPI_AddRecord(original);
+  ASSERT_EQ(res_add, 0);
   original->m_payload[0].m_subframe = testValue;
   
   uint8_t* buf = nullptr;
@@ -662,10 +662,10 @@ TEST(UcapiDll_Subframe, MultipleRecordsWithDifferentValues) {
   // Add multiple records with different subframe values
   std::vector<float> subframeValues = {0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
   for (float value : subframeValues) {
-    original->m_payload.emplace_back(ucapi_t::record_t(0, nullptr));
+    int res_add = UCAPI_AddRecord(original);
+    ASSERT_EQ(res_add, 0);
     original->m_payload.back().m_subframe = value;
   }
-  original->m_num_payload = static_cast<uint16_t>(subframeValues.size());
   
   uint8_t* buf = nullptr;
   size_t sz = 0;
