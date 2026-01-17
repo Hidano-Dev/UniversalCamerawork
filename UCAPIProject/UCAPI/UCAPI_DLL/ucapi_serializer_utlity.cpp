@@ -9,6 +9,9 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 	os.write(reinterpret_cast<const char*>(&obj->m_num_payload), sizeof(obj->m_num_payload));
 	os.write(reinterpret_cast<const char*>(&obj->m_crc16), sizeof(obj->m_crc16));
 
+	// Static zero-initialized array for reserved bytes
+	static const uint8_t reserved[25] = {0};
+	
 	for (int i = 0; i < obj->m_num_payload; i++) {
 		auto rec = obj->m_payload[i];
 		os.write(reinterpret_cast<const char*>(&rec.m_camera_no), sizeof(rec.m_camera_no));
@@ -41,6 +44,6 @@ void write_ucapi(const ucapi_t* obj, std::ostream& os) {
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_right_mm), sizeof(rec.m_lens_distortion_center_point_right_mm));
 		os.write(reinterpret_cast<const char*>(&rec.m_lens_distortion_center_point_up_mm), sizeof(rec.m_lens_distortion_center_point_up_mm));
 		// m_reserved�̕�25�o�C�g��0�Ŗ��߂�
-		os.write(reinterpret_cast<const char*>(new uint8_t[25]()), 25);
+		os.write(reinterpret_cast<const char*>(reserved), 25);
 	}
 }
