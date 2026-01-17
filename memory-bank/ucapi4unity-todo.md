@@ -12,14 +12,15 @@ Unity側スクリプト群の構成レビューで発見された改善項目一
 ## 🔴 高優先度 (P0)
 
 ### UNITY-001: UPMパッケージ化対応
-- **ステータス**: [ ] 未着手
+- **ステータス**: [~] 進行中（部分完了）
 - **概要**: `package.json` がなくUnityPackageManagerで配布できない構成
 - **対応内容**:
-  - `Packages/com.universalcamerawork.ucapi4unity/` へファイル移動
-  - `package.json` 作成（name, version, displayName, dependencies等）
-  - サンプルを `Samples~/` フォルダへ移動（UPM標準形式）
-  - `README.md` 追加
+  - [ ] `Packages/com.universalcamerawork.ucapi4unity/` へファイル移動
+  - [x] `package.json` 作成（name, version, displayName, dependencies等）
+  - [ ] サンプルを `Samples~/` フォルダへ移動（UPM標準形式）
+  - [x] `README.md` 追加
 - **影響範囲**: ディレクトリ構成全体
+- **備考**: 2026-01-17 ファイル移動せずAssets以下にpackage.jsonとREADME.mdを作成
 
 ### UNITY-002: Assembly Definition参照方式の修正
 - **ステータス**: [ ] 未着手
