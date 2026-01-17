@@ -23,8 +23,8 @@ jobs:
 
       - name: vcpkg install
         run: |
-            $env:VCPKG_ROOT/vcpkg install msgpack gtest --triplet x64-windows
-            $env:VCPKG_ROOT/vcpkg integrate install
+            & "$env:VCPKG_ROOT\vcpkg.exe" install msgpack gtest --triplet x64-windows
+            & "$env:VCPKG_ROOT\vcpkg.exe" integrate install
 
       # ③ MSBuild を PATH へ
       - name: Add MSBuild to PATH
