@@ -106,7 +106,13 @@ jobs:
           echo === ASan Test Starting ===
           set ASAN_OPTIONS=halt_on_error=1:print_stacktrace=1:verbosity=1
           set PATH=%cd%\UCAPIProject\UCAPI\x64\ASan;%PATH%
-          echo PATH includes: %cd%\UCAPIProject\UCAPI\x64\ASan
-          dir .\UCAPIProject\UCAPI\x64\ASan\*.dll
+          for /d %%i in ("C:\Program Files\Microsoft Visual Studio\2022\*") do (
+            for /d %%j in ("%%i\VC\Tools\MSVC\*") do (
+              if exist "%%j\bin\Hostx64\x64\clang_rt.asan_dynamic-x86_64.dll" (
+                echo Found ASan runtime at: %%j\bin\Hostx64\x64
+                set PATH=%%j\bin\Hostx64\x64;%PATH%
+              )
+            )
+          )
           .\UCAPIProject\UCAPI\x64\ASan\UCAPI_DLL_Test.exe 2>&1
           echo === ASan Test Exit Code: %ERRORLEVEL% ===
