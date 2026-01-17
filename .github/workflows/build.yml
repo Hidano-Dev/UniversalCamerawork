@@ -9,6 +9,7 @@ on:
 env:
   SOLUTION_PATH: UCAPIProject/UCAPI/UCAPI.sln
   VCPKG_DEFAULT_TRIPLET: x64-windows
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
 jobs:
   build:
@@ -32,8 +33,6 @@ jobs:
         run: |
           & "${{ github.workspace }}/vcpkg/vcpkg.exe" install msgpack gtest --triplet x64-windows
           & "${{ github.workspace }}/vcpkg/vcpkg.exe" integrate install
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -85,8 +84,6 @@ jobs:
         run: |
           & "${{ github.workspace }}/vcpkg/vcpkg.exe" install msgpack gtest --triplet x64-windows
           & "${{ github.workspace }}/vcpkg/vcpkg.exe" integrate install
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
