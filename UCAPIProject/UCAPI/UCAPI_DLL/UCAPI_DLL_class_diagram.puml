@@ -105,9 +105,6 @@ class Config {
 class ucapi_msgpack_record_t
 class ucapi_msgpack_t
 
-' 変換ユーティリティ
-class "convert_to_ucapi()/convert_to_msgpack()" as Converter
-
 ' 関連
 ucapi_t "1" *-- "0..n" ucapi_t::record_t
 ucapi_t::record_t o-- timecode_t
@@ -115,7 +112,5 @@ MessagePackSerializer ..> ucapi_msgpack_record_t
 MessagePackSerializer ..> ucapi_msgpack_t
 MessageSerializerFactoryImpl o-- IMessageSerializer
 Config o-- IMessageSerializerFactory
-Converter ..> ucapi_t
-Converter ..> ucapi_msgpack_t
 
 @enduml

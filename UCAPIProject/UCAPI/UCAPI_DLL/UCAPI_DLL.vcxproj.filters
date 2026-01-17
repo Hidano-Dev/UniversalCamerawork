@@ -30,9 +30,6 @@
     <ClInclude Include="ucapi_msgpack_types.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="ucapi_msgpack_converter.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="ucapi_serializer_utility.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -66,9 +63,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ucapi.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ucapi_msgpack_converter.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ucapi_serializer_utlity.cpp">
