@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Universal Camerawork API - Cross-platform camera state sharing library",
   "dependencies": [
-    "msgpack"
+    "msgpack",
+    "gtest"
   ]
 }
