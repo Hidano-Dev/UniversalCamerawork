@@ -12,6 +12,9 @@
   - P0-6: 例外時リソースリーク修正 - UCAPI_Deserialize
 - **P1-1完了**: _clean_up()関数の実装 (2026-01-17)
 - **P1-6完了**: 未使用コードの削除 - convert_to_ucapi/convert_to_msgpack (2026-01-17)
+- **P2-4完了**: timecode_tとucapi_tの統合 (2026-01-17)
+  - アクセサメソッド `get_timecode()` / `set_timecode()` を追加
+  - `m_subframe` の型を `uint32_t` から `float` に修正（仕様書準拠）
 
 ## 進行中
 - P1タスク（品質・保守性向上）
@@ -34,6 +37,7 @@
 - Unityプラグイン（UCAPI4Unity）のUPMパッケージ化対応
 
 ## 更新履歴
+- 2026-01-17: P2-4完了（timecode_tとucapi_tの統合: アクセサ追加、m_subframeをfloatに修正）
 - 2026-01-17: P1-6完了（未使用コードの削除）
 - 2026-01-17: P0タスク全完了、P1-1完了を反映
 - 2025-06-19: 初版作成

@@ -105,7 +105,13 @@
 - **対応**:
   - `timecode_t`を`ucapi_t`から使用するよう統合
   - または不要なら削除
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - 方針A（アクセサメソッド追加）を採用
+  - `record_t::get_timecode()` / `set_timecode()` アクセサを追加
+  - `m_subframe` の型を `uint32_t` から `float` に修正（仕様書準拠）
+  - `ucapi_serializer_utlity.cpp` に欠落していた `m_subframe` 書き込みを追加
+  - `ucapi_msgpack_types.h` の `subframe` を `float` に修正
 
 ### P2-5: コメント言語の統一
 - **ファイル**:
@@ -259,10 +265,18 @@
 - プロジェクト方針: 英語に統一
 - dllmain.cpp, framework.h, pch.h, pch.cppの日本語コメントを英語に翻訳
 
+### P2-4: timecode_tとucapi_tの統合 ✓
+- 2026-01-17 完了
+- 方針A（アクセサメソッド追加）を採用: `get_timecode()` / `set_timecode()`
+- `m_subframe` の型を `uint32_t` から `float` に修正（仕様書準拠）
+- `ucapi_serializer_utlity.cpp` に欠落していた `m_subframe` 書き込みを追加
+- `ucapi_msgpack_types.h` の `subframe` を `float` に修正
+
 ---
 
 ## 更新履歴
 
+- 2026-01-17: P2-4完了（timecode_tとucapi_tの統合: アクセサ追加、m_subframeをfloatに修正）
 - 2026-01-17: P2-5完了（コメント言語の英語統一: dllmain.cpp, framework.h, pch.h, pch.cpp）
 - 2026-01-17: P1-6完了（未使用コードの削除 - convert_to_ucapi/convert_to_msgpack）
 - 2026-01-17: P2-2完了（マジックナンバーの定数化、8定数をucapi.hに定義）
