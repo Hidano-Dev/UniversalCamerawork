@@ -160,7 +160,12 @@
   - `UCAPIProject/UCAPI/UCAPI_DLL/UCAPI_DLL.vcxproj`
 - **問題**: `vcpkg.json`がなく、msgpack等の依存関係バージョンが不明確
 - **対応**: `vcpkg.json`を作成し、依存ライブラリを明示
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - `UCAPIProject/UCAPI/vcpkg.json`を作成（msgpack依存を明示）
+  - `UCAPI_DLL.vcxproj`に`VcpkgEnableManifest=true`を追加
+  - `MSGPACK_NO_BOOST`プリプロセッサ定義を追加（boost依存を削除、軽量化）
+  - vcpkgをD:\vcpkgにインストール、VS2022にMSBuild統合
 
 ### P2-2: マジックナンバーの定数化
 - **ファイル**:
@@ -295,10 +300,17 @@
 - CRC-16/XMODEMテストベクタ "123456789" -> 0x31C3 を追加
 - 複数バイトテスト (4x0x00 -> 0x84C0, 4x0xFF -> 0x1D0F) を追加
 
+### P2-1: vcpkg依存関係の明示化 ✓
+- 2026-01-17 完了
+- `UCAPIProject/UCAPI/vcpkg.json`を作成（msgpack依存を明示）
+- `UCAPI_DLL.vcxproj`にマニフェストモード有効化 + MSGPACK_NO_BOOST追加
+- vcpkgをD:\vcpkgにインストール、VS2022にMSBuild統合
+
 ---
 
 ## 更新履歴
 
+- 2026-01-17: P2-1完了（vcpkg.json作成、マニフェストモード有効化、MSGPACK_NO_BOOST追加）
 - 2026-01-17: P1-2完了（CRC16テストに業界標準参照値を追加）
 - 2026-01-17: tasks.mdから有効なタスクを統合（P1-3拡張、P2-6拡張、P2-7/P2-8/P2-9新規追加）
 - 2026-01-17: P0-6完了（UCAPI_Deserializeのstd::unique_ptrによるRAII化）
