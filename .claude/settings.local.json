@@ -13,7 +13,11 @@
       "Bash(cmd /c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\Common7\\\\Tools\\\\VsDevCmd.bat\"\" && cd /d \"\"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\"\" && msbuild UCAPI_DLL.sln /p:Configuration=Debug /p:Platform=x64 /v:minimal\")",
       "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\\\\UCAPI_DLL.sln\" /p:Configuration=Debug /p:Platform=x64 /v:minimal)",
       "Bash(\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\MSBuild\\\\Current\\\\Bin\\\\MSBuild.exe\" \"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\UCAPIProject\\\\UCAPI\\\\UCAPI_DLL.sln\" -p:Configuration=Debug -p:Platform=x64 -v:minimal)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(powershell -Command \"Get-ChildItem -Path ''memory-bank'' -File | Select-Object Name, LastWriteTime | Sort-Object LastWriteTime -Descending | Format-Table -AutoSize\")",
+      "Bash(powershell:*)",
+      "Bash(python:*)",
+      "Bash(dir /s /b \"D:\\\\Personal\\\\Repositries\\\\UniversalCamerawork\\\\Unity\\\\UCAPI_Develop\\\\UCAPI_Develop\\\\Assets\\\\UCAPI4Unity\")"
     ]
   }
 }
