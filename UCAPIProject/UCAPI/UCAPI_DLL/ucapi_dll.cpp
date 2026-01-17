@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ucapi_dll.h"
 #include <iostream>
+#include <memory>
 #include <msgpack.hpp>
 #include "ucapi.h"
 #include "ucapi_msgpack_converter.h"
@@ -25,15 +26,15 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
             return nullptr;
         }
         
-        ucapi_t* native = new ucapi_t();
+        auto native = std::make_unique<ucapi_t>();
         native->m_magic = 0x55AA;
         native->m_version = 1;
         native->m_num_payload = 1;
         native->m_crc16 = 0;
         native->m_payload.emplace_back(sizeof(ucapi_t::record_t));
         native->m_payload[0] = cameraState;
-        
-        return native;
+
+        return native.release();
     }
     catch (const std::exception& e) {
         std::cerr << "[UCAPI_Deserialize] " << e.what() << std::endl;
