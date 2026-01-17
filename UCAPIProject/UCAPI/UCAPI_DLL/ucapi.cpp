@@ -105,7 +105,7 @@ ucapi_t::record_t::record_t(size_t payload_length, const void* dataPtr) {
 	m_camera_no = 0;
 	m_commands = 0;
 	m_timecode = 0;
-	m_subframe = 0;
+	m_subframe = 0.0f;
 	m_packet_no = 0;
 	m_eye_position_right_m = 0;
 	m_eye_position_up_m = 0;
@@ -153,7 +153,7 @@ void ucapi_t::record_t::_read(const void* dataPtr, size_t payload_length) {
 	m_camera_no = *reinterpret_cast<const uint32_t*>(&data[0]);
 	m_commands = *reinterpret_cast<const uint16_t*>(&data[4]);
 	m_timecode = *reinterpret_cast<const uint32_t*>(&data[6]);
-	m_subframe = *reinterpret_cast<const uint32_t*>(&data[10]);
+	m_subframe = *reinterpret_cast<const float*>(&data[10]);
 	m_packet_no = *reinterpret_cast<const uint8_t*>(&data[14]);
 	m_eye_position_right_m = *reinterpret_cast<const float*>(&data[15]);
 	m_eye_position_up_m = *reinterpret_cast<const float*>(&data[19]);

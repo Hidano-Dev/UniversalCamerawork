@@ -105,7 +105,13 @@
 - **対応**:
   - `timecode_t`を`ucapi_t`から使用するよう統合
   - または不要なら削除
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - 方針A（アクセサメソッド追加）を採用
+  - `record_t::get_timecode()` / `set_timecode()` アクセサを追加
+  - `m_subframe` の型を `uint32_t` から `float` に修正（仕様書準拠）
+  - `ucapi_serializer_utlity.cpp` に欠落していた `m_subframe` 書き込みを追加
+  - `ucapi_msgpack_types.h` の `subframe` を `float` に修正
 
 ### P2-5: コメント言語の統一
 - **ファイル**:
@@ -113,7 +119,12 @@
   - `UCAPIProject/UCAPI/UCAPI_DLL/*.h`, `*.cpp`（全般）
 - **問題**: 日本語と英語のコメントが混在
 - **対応**: プロジェクトの方針を決めて統一
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-17)
+- **実装詳細**:
+  - プロジェクト方針: 英語に統一
+  - 対象ファイル: dllmain.cpp, framework.h, pch.h, pch.cpp
+  - ucapi.cppは既に英語コメントに更新済み
+  - .vcxproj.filtersはVisual Studio自動生成のため対象外
 
 ### P2-6: 仕様書と実装の同期・ドキュメント整備
 - **ファイル**:

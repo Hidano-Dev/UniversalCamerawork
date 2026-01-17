@@ -1,5 +1,5 @@
-﻿// pch.cpp: プリコンパイル済みヘッダーに対応するソース ファイル
+﻿// pch.cpp: Source file corresponding to the pre-compiled header
 
 #include "pch.h"
 
-// プリコンパイル済みヘッダーを使用している場合、コンパイルを成功させるにはこのソース ファイルが必要です。
+// When using pre-compiled headers, this source file is necessary for compilation to succeed.
