@@ -72,8 +72,28 @@ public:
         uint32_t m_camera_no;
         uint16_t m_commands;
         uint32_t m_timecode;
-		uint32_t m_subframe;
+        float m_subframe;
         uint8_t m_packet_no;
+
+        /// Timecode accessors for convenient field access.
+        ///
+        /// The raw field ::m_timecode stores a packed 32-bit representation of the
+        /// timecode. These helpers convert between that packed form and the
+        /// higher-level ::timecode_t structure used by callers.
+        ///
+        /// @return A ::timecode_t value obtained by unpacking the internal
+        ///         32-bit timecode stored in ::m_timecode.
+        timecode_t get_timecode() const { return timecode_t::unpack(m_timecode); }
+
+        /// Set the timecode using a structured ::timecode_t value.
+        ///
+        /// This function packs the provided ::timecode_t into the 32-bit
+        /// representation used by the binary UCAPI record and stores it in
+        /// ::m_timecode.
+        ///
+        /// @param tc Structured timecode value to be packed into the internal
+        ///           32-bit representation.
+        void set_timecode(const timecode_t& tc) { m_timecode = timecode_t::pack(tc); }
         float m_eye_position_right_m;
         float m_eye_position_up_m;
         float m_eye_position_forward_m;
