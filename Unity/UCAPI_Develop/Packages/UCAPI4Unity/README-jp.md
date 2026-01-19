@@ -15,20 +15,45 @@ UCAPI4Unityは、共通のバイナリフォーマットを使用して、複数
 
 ## 動作要件
 
-- Unity 2021.3 以降
+- Unity 6000.0 以降
 - （オプション）Cinemachineカメラサポートには Cinemachine パッケージが必要
 
 ## インストール
+
+### OpenUPM経由
+
+[openupm-cli](https://openupm.com/docs/getting-started.html)がインストールされている場合：
+
+```bash
+openupm add com.hidano.ucapi4unity
+```
+
+または、`Packages/manifest.json` に以下を追加：
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": ["com.hidano"]
+    }
+  ],
+  "dependencies": {
+    "com.hidano.ucapi4unity": "0.1.0-preview.1"
+  }
+}
+```
 
 ### Unity Package Manager経由（Git URL）
 
 1. Unity Package Managerを開く（Window > Package Manager）
 2. 「+」ボタンをクリックし、「Add package from git URL...」を選択
-3. このリポジトリのGit URLを入力
+3. 以下のURLを入力
 
-### 手動インストール
-
-1. `UCAPI4Unity`フォルダをプロジェクトの`Assets`または`Packages`フォルダにコピー
+```
+https://github.com/Hidano/UniversalCamerawork.git?path=Unity/UCAPI_Develop/Packages/UCAPI4Unity
+```
 
 ## ディレクトリ構成
 
@@ -39,7 +64,7 @@ UCAPI4Unity/
 │   ├── Core/          # コアAPI (UcApiCore, UcApiRecord等)
 │   ├── UnityCamera/   # 標準Unity Camera連携
 │   └── CinemachineCamera/  # Cinemachine連携
-├── Sample/            # サンプルシーン・スクリプト
+├── Samples~/          # サンプルシーン・スクリプト
 └── Tests/             # ユニットテスト
 ```
 
@@ -52,8 +77,8 @@ using UcApi.Core;
 
 // カメラからレコードを作成
 var record = new UcApiRecord();
-record.Position = transform.position;
-record.Rotation = transform.rotation;
+record.Position = camera.transform.position;
+record.Rotation = camera.transform.rotation;
 record.FieldOfView = camera.fieldOfView;
 
 // シリアライズ
@@ -69,14 +94,14 @@ using UcApi.Core;
 UcApiRecord record = UcApiCore.Deserialize(data);
 
 // カメラに適用
-transform.position = record.Position;
-transform.rotation = record.Rotation;
+camera.transform.position = record.Position;
+camera.transform.rotation = record.Rotation;
 camera.fieldOfView = record.FieldOfView;
 ```
 
 ## ライセンス
 
-詳細はLICENSEファイルを参照してください。
+本プロジェクトはMITライセンスの下で公開されています。詳細は[LICENSE](LICENSE)ファイルを参照してください。
 
 ## 関連ドキュメント
 
