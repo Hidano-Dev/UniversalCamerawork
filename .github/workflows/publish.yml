@@ -25,5 +25,5 @@ jobs:
 
       - name: Publish
         run: |
-          cd MyUnityPackage
+          cd Unity/UCAPI_Develop/Packages/UCAPI4Unity
           npm publish
