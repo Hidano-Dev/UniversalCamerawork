@@ -228,6 +228,7 @@
     <ClInclude Include="ucapi_msgpack_serializer.h" />
     <ClInclude Include="ucapi_message_serializer_factory_impl.h" />
     <ClInclude Include="ucapi_config.h" />
+    <ClInclude Include="ucapi_logger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -245,6 +246,7 @@
     <ClCompile Include="ucapi_msgpack_serializer.cpp" />
     <ClCompile Include="ucapi_message_serializer_factory_impl.cpp" />
     <ClCompile Include="ucapi_config.cpp" />
+    <ClCompile Include="ucapi_logger.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

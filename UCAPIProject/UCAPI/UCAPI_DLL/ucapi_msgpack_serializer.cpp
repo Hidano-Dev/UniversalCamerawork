@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ucapi_msgpack_serializer.h"
 #include <msgpack.hpp>
-#include <iostream>
+#include "ucapi_logger.h"
 
 namespace ucapi {
 
@@ -16,7 +16,7 @@ HRESULT MessagePackSerializer::Serialize(const CameraState& src, std::vector<uin
         return S_OK;
     }
     catch (const std::exception& e) {
-        std::cerr << "[MessagePackSerializer::Serialize] " << e.what() << std::endl;
+        UCAPI_LOG_ERROR(e.what());
         return E_FAIL;
     }
 }
@@ -37,7 +37,7 @@ HRESULT MessagePackSerializer::Deserialize(const uint8_t* data, size_t size, Cam
         return S_OK;
     }
     catch (const std::exception& e) {
-        std::cerr << "[MessagePackSerializer::Deserialize] " << e.what() << std::endl;
+        UCAPI_LOG_ERROR(e.what());
         return E_FAIL;
     }
 }

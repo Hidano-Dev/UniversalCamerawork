@@ -103,11 +103,28 @@
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_logger.cpp`（新規作成）
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_dll.h`（API追加）
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_dll.cpp`（std::cerr使用箇所を置換）
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp`（std::cerr置換）
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_msgpack_serializer.cpp`（std::cerr置換）
+  - `UCAPIProject/UCAPI/UCAPI_DLL/dllmain.cpp`（Initialize/Shutdown追加）
 - **問題**: 仕様書にSingletonロガーの記載があるが未実装（現在は`std::cerr`のみ）
 - **対応**:
   - ロガークラスを実装
   - DLLエクスポート関数にログ取得APIを追加
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-19)
+- **実装詳細**:
+  - LogLevel列挙型: None(0), Error(1), Warning(2), Info(3), Debug(4)
+  - LogEntry構造体: level, timestamp, function, message
+  - Loggerクラス: Configと同じSingletonパターン（std::call_once + std::atomic<bool>）
+  - 循環バッファ: 最大256エントリ（UCAPI_MAX_LOG_ENTRIES）
+  - スレッドセーフ: std::mutex によるログ操作の排他制御
+  - 便利マクロ: UCAPI_LOG_ERROR/WARNING/INFO/DEBUG
+  - DLLエクスポートAPI（6関数）:
+    - UCAPI_GetLogCount: ログ件数取得
+    - UCAPI_GetLog: 詳細ログ取得
+    - UCAPI_GetLogMessage: フォーマット済みログ取得
+    - UCAPI_ClearLogs: ログクリア
+    - UCAPI_SetLogLevel/UCAPI_GetLogLevel: ログレベル設定/取得
+  - std::cerr置換: 計11箇所（ucapi_dll.cpp 8箇所、ucapi.cpp 1箇所、ucapi_msgpack_serializer.cpp 2箇所）
 
 ### P2-4: timecode_tとucapi_tの統合
 - **ファイル**:
@@ -284,6 +301,7 @@
 
 ## 更新履歴
 
+- 2026-01-19: P2-3完了（Singletonロガーの実装、DLLエクスポートAPI 6関数追加、std::cerr 11箇所置換）
 - 2026-01-17: P1-4完了（AddressSanitizer/メモリリークテストの導入、ASan|x64ビルド構成追加、CIにASanテストジョブ追加）
 - 2026-01-17: P2-5完了（コメント言語の英語統一: dllmain.cpp, framework.h, pch.h, pch.cpp）
 - 2026-01-17: P1-6完了（未使用コードの削除 - convert_to_ucapi/convert_to_msgpack）

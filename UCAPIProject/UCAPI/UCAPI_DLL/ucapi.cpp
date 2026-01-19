@@ -1,8 +1,8 @@
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
 #include "pch.h"
-#include <iostream>
 #include "ucapi.h"
+#include "ucapi_logger.h"
 
 ucapi_t::ucapi_t(const void* dataPtr, size_t bufferSize){
     // magic is initialized with UCAPI_MAGIC (0x55AA)
@@ -70,8 +70,7 @@ void ucapi_t::_read(const void* dataPtr, size_t bufferSize) {
 	}
 	catch (std::exception& e) {
 		_clean_up();
-		// Print the exception message to the console.
-		std::cerr << e.what() << std::endl;
+		UCAPI_LOG_ERROR(e.what());
 		throw;
     }
 }
