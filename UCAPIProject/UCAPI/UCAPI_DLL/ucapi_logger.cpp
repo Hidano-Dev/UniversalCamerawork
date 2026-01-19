@@ -164,6 +164,7 @@ void Logger::AddEntry(LogLevel level, const char* function, const char* message)
         // Overwrite oldest entry
         m_entries[m_writeIndex] = LogEntry(level, function, message);
         m_writeIndex = (m_writeIndex + 1) % UCAPI_MAX_LOG_ENTRIES;
+        m_count = UCAPI_MAX_LOG_ENTRIES;
     }
 }
 
