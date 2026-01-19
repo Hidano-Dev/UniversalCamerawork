@@ -167,11 +167,5 @@ void Logger::AddEntry(LogLevel level, const char* function, const char* message)
     }
 }
 
-uint64_t Logger::GetTimestamp()
-{
-    auto now = std::chrono::system_clock::now();
-    auto duration = now.time_since_epoch();
-    return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(duration).count());
-}
 
 } // namespace ucapi
