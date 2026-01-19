@@ -260,3 +260,5 @@ vcpkg_installed/
 nul
 .claude/settings.local.json
 test_detail.xml
+Unity/UCAPI_Develop/.idea/.idea.UCAPI_Develop/.idea
+Unity/UCAPI_Develop/UserSettings
