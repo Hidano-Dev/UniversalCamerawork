@@ -6,13 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/UCAPI4Unity/Sample/UnityCameraSample.unity
+    path: Assets/UCAPI4Unity/Samples/UnityCameraSample.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 0
-    path: Assets/UCAPI4Unity/Sample/CinemachineSendSample.unity
+    path: Assets/UCAPI4Unity/Samples/CinemachineSendSample.unity
     guid: 02b5b80267f15034f8a8dacea3a446bf
   - enabled: 1
-    path: Assets/UCAPI4Unity/Sample/CinemachineReceiveSample.unity
+    path: Assets/UCAPI4Unity/Samples/CinemachineReceiveSample.unity
     guid: 0af19e1320538b447a45cd338ad5afc6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -23,7 +23,7 @@
         {
             "displayName": "Basic Sample",
             "description": "Basic usage sample for UCAPI4Unity with standard Unity Camera and Cinemachine.",
-            "path": "Sample"
+            "path": "Samples~"
         }
     ]
 }
