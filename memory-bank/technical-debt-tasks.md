@@ -55,7 +55,12 @@
   - `UCAPIProject/UCAPI/UCAPI_DLL_Test/UCAPI_DLL_Test.vcxproj`
 - **問題**: GoogleTest v1.8.1.7（2019年頃）は古く、最新機能が使えない
 - **対応**: 最新の安定版（v1.14以降）に更新
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-01-19)
+- **実装詳細**:
+  - NuGetパッケージ（Microsoft.googletest.v140...）からvcpkgに移行
+  - UCAPI_DLL_Test.vcxprojにvcpkgマニフェストモード設定を追加
+  - packages.configからNuGet参照を削除
+  - vcpkg.jsonに既存のgtest依存を利用（v1.15+）
 
 ### P1-6: 未使用コードの削除 - convert_to_ucapi
 - **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_msgpack_converter.h`, `.cpp`

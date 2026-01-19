@@ -7,6 +7,13 @@
 #include <limits>
 #include <cmath>
 
+// GoogleTest main function
+// This is required because gtest_main.lib may not link correctly with vcpkg wildcard linking
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+
 // Deserialize 正常系
 TEST(UcapiDll_Deserialize, ValidBuffer) {
 	// 正常系: テスト用オブジェクトの生成
