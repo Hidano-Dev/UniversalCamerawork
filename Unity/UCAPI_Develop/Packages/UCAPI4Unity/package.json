@@ -24,5 +24,19 @@
             "description": "Basic usage sample for UCAPI4Unity with standard Unity Camera and Cinemachine.",
             "path": "Samples~"
         }
-    ]
+    ],
+
+    "license": "MIT",
+    "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hidano-Dev/UniversalCamerawork.git"
+    },
+    "bugs": {
+    "url": "https://github.com/Hidano-Dev/UniversalCamerawork/issues"
+    },
+    "homepage": "https://github.com/Hidano-Dev/UniversalCamerawork#readme",
+
+    "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@Hidano-Dev"
+    }
 }
