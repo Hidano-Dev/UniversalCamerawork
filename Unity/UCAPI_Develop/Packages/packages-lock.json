@@ -7,7 +7,7 @@
       "dependencies": {},
       "hash": "caadb6d6754f8dd179b5e6e023f636132a7d91b8"
     },
-    "com.hidano.universalcamerawork.ucapi4unity": {
+    "com.hidano.ucapi4unity": {
       "version": "file:UCAPI4Unity",
       "depth": 0,
       "source": "embedded",

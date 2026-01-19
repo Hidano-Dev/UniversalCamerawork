@@ -15,20 +15,45 @@ UCAPI4Unity enables sharing camera state data (position, rotation, zoom, timecod
 
 ## Requirements
 
-- Unity 2021.3 or later
+- Unity 6000.0 or later
 - (Optional) Cinemachine package for Cinemachine camera support
 
 ## Installation
+
+### Via OpenUPM
+
+If you have [openupm-cli](https://openupm.com/docs/getting-started.html) installed:
+
+```bash
+openupm add com.hidano.ucapi4unity
+```
+
+Or, add the following to your `Packages/manifest.json`:
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "OpenUPM",
+      "url": "https://package.openupm.com",
+      "scopes": ["com.hidano"]
+    }
+  ],
+  "dependencies": {
+    "com.hidano.ucapi4unity": "0.1.0-preview.1"
+  }
+}
+```
 
 ### Via Unity Package Manager (Git URL)
 
 1. Open Unity Package Manager (Window > Package Manager)
 2. Click the "+" button and select "Add package from git URL..."
-3. Enter the Git URL of this repository
+3. Enter the following URL
 
-### Manual Installation
-
-1. Copy the `UCAPI4Unity` folder to your project's `Assets` or `Packages` folder
+```
+https://github.com/Hidano-Dev/UniversalCamerawork.git?path=Unity/UCAPI_Develop/Packages/UCAPI4Unity
+```
 
 ## Directory Structure
 
@@ -39,7 +64,7 @@ UCAPI4Unity/
 │   ├── Core/          # Core API (UcApiCore, UcApiRecord, etc.)
 │   ├── UnityCamera/   # Standard Unity Camera integration
 │   └── CinemachineCamera/  # Cinemachine integration
-├── Sample/            # Sample scenes and scripts
+├── Samples~/          # Sample scenes and scripts
 └── Tests/             # Unit tests
 ```
 
@@ -52,8 +77,8 @@ using UcApi.Core;
 
 // Create a record from camera
 var record = new UcApiRecord();
-record.Position = transform.position;
-record.Rotation = transform.rotation;
+record.Position = camera.transform.position;
+record.Rotation = camera.transform.rotation;
 record.FieldOfView = camera.fieldOfView;
 
 // Serialize
@@ -69,14 +94,14 @@ using UcApi.Core;
 UcApiRecord record = UcApiCore.Deserialize(data);
 
 // Apply to camera
-transform.position = record.Position;
-transform.rotation = record.Rotation;
+camera.transform.position = record.Position;
+camera.transform.rotation = record.Rotation;
 camera.fieldOfView = record.FieldOfView;
 ```
 
 ## License
 
-See LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Related
 
