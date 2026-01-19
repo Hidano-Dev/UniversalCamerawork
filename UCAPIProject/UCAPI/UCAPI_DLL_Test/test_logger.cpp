@@ -210,7 +210,8 @@ TEST(Logger, CircularBufferMultipleWraparounds) {
     logger.ClearLogs();
     logger.SetLogLevel(ucapi::LogLevel::Debug);
     
-    // Add 2.5x buffer size entries
+    // Add 2.5x buffer size entries to test multiple wraparounds
+    // This ensures the circular buffer logic works correctly beyond a single wraparound
     constexpr size_t totalEntries = ucapi::UCAPI_MAX_LOG_ENTRIES * 2 + ucapi::UCAPI_MAX_LOG_ENTRIES / 2;
     for (size_t i = 0; i < totalEntries; ++i) {
         std::string msg = "Entry " + std::to_string(i);
@@ -240,6 +241,8 @@ TEST(Logger, ConcurrentLogging) {
     logger.ClearLogs();
     logger.SetLogLevel(ucapi::LogLevel::Debug);
     
+    // Use 8 threads with 50 logs each to stress-test thread safety
+    // Total: 400 logs, which exceeds circular buffer size (256) to also test wraparound under concurrent access
     constexpr int NUM_THREADS = 8;
     constexpr int LOGS_PER_THREAD = 50;
     std::atomic<int> successCount{0};
@@ -593,6 +596,8 @@ TEST(Logger, VeryLongStrings) {
     ucapi::Logger& logger = ucapi::Logger::GetInstance();
     logger.ClearLogs();
     
+    // Test with realistically large strings (1000 chars for function, 2000 for message)
+    // This validates the logger handles large strings without truncation or crashes
     std::string longFunction(1000, 'F');
     std::string longMessage(2000, 'M');
     
