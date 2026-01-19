@@ -151,13 +151,13 @@ UCAPI_API int UCAPI_GetLog(
             *outTimestamp = entry.timestamp;
         }
         if (outFunction && functionBufSize > 0) {
-            if (entry.function.size() >= functionBufSize) {
+            if (entry.function.size() + 1 > functionBufSize) {
                 return -2;  // Buffer too small
             }
             strncpy_s(outFunction, functionBufSize, entry.function.c_str(), _TRUNCATE);
         }
         if (outMessage && messageBufSize > 0) {
-            if (entry.message.size() >= messageBufSize) {
+            if (entry.message.size() + 1 > messageBufSize) {
                 return -2;  // Buffer too small
             }
             strncpy_s(outMessage, messageBufSize, entry.message.c_str(), _TRUNCATE);
