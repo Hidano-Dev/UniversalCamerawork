@@ -190,7 +190,7 @@ UCAPI_API int UCAPI_GetLogMessage(size_t index, char* outBuffer, size_t bufferSi
         }
 
         std::string formatted = std::string(levelStr) + "[" + entry.function + "] " + entry.message;
-        if (formatted.size() >= bufferSize) {
+        if (formatted.size() + 1 > bufferSize) {
             return -2;
         }
         strncpy_s(outBuffer, bufferSize, formatted.c_str(), _TRUNCATE);
