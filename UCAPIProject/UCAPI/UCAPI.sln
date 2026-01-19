@@ -9,7 +9,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCAPI_DLL_Test", "UCAPI_DLL
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		ASan|Any CPU = ASan|Any CPU
 		ASan|x64 = ASan|x64
+		ASan|x86 = ASan|x86
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -18,8 +20,12 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{192A3733-CA38-47E5-86BD-5C46823CA89B}.ASan|Any CPU.ActiveCfg = ASan|x64
+		{192A3733-CA38-47E5-86BD-5C46823CA89B}.ASan|Any CPU.Build.0 = ASan|x64
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.ASan|x64.ActiveCfg = ASan|x64
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.ASan|x64.Build.0 = ASan|x64
+		{192A3733-CA38-47E5-86BD-5C46823CA89B}.ASan|x86.ActiveCfg = ASan|x64
+		{192A3733-CA38-47E5-86BD-5C46823CA89B}.ASan|x86.Build.0 = ASan|x64
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.Debug|Any CPU.Build.0 = Debug|x64
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.Debug|x64.ActiveCfg = Debug|x64
@@ -32,8 +38,12 @@ Global
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.Release|x64.Build.0 = Release|x64
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.Release|x86.ActiveCfg = Release|Win32
 		{192A3733-CA38-47E5-86BD-5C46823CA89B}.Release|x86.Build.0 = Release|Win32
+		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.ASan|Any CPU.ActiveCfg = ASan|x64
+		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.ASan|Any CPU.Build.0 = ASan|x64
 		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.ASan|x64.ActiveCfg = ASan|x64
 		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.ASan|x64.Build.0 = ASan|x64
+		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.ASan|x86.ActiveCfg = ASan|x64
+		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.ASan|x86.Build.0 = ASan|x64
 		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.Debug|Any CPU.Build.0 = Debug|x64
 		{9BB0C5B1-5CAD-4218-9B6A-F477DCB12041}.Debug|x64.ActiveCfg = Debug|x64
