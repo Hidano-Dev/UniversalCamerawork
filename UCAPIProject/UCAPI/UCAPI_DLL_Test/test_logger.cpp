@@ -291,7 +291,7 @@ TEST(Logger, ConcurrentReadWrite) {
         while (!stopFlag.load()) {
             logger.Info("Writer", "Writing...");
             ++writeCount;
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
+            std::this_thread::yield();  // Cooperative multitasking
         }
     };
     
@@ -304,7 +304,7 @@ TEST(Logger, ConcurrentReadWrite) {
                 logger.GetLogEntry(0, entry);
                 ++readCount;
             }
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
+            std::this_thread::yield();  // Cooperative multitasking
         }
     };
     
@@ -347,7 +347,7 @@ TEST(Logger, ConcurrentClearAndAdd) {
         while (!stopFlag.load()) {
             logger.Info("Adder", "Adding entry");
             ++addCount;
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            std::this_thread::yield();  // Cooperative multitasking
         }
     };
     
