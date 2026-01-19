@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "displayName": "UCAPI4Unity",
     "description": "Unity plugin for Universal Camerawork API. Share camera state data (position, rotation, zoom, etc.) across multiple platforms (Unity/Unreal/Blender) using a common binary format.",
-    "unity": "2021.3",
+    "unity": "6000.0",
     "unityRelease": "0f1",
     "documentationUrl": "",
     "changelogUrl": "",
@@ -16,8 +16,7 @@
         "pipeline"
     ],
     "author": {
-        "name": "UniversalCamerawork",
-        "url": ""
+        "name": "Hidano"
     },
     "samples": [
         {
