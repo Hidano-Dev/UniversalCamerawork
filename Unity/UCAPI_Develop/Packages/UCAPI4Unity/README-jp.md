@@ -52,7 +52,7 @@ openupm add com.hidano.ucapi4unity
 3. 以下のURLを入力
 
 ```
-https://github.com/Hidano/UniversalCamerawork.git?path=Unity/UCAPI_Develop/Packages/UCAPI4Unity
+https://github.com/Hidano-Dev/UniversalCamerawork.git?path=Unity/UCAPI_Develop/Packages/UCAPI4Unity
 ```
 
 ## ディレクトリ構成

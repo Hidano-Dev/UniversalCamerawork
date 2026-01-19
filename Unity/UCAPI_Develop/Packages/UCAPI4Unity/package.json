@@ -1,6 +1,6 @@
 {
-    "name": "com.hidano.universalcamerawork.ucapi4unity",
-    "version": "0.1.0",
+    "name": "com.hidano.ucapi4unity",
+    "version": "0.1.0-preview.1",
     "displayName": "UCAPI4Unity",
     "description": "Unity plugin for Universal Camerawork API. Share camera state data (position, rotation, zoom, etc.) across multiple platforms (Unity/Unreal/Blender) using a common binary format.",
     "unity": "6000.0",

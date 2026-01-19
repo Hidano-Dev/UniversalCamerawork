@@ -52,7 +52,7 @@ Or, add the following to your `Packages/manifest.json`:
 3. Enter the following URL
 
 ```
-https://github.com/Hidano/UniversalCamerawork.git?path=Unity/UCAPI_Develop/Packages/UCAPI4Unity
+https://github.com/Hidano-Dev/UniversalCamerawork.git?path=Unity/UCAPI_Develop/Packages/UCAPI4Unity
 ```
 
 ## Directory Structure
