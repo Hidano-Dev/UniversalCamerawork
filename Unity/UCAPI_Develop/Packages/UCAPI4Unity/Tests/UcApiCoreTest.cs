@@ -76,7 +76,8 @@ namespace UCAPI4Unity.Tests
         {
             // データが不足しているバッファ
             var shortBuffer = new byte[2];
-            Assert.Throws<Exception>(() => UcApiCore.DeserializeToRecord(shortBuffer, 1));
+            var ex = Assert.Throws<Exception>(() => UcApiCore.DeserializeToRecord(shortBuffer, 1));
+            Assert.That(ex.Message, Is.EqualTo("Deserialization failed."));
         }
 
         // 境界値（最小サイズ、最大サイズ）を用いたテスト例
