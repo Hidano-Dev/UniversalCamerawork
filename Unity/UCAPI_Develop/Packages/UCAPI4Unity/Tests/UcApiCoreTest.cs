@@ -112,7 +112,11 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(maxRecord.CameraNo, maxDeserialized[0].CameraNo);
             Assert.AreEqual(maxRecord.Commands, maxDeserialized[0].Commands);
             Assert.AreEqual(maxRecord.TimeCode, maxDeserialized[0].TimeCode);
+            Assert.AreEqual(maxRecord.SubFrame, maxDeserialized[0].SubFrame);
             Assert.AreEqual(maxRecord.PacketNo, maxDeserialized[0].PacketNo);
+            Assert.AreEqual(maxRecord.EyePositionRightM, maxDeserialized[0].EyePositionRightM);
+            Assert.AreEqual(maxRecord.EyePositionUpM, maxDeserialized[0].EyePositionUpM);
+            Assert.AreEqual(maxRecord.EyePositionForwardM, maxDeserialized[0].EyePositionForwardM);
 
             yield return null;
         }
