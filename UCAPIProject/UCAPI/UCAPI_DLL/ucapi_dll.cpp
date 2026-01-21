@@ -102,6 +102,143 @@ UCAPI_API void UCAPI_Destroy(ucapi_t* obj) {
     delete obj;
 }
 
+// =============================================================================
+// C-compatible Serialize/Deserialize API implementation
+// =============================================================================
+
+namespace {
+    // Helper: Convert flat record to CameraState
+    ucapi::CameraState FlatToCameraState(const ucapi_record_flat_t* flat) {
+        ucapi::CameraState state(sizeof(ucapi::CameraState));
+        state.m_camera_no = flat->camera_no;
+        state.m_commands = flat->commands;
+        state.m_timecode = flat->timecode;
+        state.m_subframe = flat->subframe;
+        state.m_packet_no = flat->packet_no;
+        state.m_eye_position_right_m = flat->eye_position_right_m;
+        state.m_eye_position_up_m = flat->eye_position_up_m;
+        state.m_eye_position_forward_m = flat->eye_position_forward_m;
+        state.m_look_vector_right_m = flat->look_vector_right_m;
+        state.m_look_vector_up_m = flat->look_vector_up_m;
+        state.m_look_vector_forward_m = flat->look_vector_forward_m;
+        state.m_up_vector_right_m = flat->up_vector_right_m;
+        state.m_up_vector_up_m = flat->up_vector_up_m;
+        state.m_up_vector_forward_m = flat->up_vector_forward_m;
+        state.m_focal_length_mm = flat->focal_length_mm;
+        state.m_aspect_ratio = flat->aspect_ratio;
+        state.m_focus_distance_m = flat->focus_distance_m;
+        state.m_aperture = flat->aperture;
+        state.m_sensor_size_width_mm = flat->sensor_size_width_mm;
+        state.m_sensor_size_height_mm = flat->sensor_size_height_mm;
+        state.m_near_clip_m = flat->near_clip_m;
+        state.m_far_clip_m = flat->far_clip_m;
+        state.m_lens_shift_horizontal_ratio = flat->lens_shift_horizontal_ratio;
+        state.m_lens_shift_vertical_ratio = flat->lens_shift_vertical_ratio;
+        state.m_lens_distortion_radial_coefficients_k1 = flat->lens_distortion_radial_coefficients_k1;
+        state.m_lens_distortion_radial_coefficients_k2 = flat->lens_distortion_radial_coefficients_k2;
+        state.m_lens_distortion_center_point_right_mm = flat->lens_distortion_center_point_right_mm;
+        state.m_lens_distortion_center_point_up_mm = flat->lens_distortion_center_point_up_mm;
+        return state;
+    }
+
+    // Helper: Convert CameraState to flat record
+    void CameraStateToFlat(const ucapi::CameraState& state, ucapi_record_flat_t* flat) {
+        flat->camera_no = state.m_camera_no;
+        flat->commands = state.m_commands;
+        flat->timecode = state.m_timecode;
+        flat->subframe = state.m_subframe;
+        flat->packet_no = state.m_packet_no;
+        flat->eye_position_right_m = state.m_eye_position_right_m;
+        flat->eye_position_up_m = state.m_eye_position_up_m;
+        flat->eye_position_forward_m = state.m_eye_position_forward_m;
+        flat->look_vector_right_m = state.m_look_vector_right_m;
+        flat->look_vector_up_m = state.m_look_vector_up_m;
+        flat->look_vector_forward_m = state.m_look_vector_forward_m;
+        flat->up_vector_right_m = state.m_up_vector_right_m;
+        flat->up_vector_up_m = state.m_up_vector_up_m;
+        flat->up_vector_forward_m = state.m_up_vector_forward_m;
+        flat->focal_length_mm = state.m_focal_length_mm;
+        flat->aspect_ratio = state.m_aspect_ratio;
+        flat->focus_distance_m = state.m_focus_distance_m;
+        flat->aperture = state.m_aperture;
+        flat->sensor_size_width_mm = state.m_sensor_size_width_mm;
+        flat->sensor_size_height_mm = state.m_sensor_size_height_mm;
+        flat->near_clip_m = state.m_near_clip_m;
+        flat->far_clip_m = state.m_far_clip_m;
+        flat->lens_shift_horizontal_ratio = state.m_lens_shift_horizontal_ratio;
+        flat->lens_shift_vertical_ratio = state.m_lens_shift_vertical_ratio;
+        flat->lens_distortion_radial_coefficients_k1 = state.m_lens_distortion_radial_coefficients_k1;
+        flat->lens_distortion_radial_coefficients_k2 = state.m_lens_distortion_radial_coefficients_k2;
+        flat->lens_distortion_center_point_right_mm = state.m_lens_distortion_center_point_right_mm;
+        flat->lens_distortion_center_point_up_mm = state.m_lens_distortion_center_point_up_mm;
+    }
+}
+
+UCAPI_API int UCAPI_SerializeRecord(
+    const ucapi_record_flat_t* record,
+    uint8_t** outBuffer,
+    size_t* outSize
+) {
+    if (record == nullptr || outBuffer == nullptr || outSize == nullptr) {
+        return -1;
+    }
+    try {
+        auto serializer = ucapi::Config::GetSerializerFactory().CreateSerializer("MsgPack");
+        if (!serializer) {
+            UCAPI_LOG_ERROR("Failed to create MsgPack serializer");
+            return -1;
+        }
+
+        ucapi::CameraState state = FlatToCameraState(record);
+        std::vector<uint8_t> buffer;
+        HRESULT hr = serializer->Serialize(state, buffer);
+        if (FAILED(hr)) {
+            UCAPI_LOG_ERROR("Serialization failed");
+            return -1;
+        }
+
+        *outSize = buffer.size();
+        *outBuffer = new uint8_t[*outSize];
+        std::memcpy(*outBuffer, buffer.data(), *outSize);
+        return 0;
+    }
+    catch (const std::exception& e) {
+        UCAPI_LOG_ERROR(e.what());
+        return -1;
+    }
+}
+
+UCAPI_API int UCAPI_DeserializeRecord(
+    const uint8_t* buffer,
+    size_t bufferSize,
+    ucapi_record_flat_t* outRecord
+) {
+    if (buffer == nullptr || bufferSize == 0 || outRecord == nullptr) {
+        return -1;
+    }
+    try {
+        auto serializer = ucapi::Config::GetSerializerFactory().CreateSerializer("MsgPack");
+        if (!serializer) {
+            UCAPI_LOG_ERROR("Failed to create MsgPack serializer");
+            return -1;
+        }
+
+        ucapi::CameraState state(sizeof(ucapi::CameraState));
+        HRESULT hr = serializer->Deserialize(buffer, bufferSize, state);
+        if (FAILED(hr)) {
+            UCAPI_LOG_ERROR("Deserialization failed");
+            return -1;
+        }
+
+        CameraStateToFlat(state, outRecord);
+        return 0;
+    }
+    catch (const std::exception& e) {
+        UCAPI_LOG_ERROR(e.what());
+        return -1;
+    }
+}
+
 // Add an empty record to the payload
 UCAPI_API int UCAPI_AddRecord(ucapi_t* obj) {
     if (obj == nullptr) {
