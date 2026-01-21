@@ -57,7 +57,8 @@ namespace UCAPI4Unity.Runtime.Core
             var result = UCAPI_DeserializeRecord(buffer, (UIntPtr)buffer.Length, out var record);
             if (result != 0)
             {
-                throw new Exception("Deserialization failed.");
+                throw new Exception(
+                    $"Deserialization failed with error code {result}. BufferLength={buffer?.Length ?? 0}, PayloadCount={payloadCount}.");
             }
 
             return new[] { record };
