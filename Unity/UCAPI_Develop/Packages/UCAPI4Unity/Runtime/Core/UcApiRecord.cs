@@ -1,5 +1,11 @@
+using System.Runtime.InteropServices;
+
 namespace UCAPI4Unity.Runtime.Core
 {
+    /// <summary>
+    /// Camera record structure matching DLL's ucapi_record_flat_t (packed, 1-byte alignment)
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct UcApiRecord
     {
         public uint CameraNo;
@@ -30,6 +36,5 @@ namespace UCAPI4Unity.Runtime.Core
         public float LensDistortionRadialCoefficientsK2;
         public float LensDistortionCenterPointRightMm;
         public float LensDistortionCenterPointUpMm;
-
     }
 }

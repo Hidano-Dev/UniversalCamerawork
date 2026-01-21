@@ -15,9 +15,75 @@
 #include <cstdint>
 #include "ucapi.h"
 
+// =============================================================================
+// C-compatible flat record structure (POD type for interop)
+// =============================================================================
+#pragma pack(push, 1)
+typedef struct ucapi_record_flat_t {
+    uint32_t camera_no;
+    uint16_t commands;
+    uint32_t timecode;
+    float subframe;
+    uint8_t packet_no;
+    float eye_position_right_m;
+    float eye_position_up_m;
+    float eye_position_forward_m;
+    float look_vector_right_m;
+    float look_vector_up_m;
+    float look_vector_forward_m;
+    float up_vector_right_m;
+    float up_vector_up_m;
+    float up_vector_forward_m;
+    float focal_length_mm;
+    float aspect_ratio;
+    float focus_distance_m;
+    float aperture;
+    float sensor_size_width_mm;
+    float sensor_size_height_mm;
+    float near_clip_m;
+    float far_clip_m;
+    float lens_shift_horizontal_ratio;
+    float lens_shift_vertical_ratio;
+    float lens_distortion_radial_coefficients_k1;
+    float lens_distortion_radial_coefficients_k2;
+    float lens_distortion_center_point_right_mm;
+    float lens_distortion_center_point_up_mm;
+} ucapi_record_flat_t;
+#pragma pack(pop)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    // =============================================================================
+    // C-compatible Serialize/Deserialize API (recommended for interop)
+    // =============================================================================
+
+    /// Serialize a flat record to MessagePack format
+    /// @param record Pointer to flat record structure
+    /// @param outBuffer Output: pointer to allocated buffer (caller must free with UCAPI_FreeBuffer)
+    /// @param outSize Output: size of the allocated buffer
+    /// @return 0 on success, -1 on failure
+    UCAPI_API int UCAPI_SerializeRecord(
+        const ucapi_record_flat_t* record,
+        uint8_t** outBuffer,
+        size_t* outSize
+    );
+
+    /// Deserialize MessagePack data to a flat record
+    /// @param buffer Input buffer containing MessagePack data
+    /// @param bufferSize Size of the input buffer
+    /// @param outRecord Output: pointer to flat record structure (caller allocated)
+    /// @return 0 on success, -1 on failure
+    UCAPI_API int UCAPI_DeserializeRecord(
+        const uint8_t* buffer,
+        size_t bufferSize,
+        ucapi_record_flat_t* outRecord
+    );
+
+    // =============================================================================
+    // Legacy API (uses C++ class internally - not recommended for interop)
+    // =============================================================================
 
     UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount);
 

@@ -6,11 +6,23 @@ namespace UCAPI4Unity.Runtime.Core
 {
     public static class UcApiCore
     {
-        [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr UCAPI_Deserialize(byte[] buffer, UIntPtr payloadCount);
+        // =============================================================================
+        // New C-compatible API (recommended)
+        // =============================================================================
 
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int UCAPI_Serialize(IntPtr obj, out IntPtr outBuffer, out UIntPtr outSize);
+        private static extern int UCAPI_SerializeRecord(
+            ref UcApiRecord record,
+            out IntPtr outBuffer,
+            out UIntPtr outSize
+        );
+
+        [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int UCAPI_DeserializeRecord(
+            byte[] buffer,
+            UIntPtr bufferSize,
+            out UcApiRecord outRecord
+        );
 
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern void UCAPI_FreeBuffer(IntPtr buffer);
@@ -18,56 +30,12 @@ namespace UCAPI4Unity.Runtime.Core
         [DllImport("UCAPI_DLL", CallingConvention = CallingConvention.Cdecl)]
         private static extern ushort UCAPI_CalcCRC16(IntPtr recordPtr, UIntPtr length, ushort poly, ushort initValue);
 
+        /// <summary>
+        /// Serialize a UcApiRecord to MessagePack format
+        /// </summary>
         public static byte[] SerializeFromRecord(UcApiRecord record)
         {
-            var payloadPtr = Marshal.AllocHGlobal(Marshal.SizeOf(record));
-            Marshal.StructureToPtr(record, payloadPtr, false);
-            
-            var obj = new UcApiObject
-            {
-                Magic = 0xAA55,
-                Version = 0,
-                NumPayload = 1,
-                CRC16 = ComputeChecksum(record),
-                Payloads = payloadPtr
-            };
-            
-            var serializedData = SerializeFromObject(obj);
-            // serializedDataにコピーした後、ポインタを解放
-            Marshal.FreeHGlobal(payloadPtr);
-            return serializedData;
-        }
-        
-        public static UcApiRecord[] DeserializeToRecord(byte[] buffer, int payloadCount)
-        {
-            var ucApiObject = DeserializeToObject(buffer, payloadCount);
-            if (ucApiObject.NumPayload == 0)
-            {
-                throw new Exception("No payloads found.");
-            }
-            var payloads = new UcApiRecord[ucApiObject.NumPayload];
-            var payloadPtr = ucApiObject.Payloads;
-            for (var i = 0; i < ucApiObject.NumPayload; i++)
-            {
-                var payload = Marshal.PtrToStructure<UcApiRecord>(payloadPtr);
-                payloads[i] = payload;
-                payloadPtr += Marshal.SizeOf(payload);
-            }
-            
-            var crc = ComputeChecksum(payloads[0]);
-            if(ucApiObject.CRC16 != crc)
-            {
-                Debug.LogError("CRC16 checksum mismatch. Header: " + ucApiObject.CRC16 + ", Payload: " + crc);
-            }
-            
-            return payloads;
-        }
-        
-        internal static byte[] SerializeFromObject(UcApiObject ucApiObject)
-        {
-            var ucApiObjectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(ucApiObject));
-            Marshal.StructureToPtr(ucApiObject, ucApiObjectPtr, false);
-            var result = UCAPI_Serialize(ucApiObjectPtr, out var buffer, out var size);
+            var result = UCAPI_SerializeRecord(ref record, out var buffer, out var size);
             if (result != 0 || buffer == IntPtr.Zero)
             {
                 throw new Exception("Serialization to MessagePack failed.");
@@ -76,29 +44,30 @@ namespace UCAPI4Unity.Runtime.Core
             var managedBuffer = new byte[(int)size];
             Marshal.Copy(buffer, managedBuffer, 0, (int)size);
             UCAPI_FreeBuffer(buffer);
-
-            Marshal.FreeHGlobal(ucApiObjectPtr);
             return managedBuffer;
         }
 
-        internal static UcApiObject DeserializeToObject(byte[] buffer, int payloadCount)
+        /// <summary>
+        /// Deserialize MessagePack data to UcApiRecord array
+        /// </summary>
+        public static UcApiRecord[] DeserializeToRecord(byte[] buffer, int payloadCount)
         {
-            var ucApiObjPtr = UCAPI_Deserialize(buffer, (UIntPtr)payloadCount);
-            if (ucApiObjPtr == IntPtr.Zero)
+            // Note: Current API deserializes one record at a time
+            // payloadCount parameter is kept for API compatibility but only first record is used
+            var result = UCAPI_DeserializeRecord(buffer, (UIntPtr)buffer.Length, out var record);
+            if (result != 0)
             {
-                throw new Exception("Deserialization failed.");
+                throw new Exception(
+                    $"Deserialization failed with error code {result}. BufferLength={buffer?.Length ?? 0}, PayloadCount={payloadCount}.");
             }
-            var ucApiObject = Marshal.PtrToStructure<UcApiObject>(ucApiObjPtr);
-            if (ucApiObject.NumPayload == 0)
-            {
-                throw new Exception("No payloads found.");
-            }
-            
-            UCAPI_FreeBuffer(ucApiObjPtr);
-            return ucApiObject;
+
+            return new[] { record };
         }
-        
-        private static ushort ComputeChecksum(UcApiRecord record, ushort poly = 0x1021, ushort initValue = 0xFFFF)
+
+        /// <summary>
+        /// Compute CRC16 checksum for a record
+        /// </summary>
+        public static ushort ComputeChecksum(UcApiRecord record, ushort poly = 0x1021, ushort initValue = 0xFFFF)
         {
             int size = Marshal.SizeOf(record);
             IntPtr ptr = Marshal.AllocHGlobal(size);
