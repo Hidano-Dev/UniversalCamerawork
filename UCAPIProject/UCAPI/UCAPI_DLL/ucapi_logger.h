@@ -6,6 +6,7 @@
 #include <memory>
 #include <atomic>
 #include <mutex>
+#include "ucapi_dll.h"
 
 namespace ucapi {
 
@@ -19,7 +20,7 @@ enum class LogLevel : uint8_t {
 };
 
 /// Single log entry structure
-struct LogEntry {
+struct UCAPI_API LogEntry {
     LogLevel level;           ///< Log level of this entry
     uint64_t timestamp;       ///< Timestamp in milliseconds since epoch
     std::string function;     ///< Function name where log was generated
@@ -33,7 +34,7 @@ struct LogEntry {
 constexpr size_t UCAPI_MAX_LOG_ENTRIES = 256;
 
 /// Singleton logger class for UCAPI
-class Logger {
+class UCAPI_API Logger {
 public:
     /// Get the singleton instance (throws if not initialized)
     static Logger& GetInstance();
