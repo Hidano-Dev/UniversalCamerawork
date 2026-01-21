@@ -67,18 +67,16 @@ namespace UCAPI4Unity.Runtime.Core
         /// <summary>
         /// Compute CRC16 checksum for a record
         /// </summary>
-        public static ushort ComputeChecksum(UcApiRecord record, ushort poly = 0x1021, ushort initValue = 0xFFFF)
+        public static unsafe ushort ComputeChecksum(UcApiRecord record, ushort poly = 0x1021, ushort initValue = 0xFFFF)
         {
             int size = Marshal.SizeOf(record);
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            try
+            byte[] buffer = new byte[size];
+            
+            // Use fixed to pin the buffer and get a pointer without unmanaged allocation
+            fixed (byte* ptr = buffer)
             {
-                Marshal.StructureToPtr(record, ptr, false);
-                return UCAPI_CalcCRC16(ptr, (UIntPtr)size, poly, initValue);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
+                Marshal.StructureToPtr(record, (IntPtr)ptr, false);
+                return UCAPI_CalcCRC16((IntPtr)ptr, (UIntPtr)size, poly, initValue);
             }
         }
 
@@ -125,13 +123,16 @@ namespace UCAPI4Unity.Runtime.Core
         /// デバッグ用にレコードの内容を出力します。
         /// </summary>
         /// <param name="record"></param>
-        private static void DumpRecordBinary(UcApiRecord record)
+        private static unsafe void DumpRecordBinary(UcApiRecord record)
         {
-            var buffer = new byte[Marshal.SizeOf(record)];
-            var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(record));
-            Marshal.StructureToPtr(record, ptr, false);
-            Marshal.Copy(ptr, buffer, 0, buffer.Length);
-            Marshal.FreeHGlobal(ptr);
+            var size = Marshal.SizeOf(record);
+            var buffer = new byte[size];
+            
+            // Use fixed to pin the buffer and avoid unmanaged allocation
+            fixed (byte* ptr = buffer)
+            {
+                Marshal.StructureToPtr(record, (IntPtr)ptr, false);
+            }
 
             Debug.Log("Record Dump:"
                       + $"\n  CRC16: {ComputeChecksum(record)}"
