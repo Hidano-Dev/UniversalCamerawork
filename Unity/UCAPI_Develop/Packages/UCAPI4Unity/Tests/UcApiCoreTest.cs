@@ -64,8 +64,26 @@ namespace UCAPI4Unity.Tests
             Assert.AreEqual(original.EyePositionRightM, record.EyePositionRightM, 0.001f);
             Assert.AreEqual(original.EyePositionUpM, record.EyePositionUpM, 0.001f);
             Assert.AreEqual(original.EyePositionForwardM, record.EyePositionForwardM, 0.001f);
+            Assert.AreEqual(original.LookVectorRightM, record.LookVectorRightM, 0.001f);
+            Assert.AreEqual(original.LookVectorUpM, record.LookVectorUpM, 0.001f);
+            Assert.AreEqual(original.LookVectorForwardM, record.LookVectorForwardM, 0.001f);
+            Assert.AreEqual(original.UpVectorRightM, record.UpVectorRightM, 0.001f);
+            Assert.AreEqual(original.UpVectorUpM, record.UpVectorUpM, 0.001f);
+            Assert.AreEqual(original.UpVectorForwardM, record.UpVectorForwardM, 0.001f);
             Assert.AreEqual(original.FocalLengthMm, record.FocalLengthMm, 0.001f);
             Assert.AreEqual(original.AspectRatio, record.AspectRatio, 0.001f);
+            Assert.AreEqual(original.FocusDistanceM, record.FocusDistanceM, 0.001f);
+            Assert.AreEqual(original.Aperture, record.Aperture, 0.001f);
+            Assert.AreEqual(original.SensorSizeWidthMm, record.SensorSizeWidthMm, 0.001f);
+            Assert.AreEqual(original.SensorSizeHeightMm, record.SensorSizeHeightMm, 0.001f);
+            Assert.AreEqual(original.NearClipM, record.NearClipM, 0.001f);
+            Assert.AreEqual(original.FarClipM, record.FarClipM, 0.001f);
+            Assert.AreEqual(original.LensShiftHorizontalRatio, record.LensShiftHorizontalRatio, 0.001f);
+            Assert.AreEqual(original.LensShiftVerticalRatio, record.LensShiftVerticalRatio, 0.001f);
+            Assert.AreEqual(original.LensDistortionRadialCoefficientsK1, record.LensDistortionRadialCoefficientsK1, 0.001f);
+            Assert.AreEqual(original.LensDistortionRadialCoefficientsK2, record.LensDistortionRadialCoefficientsK2, 0.001f);
+            Assert.AreEqual(original.LensDistortionCenterPointRightMm, record.LensDistortionCenterPointRightMm, 0.001f);
+            Assert.AreEqual(original.LensDistortionCenterPointUpMm, record.LensDistortionCenterPointUpMm, 0.001f);
 
             yield return null;
         }
