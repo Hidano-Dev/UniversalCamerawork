@@ -4,10 +4,12 @@
     "displayName": "UCAPI4Unity",
     "description": "Unity plugin for Universal Camerawork API. Share camera state data (position, rotation, zoom, etc.) across multiple platforms (Unity/Unreal/Blender) using a common binary format.",
     "unity": "6000.0",
-    "unityRelease": "0f1",
-    "documentationUrl": "",
-    "changelogUrl": "",
-    "licensesUrl": "",
+    "dependencies": {
+        "com.hidano.uosc": "1.0.0",
+        "com.unity.cinemachine": "3.1.5",
+        "com.unity.render-pipelines.universal": "17.0.3",
+        "com.unity.timeline": "1.8.10"
+    },
     "keywords": [
         "camera",
         "camerawork",
@@ -24,19 +26,5 @@
             "description": "Basic usage sample for UCAPI4Unity with standard Unity Camera and Cinemachine.",
             "path": "Samples~"
         }
-    ],
-
-    "license": "MIT",
-    "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Hidano-Dev/UniversalCamerawork.git"
-    },
-    "bugs": {
-    "url": "https://github.com/Hidano-Dev/UniversalCamerawork/issues"
-    },
-    "homepage": "https://github.com/Hidano-Dev/UniversalCamerawork#readme",
-
-    "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@Hidano-Dev"
-    }
+    ]
 }
