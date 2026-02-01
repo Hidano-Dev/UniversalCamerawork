@@ -20,22 +20,16 @@ UCAPI4Unityは、共通のバイナリフォーマットを使用して、複数
 
 ## インストール
 
-### OpenUPM経由
+### npmレジストリ経由（Scoped Registry）
 
-[openupm-cli](https://openupm.com/docs/getting-started.html)がインストールされている場合：
-
-```bash
-openupm add com.hidano.ucapi4unity
-```
-
-または、`Packages/manifest.json` に以下を追加：
+`Packages/manifest.json` に以下を追加：
 
 ```json
 {
   "scopedRegistries": [
     {
-      "name": "OpenUPM",
-      "url": "https://package.openupm.com",
+      "name": "hidano",
+      "url": "https://registry.npmjs.com",
       "scopes": ["com.hidano"]
     }
   ],
@@ -73,30 +67,31 @@ UCAPI4Unity/
 ### カメラデータのシリアライズ
 
 ```csharp
-using UcApi.Core;
+using UCAPI4Unity.Runtime.UnityCamera;
 
-// カメラからレコードを作成
-var record = new UcApiRecord();
-record.Position = camera.transform.position;
-record.Rotation = camera.transform.rotation;
-record.FieldOfView = camera.fieldOfView;
-
-// シリアライズ
-byte[] data = UcApiCore.Serialize(record);
+// カメラの状態をバイト配列にシリアライズ
+byte[] data = UcApi4UnityCamera.SerializeFromCamera(camera);
 ```
 
 ### カメラデータのデシリアライズ
 
 ```csharp
-using UcApi.Core;
+using UCAPI4Unity.Runtime.UnityCamera;
 
-// 受信したデータをデシリアライズ
-UcApiRecord record = UcApiCore.Deserialize(data);
+// デシリアライズしてカメラに適用
+UcApi4UnityCamera.ApplyToCamera(data, camera);
+```
 
-// カメラに適用
-camera.transform.position = record.Position;
-camera.transform.rotation = record.Rotation;
-camera.fieldOfView = record.FieldOfView;
+### Cinemachineカメラ
+
+```csharp
+using UCAPI4Unity.Runtime.CinemachineCamera;
+
+// Cinemachine仮想カメラからシリアライズ
+byte[] data = UcApi4CinemachineCamera.SerializeFromVirtualCamera(virtualCamera);
+
+// デシリアライズしてCinemachine仮想カメラに適用
+UcApi4CinemachineCamera.ApplyToVirtualCamera(data, virtualCamera, volumeSettings);
 ```
 
 ## ライセンス

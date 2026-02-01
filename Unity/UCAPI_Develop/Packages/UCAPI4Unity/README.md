@@ -20,22 +20,16 @@ UCAPI4Unity enables sharing camera state data (position, rotation, zoom, timecod
 
 ## Installation
 
-### Via OpenUPM
+### Via npm Registry (Scoped Registry)
 
-If you have [openupm-cli](https://openupm.com/docs/getting-started.html) installed:
-
-```bash
-openupm add com.hidano.ucapi4unity
-```
-
-Or, add the following to your `Packages/manifest.json`:
+Add the following to your `Packages/manifest.json`:
 
 ```json
 {
   "scopedRegistries": [
     {
-      "name": "OpenUPM",
-      "url": "https://package.openupm.com",
+      "name": "hidano",
+      "url": "https://registry.npmjs.com",
       "scopes": ["com.hidano"]
     }
   ],
@@ -73,30 +67,31 @@ UCAPI4Unity/
 ### Serialize Camera Data
 
 ```csharp
-using UcApi.Core;
+using UCAPI4Unity.Runtime.UnityCamera;
 
-// Create a record from camera
-var record = new UcApiRecord();
-record.Position = camera.transform.position;
-record.Rotation = camera.transform.rotation;
-record.FieldOfView = camera.fieldOfView;
-
-// Serialize
-byte[] data = UcApiCore.Serialize(record);
+// Serialize camera state to byte array
+byte[] data = UcApi4UnityCamera.SerializeFromCamera(camera);
 ```
 
 ### Deserialize Camera Data
 
 ```csharp
-using UcApi.Core;
+using UCAPI4Unity.Runtime.UnityCamera;
 
-// Deserialize received data
-UcApiRecord record = UcApiCore.Deserialize(data);
+// Deserialize and apply to camera
+UcApi4UnityCamera.ApplyToCamera(data, camera);
+```
 
-// Apply to camera
-camera.transform.position = record.Position;
-camera.transform.rotation = record.Rotation;
-camera.fieldOfView = record.FieldOfView;
+### Cinemachine Camera
+
+```csharp
+using UCAPI4Unity.Runtime.CinemachineCamera;
+
+// Serialize from Cinemachine virtual camera
+byte[] data = UcApi4CinemachineCamera.SerializeFromVirtualCamera(virtualCamera);
+
+// Deserialize and apply to Cinemachine virtual camera
+UcApi4CinemachineCamera.ApplyToVirtualCamera(data, virtualCamera, volumeSettings);
 ```
 
 ## License
