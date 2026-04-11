@@ -4,66 +4,79 @@
 
 ## プロジェクト概要
 - プロジェクト名：UniversalCamerawork (UCAPI)
-- 目的：複数プラットフォーム（Unity、Unreal、Blenderなど）間でカメラ状態情報（位置、回転、ズームレベル）を共通バイナリ形式でシリアライズ／デシリアライズし共有するC++ DLLを開発する。
+- 目的：複数プラットフォーム（Unity、Unreal、Blenderなど）間でカメラ状態情報（位置、回転、光学パラメータ、タイムコード）を共通フォーマットでシリアライズ／デシリアライズし共有するC++ DLLを開発する。
 - コア機能：
-  - 独自バイナリ形式でのシリアライズ、CRC16整合性チェック
-  - バイナリ→プラットフォームネイティブ型への変換（MessagePack併用オプション）
-  - テストツール（C#ユーティリティ）による自動化テスト
+  - MessagePack シリアライズ／デシリアライズ（推奨経路）
+  - 独自バイナリ形式でのシリアライズ + CRC16 整合性チェック（Legacy 経路）
+  - シリアライザのプラグイン式切替（Factory + Strategy）
+  - Singleton ロガー（リングバッファ、5段階レベル、スレッドセーフ）
 
 ## プロジェクト構造・パターン
-- `UCAPIProject/UCAPI/`：C++ DLLコード（`UCAPI_DLL`）、C#テストツール（`UCAPI_TestTool`）
-- モジュール層：Core API → シリアライザ → コンバータ → テスト
-- デザインパターン：Singleton（ロガー、設定管理）、Factory（シリアライザ／コンバータ生成）、Strategy（シリアライズ形式切替）、Observer（更新通知）
+- `UCAPIProject/UCAPI/UCAPI_DLL/`：C++ DLL本体（コアAPI、シリアライザ、ロガー、設定）
+- `UCAPIProject/UCAPI/UCAPI_DLL_Test/`：GoogleTestベースのユニットテスト（36+ ケース）
+- `Unity/UCAPI_Develop/Packages/UCAPI4Unity/`：Unityプラグイン（C# P/Invokeラッパー、Cinemachine統合）
+- `docs/`：仕様書（UCAPI_DLL_Specification.md、UCAPI_Data_Format_Specification.yaml）
+- `memory-bank/`：知見・タスク・進捗管理ドキュメント群
+- モジュール層：Core API → Serializer (Strategy + Factory) → DLL Export Layer
+- デザインパターン：
+  - Singleton（Logger、Config）
+  - Factory（IMessageSerializerFactory）
+  - Strategy（IMessageSerializer の複数実装切替）
 - 命名規則：
   - ファイル/クラス名は `ucapi_` プレフィックス
-  - ヘッダファイル拡張子 `.h`, 実装 `.cpp`
-  - C# テストツールは PascalCase
+  - ヘッダファイル拡張子 `.h`、実装 `.cpp`
+  - DLL エクスポート関数は `UCAPI_` プレフィックス
 
 ## 開発・テスト
-- C++ コンパイル：Visual Studio 2022, MSVC, C++17
-- C++ テスト：GoogleTest（外部ヘッダ統合）
-- C# テスト：NUnit
-- 自動テスト実行：`run_ucapi_testtool.bat`
+- C++ コンパイル：Visual Studio 2022, MSVC v143, C++17
+- C++ テスト：GoogleTest（vcpkg manifest モードで管理、v1.15+）
+- 依存ライブラリ：msgpack-c（vcpkg manifest）
+- メモリ安全性検証：MSVC AddressSanitizer (`Configuration=ASan`)
+- CI/CD：GitHub Actions
+  - `gtest-ci.yml`：main への push / PR で Release x64 ビルド + テスト
+  - `build.yml`：バージョンタグ push で Release + ASan ビルド + アーティファクト保存
 
 ## ドキュメント・仕様
-- `docs/UCAPI_Data_Format_Specification.yaml` にバイナリフォーマット詳細
-- README.md にセットアップ手順と使用例
+- `docs/UCAPI_DLL_Specification.md`：DLL 仕様書（API、エラー条件、定数定義）
+- `docs/UCAPI_Data_Format_Specification.yaml`：バイナリフォーマット詳細
+- `README.md`：プロジェクト概要と CI ワークフロー説明
 
 ## コーディングガイドライン
 - 依存最小化：STL 使用を必要最小限に抑え、シングルヘッダライブラリを優先
-- エラーハンドリング：HRESULT または例外併用（DLL APIでは戻り値とエラーログ）
+- エラーハンドリング：DLL 境界では `int 0/-1` または `nullptr` を返却。例外は内部で捕捉し Logger に記録、呼び出し側は Logger API でエラー詳細を取得
 - パフォーマンス：メモリアロケーション抑制、データコピー最小化
 - セキュリティ：将来の暗号化／アクセス制御機構設計を考慮
+- スレッド安全性：Singleton（Config / Logger）は `std::call_once` + `std::atomic` で初期化、ログ操作は `std::mutex` で排他制御
 
 ## 学習すべきポイント
-- プラットフォーム依存の変換処理はDLLコアではなく、各プラットフォーム側のプラグインで実装する。
-- リングバッファ／LMAX Disruptor は同列ではなく、Disruptorはリングバッファを拡張したモデル。選択肢として必要に応じて採用する。
-- ローカルPC内通信とネットワーク通信は、Transportレイヤで実装を切り替え可能な抽象化（Strategy）を用意し、同一インターフェースで利用できる。
-- FlatBuffersまたはCap’n Protoの導入推奨。将来の新しいシリアライズライブラリに対応できるよう、IMessageSerializerインターフェースを定義し、Factory経由で切り替え可能に実装する。
+- プラットフォーム依存の変換処理は DLL コアではなく、各プラットフォーム側のプラグインで実装する
+- ローカル PC 内通信とネットワーク通信は **DLL 範囲外**（Transport 層）。各プラットフォーム側で実装
+- IMessageSerializer インターフェース + Factory による拡張機構は実装済。FlatBuffers / Cap'n Proto 対応は将来課題（P2-8 保留）
+- バイナリフォーマットは固定長レコード方式。ペイロード長は `numPayload × sizeof(Record)` で暗黙計算
 
 ## 継続的学習ポイント
-- プラグイン式コンバータ登録機構の拡張方法
-- プラットフォーム別のDLLロード／呼び出しサンプル
-- シリアライザフォーマットの後方互換性管理
+- プラグイン式シリアライザ登録機構の拡張方法
+- プラットフォーム別の DLL ロード／呼び出しサンプル
+- シリアライザフォーマットの後方互換性管理（version フィールド運用）
 
 ## 重要な履歴
 1. メモリバンク構造の定義と初期ドキュメント作成 (2025-06-19)
-2. DLLコア機能の実装計画
+2. P0（セキュリティ・安定性）全 6 項目完了 (2026-01-17): メモリリーク修正、バッファオーバーフロー対策、Config スレッドセーフ化、RAII 化
+3. P1（品質）全 6 項目完了 (2026-01-19): エッジケーステスト追加、AddressSanitizer 統合、GoogleTest v1.15 移行
+4. P2（保守）主要項目完了 (2026-01-17〜19): vcpkg manifest 化、Singleton ロガー実装、CI/CD 構築
 
 ## 知見管理システム
 以下のファイルで知見を体系的に管理しています (`memory-bank/` 配下):
-- `memory-bank/activeContext.md`: 現在の作業フォーカスと最新変更履歴を管理するアクティブコンテキスト
-- `memory-bank/chatContext.md`: AIアシスタントやチームとのチャットログや議論内容を記録
-- `memory-bank/productContext.md`: プロジェクト背景、狙い、解決する問題を整理する製品コンテキスト
-- `memory-bank/projectbrief.md`: プロジェクト概要、ゴール、制約条件をまとめたブリーフ
-- `memory-bank/systemPatterns.md`: アーキテクチャ、デザインパターン、コンポーネント関係を記述したシステムパターン
-- `memory-bank/techContext.md`: 使用技術、開発環境、依存関係や技術制約をまとめた技術コンテキスト
-- `memory-bank/tasks.md`: P0〜P2の優先タスクリストと進捗管理
-- `memory-bank/progress.md`: 完了/未完了タスク、既知課題、現在ステータスを記録
-- `memory-bank/context.md`: 正式版のプロジェクトコンテキストをまとめたファイル
-- `memory-bank/project-knowledge.md`: 技術的知見、設計決定、実装パターンとアンチパターンを集約
-- `memory-bank/project-improvements.md`: 改善履歴、試行錯誤の記録と教訓を記述
-- `memory-bank/common-patterns.md`: よく使用するコマンドやテンプレートをまとめたリファレンス
-- `memory-bank/commands/learnings.md`: カスタムスラッシュコマンド定義と使用方法を説明
+- `memory-bank/activeContext.md`: 現在の作業フォーカスと最新変更履歴
+- `memory-bank/chatContext.md`: AIアシスタントやチームとのチャットログ・議論内容
+- `memory-bank/productContext.md`: プロジェクト背景、狙い、解決する問題
+- `memory-bank/projectbrief.md`: プロジェクト概要、ゴール、制約条件
+- `memory-bank/systemPatterns.md`: アーキテクチャ、デザインパターン、コンポーネント関係
+- `memory-bank/techContext.md`: 使用技術、開発環境、依存関係や技術制約
+- `memory-bank/technical-debt-tasks.md`: P0〜P2 優先度別の技術的負債タスクリスト
+- `memory-bank/progress.md`: 完了/未完了タスク、既知課題、現在ステータス
+- `memory-bank/project-knowledge.md`: 技術的知見、設計決定、実装パターンとアンチパターン
+- `memory-bank/project-improvements.md`: 改善履歴、試行錯誤の記録と教訓
+- `memory-bank/common-patterns.md`: よく使用するコマンドやテンプレート
 
 *更新時は必ず上記ファイルに知見を追記し、後続作業で参照すること。*
