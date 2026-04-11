@@ -6,6 +6,24 @@
 
 ## P1: 重要（品質・保守性向上）
 
+### P1-7: record_t の sizeof とバイナリレイアウトの不整合
+- **ファイル**:
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.h`
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp`
+- **問題**:
+  - `ucapi.cpp:44-47` の `_read()` で複数レコードを読み込む際、ストライドとして `sizeof(record_t)` を使用している
+  - 一方で `record_t::_read()` (`ucapi.cpp:152-187`) はオフセット `0, 4, 6, 10, 14, 15, 19, ...` のタイトパック前提（合計 107 バイト）でバイトを読む
+  - `record_t` には `#pragma pack` 指定がないため、MSVC の自然アラインメントにより `sizeof(record_t)` は 107 バイトではなく 112〜116 バイト程度にパディングされる可能性が高い
+  - **複数レコード (`numPayload > 1`) を含むバッファをデシリアライズすると、ストライドとタイトパックのズレで 2 件目以降が誤読される可能性**がある
+  - 現状の単体テストは単一レコード中心のため表面化していない可能性
+- **対応案**:
+  - (A) `record_t` を `#pragma pack(push, 1)` でタイトパック化し、`sizeof(record_t) == 107` を保証する
+  - (B) ストライド計算を `sizeof(record_t)` ではなく定数 `UCAPI_MIN_RECORD_SIZE`（または仕様の 128）に置換
+  - (C) 仕様 (record 128 byte) に合わせ、reserved 21 byte を `record_t` に追加し `#pragma pack` でパック
+  - いずれにせよ、複数レコードを含む往復テストを追加し回帰防止
+- **状態**: [ ] 未着手
+- **発見日**: 2026-04-12 (P2-6 ドキュメント同期作業中に発見)
+
 ### P1-3: エッジケーステスト・異常系テストの追加
 - **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL_Test/test.cpp`
 - **問題**: Happy Pathのみで、以下のテストが不足
@@ -301,6 +319,7 @@
 
 ## 更新履歴
 
+- 2026-04-12: P1-7追加（record_tのsizeofとバイナリレイアウトの不整合をP2-6作業中に発見）
 - 2026-01-19: P2-3完了（Singletonロガーの実装、DLLエクスポートAPI 6関数追加、std::cerr 11箇所置換）
 - 2026-01-17: P1-4完了（AddressSanitizer/メモリリークテストの導入、ASan|x64ビルド構成追加、CIにASanテストジョブ追加）
 - 2026-01-17: P2-5完了（コメント言語の英語統一: dllmain.cpp, framework.h, pch.h, pch.cpp）

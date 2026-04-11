@@ -3,11 +3,13 @@
 # All multi-byte values are encoded in little-endian.
 
 Header:
-  magic: uint16_t            # Magic number (e.g. 0x55AA)
-  version: uint16_t          # Packet format version (e.g. 0x0002)
+  magic: uint16_t            # Magic number (0x55AA)
+  version: uint16_t          # Packet format version (current: 0x0001)
   numPayload: uint16_t       # Number of records in this packet
-  payloadLength: uint16_t    # Total length of payload in bytes (e.g. 128)
   crc16: uint16_t            # CRC-16 checksum of payload[]
+  reserved: uint16_t         # Reserved (2 bytes) - total header = 10 bytes
+  # Note: payload total length is derived as (numPayload * sizeof(Record)),
+  #       not stored explicitly. Maximum payload size is 64KB (UCAPI_MAX_PAYLOAD_SIZE).
 
 Payload:
   type: Record               # UCAPI record
@@ -20,10 +22,10 @@ Timecode:
   hourNumber: bits[5]        # 5-bit hour number
   frameRate: bits[4]         # 4-bit frame rate (23.976, 24, 25, 29.97, 30, 48, 50, 59.94, 60, 119.88, 120, 144, 239.76, 240)
   dropFrame: bits[1]         # 1-bit drop frame (0=NonDrop, 1=Drop)
-  reserved: bits[2]          # 3-bit reserved
+  reserved: bits[2]          # 2-bit reserved
 
 Record:
-  # Structure of each fixed-length data record
+  # Structure of each fixed-length data record (total: 128 bytes)
   cameraNo: uint32_t         # Camera number
   commands: uint16_t         # Command bit field (e.g., DOF_ENABLE = 0x04, LENS_DISTORTION_ENABLE = 0x08)
   timecode: Timecode         # Timecode information (bit allocations defined elsewhere)
@@ -57,6 +59,5 @@ Record:
   lensDistortion_CenterPoint_right_mm: float
   lensDistortion_CenterPoint_up_mm: float
 
-  # Reserved area: 25 bytes reserved to make the entire header 128 bytes
-  reserved: uint8_t[25]
-  
+  # Reserved area: 21 bytes to make the entire record 128 bytes (107 + 21 = 128)
+  reserved: uint8_t[21]
