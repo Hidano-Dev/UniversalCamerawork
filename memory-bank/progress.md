@@ -25,6 +25,9 @@
 - **P2-7完了**: CI/CD環境構築 (2026-01-17)
 - **P1-5完了**: GoogleTestバージョン更新 (2026-01-19)
   - NuGetパッケージからvcpkgに移行（v1.8.1→v1.15+）
+- **P2-6完了**: 仕様書と実装の同期・ドキュメント整備 (2026-04-12)
+  - UCAPI_DLL_Specification.md / Data_Format_Specification.yaml / copilot-instructions.md / README.md を実装に追従
+  - 副次成果としてP1-7（record_t sizeof不整合）を発見・追加
 
 ## 進行中
 - なし（P1タスク全完了）
@@ -34,9 +37,9 @@
   - P2-3: Singletonロガーの実装
   - P2-4: timecode_tとucapi_tの統合
   - P2-5: コメント言語の統一
-  - P2-6: 仕様書と実装の同期・ドキュメント整備
   - P2-8: FlatBuffers対応シリアライザ実装（保留）
   - P2-9: Mayaプラグイン骨子プロジェクト作成（保留）
+- P1-7: record_t の sizeof とバイナリレイアウトの不整合（2026-04-12 発見）
 - Unityプラグイン改善（ucapi4unity-todo.md参照）
 
 ## 現在のステータス
@@ -51,6 +54,7 @@
 - Unityプラグイン（UCAPI4Unity）のUPMパッケージ化対応
 
 ## 更新履歴
+- 2026-04-12: P2-6完了（ドキュメント4ファイル同期）、P1-7追加（record_t sizeof不整合）
 - 2026-01-19: P1-5完了（GoogleTestバージョン更新、NuGet→vcpkg移行）
 - 2026-01-17: P1-4完了（AddressSanitizer/メモリリークテストの導入）
 - 2026-01-17: P2-4完了（timecode_tとucapi_tの統合: アクセサ追加、m_subframeをfloatに修正）

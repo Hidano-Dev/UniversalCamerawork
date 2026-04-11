@@ -64,6 +64,7 @@
 2. P0（セキュリティ・安定性）全 6 項目完了 (2026-01-17): メモリリーク修正、バッファオーバーフロー対策、Config スレッドセーフ化、RAII 化
 3. P1（品質）全 6 項目完了 (2026-01-19): エッジケーステスト追加、AddressSanitizer 統合、GoogleTest v1.15 移行
 4. P2（保守）主要項目完了 (2026-01-17〜19): vcpkg manifest 化、Singleton ロガー実装、CI/CD 構築
+5. P2-6 ドキュメント同期完了 (2026-04-12): UCAPI_DLL_Specification.md / Data_Format_Specification.yaml / copilot-instructions.md / README.md を実装に追従
 
 ## 知見管理システム
 以下のファイルで知見を体系的に管理しています (`memory-bank/` 配下):

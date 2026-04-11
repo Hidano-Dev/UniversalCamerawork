@@ -191,8 +191,14 @@
   - DLL範囲外の機能を明確に記載
   - 各APIのエラー条件・戻り値を仕様書に明文化
   - READMEの更新
-- **状態**: [ ] 未着手
+- **状態**: [x] 完了 (2026-04-12)
 - **統合元**: tasks.md P1「APIエラー条件明文化」、P2「ドキュメント整備」
+- **実装詳細**:
+  - `docs/UCAPI_DLL_Specification.md`: 全面改訂。実装の24フィールド構成・15エクスポート関数・エラー条件表（5.1〜5.3）・8定数表・ASanビルド構成・CI/CDワークフローを反映。Converter削除、Logger実装済として明記、Transport/FlatBuffers/各DCCプラグインをDLL範囲外と明示
+  - `docs/UCAPI_Data_Format_Specification.yaml`: `payloadLength`フィールドを実装に合わせ`reserved`へリネーム（ペイロード長は`numPayload × sizeof(Record)`で暗黙計算と注記）。reserved bits[2]のコメント訂正、reserved配列を21byteに修正、version例示を0x0001へ
+  - `.github/copilot-instructions.md`: 存在しないC#テストツール記述削除、Observerパターン記述削除、HRESULT記述を実態に訂正、tasks.md→technical-debt-tasks.mdへ参照修正、Logger/CI/CD/vcpkg manifest等の最新状況を追記
+  - `README.md`: プロジェクト概要・特徴・対応プラットフォーム・ビルド手順・C++/C# Unity使用例・MITライセンス記述を新設。GitHub Actionsセクションを日本語化
+  - 副次成果: P1-7（record_t sizeof不整合）を新規発見し本ファイルへ追加
 
 ### P2-7: CI/CD環境構築
 - **ファイル**:
@@ -319,6 +325,7 @@
 
 ## 更新履歴
 
+- 2026-04-12: P2-6完了（仕様書・YAML・copilot-instructions・README の4ファイルを実装に同期）
 - 2026-04-12: P1-7追加（record_tのsizeofとバイナリレイアウトの不整合をP2-6作業中に発見）
 - 2026-01-19: P2-3完了（Singletonロガーの実装、DLLエクスポートAPI 6関数追加、std::cerr 11箇所置換）
 - 2026-01-17: P1-4完了（AddressSanitizer/メモリリークテストの導入、ASan|x64ビルド構成追加、CIにASanテストジョブ追加）
