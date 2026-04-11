@@ -19,7 +19,7 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
             return nullptr;
         }
         
-        ucapi::CameraState cameraState(sizeof(ucapi::CameraState));
+        ucapi::CameraState cameraState;
         HRESULT hr = serializer->Deserialize(buffer, payloadCount, cameraState);
         if (FAILED(hr)) {
             UCAPI_LOG_ERROR("Deserialization failed");
@@ -31,7 +31,7 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
         native->m_version = 1;
         native->m_num_payload = 1;
         native->m_crc16 = 0;
-        native->m_payload.emplace_back(sizeof(ucapi_t::record_t));
+        native->m_payload.emplace_back();
         native->m_payload[0] = cameraState;
 
         return native.release();
@@ -62,7 +62,7 @@ UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize
                 return -1;
             }
         } else {
-            ucapi::CameraState emptyState(sizeof(ucapi::CameraState));
+            ucapi::CameraState emptyState;
             HRESULT hr = serializer->Serialize(emptyState, buffer);
             if (FAILED(hr)) {
                 UCAPI_LOG_ERROR("Serialization failed");
@@ -95,7 +95,7 @@ UCAPI_API uint16_t UCAPI_CalcCRC16(const void* recordPtr, size_t length, uint16_
 
 // C API for object creation and destruction
 UCAPI_API ucapi_t* UCAPI_Create() {
-    return new ucapi_t(nullptr);
+    return new ucapi_t();
 }
 
 UCAPI_API void UCAPI_Destroy(ucapi_t* obj) {
@@ -109,7 +109,7 @@ UCAPI_API void UCAPI_Destroy(ucapi_t* obj) {
 namespace {
     // Helper: Convert flat record to CameraState
     ucapi::CameraState FlatToCameraState(const ucapi_record_flat_t* flat) {
-        ucapi::CameraState state(sizeof(ucapi::CameraState));
+        ucapi::CameraState state;
         state.m_camera_no = flat->camera_no;
         state.m_commands = flat->commands;
         state.m_timecode = flat->timecode;
@@ -223,7 +223,7 @@ UCAPI_API int UCAPI_DeserializeRecord(
             return -1;
         }
 
-        ucapi::CameraState state(sizeof(ucapi::CameraState));
+        ucapi::CameraState state;
         HRESULT hr = serializer->Deserialize(buffer, bufferSize, state);
         if (FAILED(hr)) {
             UCAPI_LOG_ERROR("Deserialization failed");
@@ -245,7 +245,7 @@ UCAPI_API int UCAPI_AddRecord(ucapi_t* obj) {
         return -1;
     }
     try {
-        obj->m_payload.emplace_back(0, nullptr);
+        obj->m_payload.emplace_back();
         obj->m_num_payload = static_cast<uint16_t>(obj->m_payload.size());
         return 0;
     }

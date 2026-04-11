@@ -10,19 +10,27 @@
 - **ファイル**:
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.h`
   - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi.cpp`
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_serializer_utility.h`（削除）
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_serializer_utlity.cpp`（削除）
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_dll.cpp`
+  - `UCAPIProject/UCAPI/UCAPI_DLL/ucapi_msgpack_serializer.cpp`
+  - `UCAPIProject/UCAPI/UCAPI_DLL/UCAPI_DLL.vcxproj`
+  - `UCAPIProject/UCAPI/UCAPI_DLL/UCAPI_DLL.vcxproj.filters`
 - **問題**:
-  - `ucapi.cpp:44-47` の `_read()` で複数レコードを読み込む際、ストライドとして `sizeof(record_t)` を使用している
-  - 一方で `record_t::_read()` (`ucapi.cpp:152-187`) はオフセット `0, 4, 6, 10, 14, 15, 19, ...` のタイトパック前提（合計 107 バイト）でバイトを読む
-  - `record_t` には `#pragma pack` 指定がないため、MSVC の自然アラインメントにより `sizeof(record_t)` は 107 バイトではなく 112〜116 バイト程度にパディングされる可能性が高い
-  - **複数レコード (`numPayload > 1`) を含むバッファをデシリアライズすると、ストライドとタイトパックのズレで 2 件目以降が誤読される可能性**がある
-  - 現状の単体テストは単一レコード中心のため表面化していない可能性
-- **対応案**:
-  - (A) `record_t` を `#pragma pack(push, 1)` でタイトパック化し、`sizeof(record_t) == 107` を保証する
-  - (B) ストライド計算を `sizeof(record_t)` ではなく定数 `UCAPI_MIN_RECORD_SIZE`（または仕様の 128）に置換
-  - (C) 仕様 (record 128 byte) に合わせ、reserved 21 byte を `record_t` に追加し `#pragma pack` でパック
-  - いずれにせよ、複数レコードを含む往復テストを追加し回帰防止
-- **状態**: [ ] 未着手
+  - `ucapi_t::_read()` と `record_t::_read()` で sizeof(record_t) をストライドに使用しており、タイトパック前提のオフセット読み取りとの不整合がある
+  - `write_ucapi()` は呼び出し元ゼロの dead code でありバグも複数含む（ヘッダ 8byte 書き込み、レコード 132byte 書き込み）
+  - 調査の結果、独自バイナリ read/write 経路は**全て到達不可能な dead code**であることが判明（実経路は MessagePack のみ）
+- **対応**: 案 (D) — dead code の完全削除
+  - `ucapi_serializer_utility.h` / `ucapi_serializer_utlity.cpp` を削除
+  - `ucapi_t::_read()` / `record_t::_read()` を削除
+  - `ucapi_t` コンストラクタを引数なしに簡略化
+  - `record_t` コンストラクタを引数なしに簡略化
+  - `ucapi_dll.cpp` / `ucapi_msgpack_serializer.cpp` の旧コンストラクタ呼び出し箇所を更新
+  - vcxproj / vcxproj.filters から削除ファイルの参照を除去
+  - `ucapi.cpp` から不要な `#include "ucapi_logger.h"` と kaitai コメントを削除
+- **状態**: [x] 完了 (2026-04-12)
 - **発見日**: 2026-04-12 (P2-6 ドキュメント同期作業中に発見)
+- **検証**: Release x64 ビルド成功、GoogleTest 全 73 テスト PASSED（回帰なし）
 
 ### P1-3: エッジケーステスト・異常系テストの追加
 - **ファイル**: `UCAPIProject/UCAPI/UCAPI_DLL_Test/test.cpp`
@@ -325,6 +333,7 @@
 
 ## 更新履歴
 
+- 2026-04-12: P1-7完了（dead code削除: ucapi_serializer_utility.h/cpp削除、ucapi_t::_read/record_t::_read削除、コンストラクタ簡略化、73テストPASSED）
 - 2026-04-12: P2-6完了（仕様書・YAML・copilot-instructions・README の4ファイルを実装に同期）
 - 2026-04-12: P1-7追加（record_tのsizeofとバイナリレイアウトの不整合をP2-6作業中に発見）
 - 2026-01-19: P2-3完了（Singletonロガーの実装、DLLエクスポートAPI 6関数追加、std::cerr 11箇所置換）

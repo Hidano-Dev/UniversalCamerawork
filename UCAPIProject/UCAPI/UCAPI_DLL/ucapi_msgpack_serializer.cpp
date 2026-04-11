@@ -82,7 +82,7 @@ ucapi_msgpack_record_t MessagePackSerializer::ConvertToMsgPack(const CameraState
 }
 
 CameraState MessagePackSerializer::ConvertFromMsgPack(const ucapi_msgpack_record_t& msgpack_record) {
-    CameraState crec(sizeof(CameraState));
+    CameraState crec;
     
     crec.m_camera_no = msgpack_record.camera_no;
     crec.m_commands = msgpack_record.commands;
