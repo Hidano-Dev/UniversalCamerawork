@@ -2,7 +2,6 @@
 #define UCAPI_H_
 
 #include <stdint.h>
-#include <string>
 #include <vector>
 #include "ucapi_timecode.h"
 

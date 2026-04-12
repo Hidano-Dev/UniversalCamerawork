@@ -85,7 +85,7 @@ extern "C" {
     // Legacy API (uses C++ class internally - not recommended for interop)
     // =============================================================================
 
-    UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount);
+    UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t bufferSize);
 
     UCAPI_API int UCAPI_Serialize(ucapi_t* obj, uint8_t** outBuffer, size_t* outSize);
 

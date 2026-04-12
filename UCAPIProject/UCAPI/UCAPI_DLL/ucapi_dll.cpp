@@ -7,9 +7,9 @@
 #include "ucapi_config.h"
 #include "ucapi_logger.h"
 
-UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount) {
+UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t bufferSize) {
     // Guard against null or empty buffer
-    if (buffer == nullptr || payloadCount == 0) {
+    if (buffer == nullptr || bufferSize == 0) {
         return nullptr;
     }
     try {
@@ -18,9 +18,9 @@ UCAPI_API ucapi_t* UCAPI_Deserialize(const uint8_t* buffer, size_t payloadCount)
             UCAPI_LOG_ERROR("Failed to create MsgPack serializer");
             return nullptr;
         }
-        
+
         ucapi::CameraState cameraState;
-        HRESULT hr = serializer->Deserialize(buffer, payloadCount, cameraState);
+        HRESULT hr = serializer->Deserialize(buffer, bufferSize, cameraState);
         if (FAILED(hr)) {
             UCAPI_LOG_ERROR("Deserialization failed");
             return nullptr;
