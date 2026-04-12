@@ -2,7 +2,6 @@
 #define UCAPI_H_
 
 #include <stdint.h>
-#include <string>
 #include <vector>
 #include "ucapi_timecode.h"
 
@@ -45,12 +44,11 @@ class ucapi_t{
 public:
     class record_t;
 
-    ucapi_t(const void* dataPtr = nullptr, size_t bufferSize = 0);
+    ucapi_t();
 
     static uint16_t computeCRC16(record_t* record, size_t length, uint16_t poly = UCAPI_CRC16_POLYNOMIAL, uint16_t initValue = UCAPI_CRC16_INIT_VALUE);
 
 private:
-    void _read(const void* dataPtr, size_t bufferSize);
     void _clean_up();
 
 public:
@@ -60,10 +58,9 @@ public:
 
     public:
 
-        record_t(size_t payload_length, const void* dataPtr = nullptr);
+        record_t();
 
     private:
-        void _read(const void* dataPtr, size_t payload_length);
         void _clean_up();
 
     public:
